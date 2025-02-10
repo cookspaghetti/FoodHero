@@ -148,7 +148,9 @@ public class CustomerService {
 	
 	// Method to delete a customer
 	public void deleteCustomer(String id) {
+		
 	    String filePath = SYS_PATH + "customer.txt";
+	    
 	    List<String> updatedLines = new ArrayList<>();
 	    boolean found = false;
 

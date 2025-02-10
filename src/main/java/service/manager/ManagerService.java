@@ -120,7 +120,9 @@ public class ManagerService {
 	
 	// Method to delete a manager
 	public void deleteManager(String id) {
+		
 	    String filePath = SYS_PATH + "manager.txt";
+	    
 	    List<String> updatedLines = new ArrayList<>();
 	    boolean found = false;
 

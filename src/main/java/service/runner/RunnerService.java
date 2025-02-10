@@ -150,7 +150,9 @@ public class RunnerService {
 	
 	// Method to delete a runner
 	public void deleteRunner(String id) {
+		
 	    String filePath = SYS_PATH + "runner.txt";
+	    
 	    List<String> updatedLines = new ArrayList<>();
 	    boolean found = false;
 

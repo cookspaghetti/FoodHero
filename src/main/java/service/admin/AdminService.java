@@ -122,7 +122,9 @@ public class AdminService {
 	
 	// Method to delete an admin
 	public void deleteAdmin(String id) {
+		
 	    String filePath = SYS_PATH + "admin.txt";
+	    
 	    List<String> updatedLines = new ArrayList<>();
 	    boolean found = false;
 
