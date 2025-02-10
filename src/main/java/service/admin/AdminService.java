@@ -119,5 +119,46 @@ public class AdminService {
 			System.err.println("Error writing updated admin data: " + e.getMessage());
 		}
 	}
+	
+	// Method to delete an admin
+	public void deleteAdmin(String id) {
+	    String filePath = SYS_PATH + "admin.txt";
+	    List<String> updatedLines = new ArrayList<>();
+	    boolean found = false;
+
+	    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+	        String line;
+
+	        while ((line = br.readLine()) != null) {
+	            JSONObject json = new JSONObject(line);
+
+	            // Skip the line if the ID matches (deleting this record)
+	            if (json.getString("id").equals(id)) {
+	                found = true; // Mark as found
+	                continue;     // Skip adding this record to the updated list
+	            }
+	            updatedLines.add(json.toString());
+	        }
+	    } catch (IOException e) {
+	        System.err.println("Error reading admin file: " + e.getMessage());
+	        return;
+	    }
+
+	    // Write the updated list back to the file
+	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
+	        for (String updatedLine : updatedLines) {
+	            bw.write(updatedLine);
+	            bw.newLine();
+	        }
+	        if (found) {
+	            System.out.println("Admin with ID " + id + " deleted successfully.");
+	        } else {
+	            System.out.println("Admin with ID " + id + " not found.");
+	        }
+	    } catch (IOException e) {
+	        System.err.println("Error writing updated admin data: " + e.getMessage());
+	    }
+	}
+
 
 }
