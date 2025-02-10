@@ -1,30 +1,30 @@
 package dto;
 
-public abstract class Review {
+public abstract class ReviewDTO {
 	
-	private Long id;
-    private Long orderId;
-    private Long customerId;
+	private String id;
+    private String orderId;
+    private String customerId;
     private int rating;
     private String comments;
     
     // Getters and Setters
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
-	public Long getOrderId() {
+	public String getOrderId() {
 		return orderId;
 	}
-	public void setOrderId(Long orderId) {
+	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
-	public Long getCustomerId() {
+	public String getCustomerId() {
 		return customerId;
 	}
-	public void setCustomerId(Long customerId) {
+	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
 	public int getRating() {

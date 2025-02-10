@@ -2,7 +2,7 @@ package dto;
 
 import java.util.List;
 
-public class Customer extends User {
+public class CustomerDTO extends UserDTO {
 	
 	private double credit;
     private List<String> orderHistory;

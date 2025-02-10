@@ -1,31 +1,31 @@
 package dto;
 
-public class Complain {
+public class ComplainDTO {
 	
-	private Long id;
-    private Long customerId;
-    private Long orderId;
+	private String id;
+    private String customerId;
+    private String orderId;
     private String description;
     private String status;
     private String solution;
     
     // Getters and Setters
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
-	public Long getCustomerId() {
+	public String getCustomerId() {
 		return customerId;
 	}
-	public void setCustomerId(Long customerId) {
+	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
-	public Long getOrderId() {
+	public String getOrderId() {
 		return orderId;
 	}
-	public void setOrderId(Long orderId) {
+	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
 	public String getDescription() {

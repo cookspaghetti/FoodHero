@@ -1,15 +1,15 @@
 package dto;
 
-public class AddTransaction extends Transaction {
+public class AddTransactionDTO extends TransactionDTO {
 
-	private Long adminId;
+	private String adminId;
     private String paymentMethod;
     
     // Getters and Setters
-	public Long getAdminId() {
+	public String getAdminId() {
 		return adminId;
 	}
-	public void setAdminId(Long adminId) {
+	public void setAdminId(String adminId) {
 		this.adminId = adminId;
 	}
 	public String getPaymentMethod() {

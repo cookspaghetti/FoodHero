@@ -1,6 +1,6 @@
 package dto;
 
-public class Admin extends User {
+public class AdminDTO extends UserDTO {
 	
 	// No new variables
 	

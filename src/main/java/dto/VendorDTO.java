@@ -1,11 +1,12 @@
 package dto;
 
+import java.util.HashMap;
 import java.util.List;
 
-public class Vendor extends User {
+public class VendorDTO extends UserDTO {
 	
 	private String vendorName;
-    private List<String> items;
+    private HashMap<String, Integer> items; // item id, stocks left
     private List<String> orderHistory;
     private List<String> reviews;
     
@@ -16,10 +17,10 @@ public class Vendor extends User {
 	public void setVendorName(String vendorName) {
 		this.vendorName = vendorName;
 	}
-	public List<String> getItems() {
+	public HashMap<String, Integer> getItems() {
 		return items;
 	}
-	public void setItems(List<String> items) {
+	public void setItems(HashMap<String, Integer> items) {
 		this.items = items;
 	}
 	public List<String> getOrderHistory() {

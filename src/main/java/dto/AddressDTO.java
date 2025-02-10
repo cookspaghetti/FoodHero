@@ -1,6 +1,6 @@
 package dto;
 
-public class Address {
+public class AddressDTO {
 	
 	private String id;
 	private String userId;

@@ -2,25 +2,25 @@ package dto;
 
 import java.time.LocalDateTime;
 
- abstract class Transaction {
+ abstract class TransactionDTO {
 	
-	private Long id;
-    private Long customerId;
+	private String id;
+    private String customerId;
     private double amount;
     private LocalDateTime date;
     private String description;
     
     // Getters and Setters
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
-	public Long getCustomerId() {
+	public String getCustomerId() {
 		return customerId;
 	}
-	public void setCustomerId(Long customerId) {
+	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
 	public double getAmount() {

@@ -2,34 +2,33 @@ package dto;
 
 import java.time.LocalDateTime;
 
-public class Task {
+public class TaskDTO {
 
-	
-	private Long id;
-    private Long orderId;
-    private Long runnerId;
+	private String id;
+    private String orderId;
+    private String runnerId;
     private String status;
     private String taskDetails;
     private LocalDateTime acceptanceTime;
     private LocalDateTime completionTime;
     
     // Getters and Setters
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
-	public Long getOrderId() {
+	public String getOrderId() {
 		return orderId;
 	}
-	public void setOrderId(Long orderId) {
+	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
-	public Long getRunnerId() {
+	public String getRunnerId() {
 		return runnerId;
 	}
-	public void setRunnerId(Long runnerId) {
+	public void setRunnerId(String runnerId) {
 		this.runnerId = runnerId;
 	}
 	public String getStatus() {

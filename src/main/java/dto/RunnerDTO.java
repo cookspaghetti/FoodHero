@@ -3,7 +3,7 @@ package dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class Runner extends User {
+public class RunnerDTO extends UserDTO {
 	
 	private String plateNumber;
     private List<String> tasks;

@@ -1,52 +1,52 @@
 package dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashMap;
 
-public class Order {
+public class OrderDTO {
 	
-	private Long id;
-    private Long customerId;
-    private Long vendorId;
-    private Long runnerId;
-    private List<Item> items;
+	private String id;
+    private String customerId;
+    private String vendorId;
+    private String runnerId;
+    private HashMap<String, Integer> items; // item id, amount
     private String status;
     private double totalAmount;
     private double deliveryFee;
     private LocalDateTime placementTime;
     private LocalDateTime completionTime;
     private String notes;
-    private Address deliveryAddress;
+    private AddressDTO deliveryAddress;
     
     // Getters and Setters
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
-	public Long getCustomerId() {
+	public String getCustomerId() {
 		return customerId;
 	}
-	public void setCustomerId(Long customerId) {
+	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
-	public Long getVendorId() {
+	public String getVendorId() {
 		return vendorId;
 	}
-	public void setVendorId(Long vendorId) {
+	public void setVendorId(String vendorId) {
 		this.vendorId = vendorId;
 	}
-	public Long getRunnerId() {
+	public String getRunnerId() {
 		return runnerId;
 	}
-	public void setRunnerId(Long runnerId) {
+	public void setRunnerId(String runnerId) {
 		this.runnerId = runnerId;
 	}
-	public List<Item> getItems() {
+	public HashMap<String, Integer> getItems() {
 		return items;
 	}
-	public void setItems(List<Item> items) {
+	public void setItems(HashMap<String, Integer> items) {
 		this.items = items;
 	}
 	public String getStatus() {
@@ -85,10 +85,10 @@ public class Order {
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
-	public Address getDeliveryAddress() {
+	public AddressDTO getDeliveryAddress() {
 		return deliveryAddress;
 	}
-	public void setDeliveryAddress(Address deliveryAddress) {
+	public void setDeliveryAddress(AddressDTO deliveryAddress) {
 		this.deliveryAddress = deliveryAddress;
 	}
     
