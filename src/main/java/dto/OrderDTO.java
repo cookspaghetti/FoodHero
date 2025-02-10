@@ -16,7 +16,7 @@ public class OrderDTO {
     private LocalDateTime placementTime;
     private LocalDateTime completionTime;
     private String notes;
-    private AddressDTO deliveryAddress;
+    private String deliveryAddress; // address id
     
     // Getters and Setters
 	public String getId() {
@@ -85,10 +85,10 @@ public class OrderDTO {
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
-	public AddressDTO getDeliveryAddress() {
+	public String getDeliveryAddress() {
 		return deliveryAddress;
 	}
-	public void setDeliveryAddress(AddressDTO deliveryAddress) {
+	public void setDeliveryAddress(String deliveryAddress) {
 		this.deliveryAddress = deliveryAddress;
 	}
     
