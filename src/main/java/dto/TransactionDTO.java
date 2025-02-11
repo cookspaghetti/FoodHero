@@ -2,7 +2,7 @@ package dto;
 
 import java.time.LocalDateTime;
 
- abstract class TransactionDTO {
+public abstract class TransactionDTO {
 	
 	private String id;
     private String customerId;
