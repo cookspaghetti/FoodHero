@@ -23,7 +23,7 @@ public class ItemService {
 	private static final String SYS_PATH = "src\\main\\resources\\database\\item\\";
 
 	// Method to create an item and save it to a text file in JSON format
-	public void createItem(ItemDTO item) {
+	public ResponseCode createItem(ItemDTO item) {
 
 		// Get current user info
 		Role role = SessionControlService.getRole();
@@ -31,7 +31,7 @@ public class ItemService {
 		String vendorId;
 
 		if (role != Role.VENDOR) {
-			return;
+			return ResponseCode.ACCESS_DENIED;
 		} else {
 			VendorDTO vendor = VendorService.readVendorByEmail(email);
 			vendorId = vendor.getId();
@@ -53,8 +53,10 @@ public class ItemService {
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
 			System.out.println("Item created successfully!");
+			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing item to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
@@ -125,7 +127,7 @@ public class ItemService {
 	}
 
 	// Method to update an item in the text file
-	public void updateItem(ItemDTO updatedItem) {
+	public ResponseCode updateItem(ItemDTO updatedItem) {
 
 		// Get current user info
 		Role role = SessionControlService.getRole();
@@ -133,7 +135,7 @@ public class ItemService {
 		String vendorId;
 
 		if (role != Role.VENDOR) {
-			return;
+			return ResponseCode.ACCESS_DENIED;
 		} else {
 			VendorDTO vendor = VendorService.readVendorByEmail(email);
 			vendorId = vendor.getId();
@@ -161,9 +163,12 @@ public class ItemService {
 				}
 				fileContent.add(json.toString());
 			}
-		} catch (IOException | JSONException e) {
+		} catch (IOException e) {
 			System.err.println("Error reading item file: " + e.getMessage());
-			return;
+			return ResponseCode.IO_EXCEPTION;
+		} catch (JSONException e) {
+			System.err.println("Error reading item file: " + e.getMessage());
+			return ResponseCode.JSON_EXCEPTION;
 		}
 
 		// Write the updated content back to the file
@@ -172,13 +177,15 @@ public class ItemService {
 				writer.write(content + System.lineSeparator());
 			}
 			System.out.println("Item updated successfully!");
+			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing updated item to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
 	// Method to delete an item from the text file
-	public void deleteItem(String vendorId, String itemId) {
+	public ResponseCode deleteItem(String vendorId, String itemId) {
 
 		// Construct the file name
 		String filePath = SYS_PATH + "item_" + vendorId + ".txt";
@@ -198,14 +205,17 @@ public class ItemService {
 					itemFound = true; // Item to delete found
 				}
 			}
-		} catch (IOException | JSONException e) {
+		} catch (IOException e) {
 			System.err.println("Error reading item file: " + e.getMessage());
-			return;
+			return ResponseCode.IO_EXCEPTION;
+		} catch (JSONException e) {
+			System.err.println("Error reading item file: " + e.getMessage());
+			return ResponseCode.JSON_EXCEPTION;
 		}
 
 		if (!itemFound) {
 			System.out.println("Item with ID " + itemId + " not found.");
-			return;
+			return ResponseCode.RECORD_NOT_FOUND;
 		}
 
 		// Write the updated content back to the file
@@ -214,8 +224,10 @@ public class ItemService {
 				writer.write(content + System.lineSeparator());
 			}
 			System.out.println("Item deleted successfully!");
+			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing to file after deletion: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
