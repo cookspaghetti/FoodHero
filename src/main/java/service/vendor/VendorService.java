@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import dto.VendorDTO;
 import service.utils.JsonUtils;
@@ -44,143 +45,185 @@ public class VendorService {
 			System.err.println("Error writing vendor to file: " + e.getMessage());
 		}
 	}
-	
+
 	// Method to read vendor info
 	public VendorDTO readVendor(String id) {
-	    String filePath = SYS_PATH + "vendor.txt";
+		String filePath = SYS_PATH + "vendor.txt";
 
-	    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-	        String line;
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
 
-	        // Read each line (JSON object) in the file
-	        while ((line = br.readLine()) != null) {
-	            JSONObject json = new JSONObject(line);
+			// Read each line (JSON object) in the file
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
 
-	            // Check if the ID matches
-	            if (json.getString("id").equals(id)) {
-	                // Construct Vendor object
-	                VendorDTO vendor = new VendorDTO();
-	                vendor.setId(json.getString("id"));
-	                vendor.setName(json.getString("name"));
-	                vendor.setPhoneNumber(json.getString("phoneNumber"));
-	                vendor.setAddress(json.getString("address"));
-	                vendor.setEmailAddress(json.getString("email"));
-	                vendor.setVendorName(json.getString("vendorName"));
+				// Check if the ID matches
+				if (json.getString("id").equals(id)) {
+					// Construct Vendor object
+					VendorDTO vendor = new VendorDTO();
+					vendor.setId(json.getString("id"));
+					vendor.setName(json.getString("name"));
+					vendor.setPhoneNumber(json.getString("phoneNumber"));
+					vendor.setAddress(json.getString("address"));
+					vendor.setEmailAddress(json.getString("email"));
+					vendor.setVendorName(json.getString("vendorName"));
 
-	                // Convert JSON Object (items) to HashMap<String, Integer>
-	                HashMap<String, Integer> itemsMap = new HashMap<>();
-	                JSONObject itemsJson = json.getJSONObject("items");
-	                for (String key : itemsJson.keySet()) {
-	                    itemsMap.put(key, itemsJson.getInt(key));
-	                }
-	                vendor.setItems(itemsMap);
+					// Convert JSON Object (items) to HashMap<String, Integer>
+					HashMap<String, Integer> itemsMap = new HashMap<>();
+					JSONObject itemsJson = json.getJSONObject("items");
+					for (String key : itemsJson.keySet()) {
+						itemsMap.put(key, itemsJson.getInt(key));
+					}
+					vendor.setItems(itemsMap);
 
-	                // Convert JSON arrays to List<String>
-	                vendor.setOrderHistory(JsonUtils.jsonArrayToList(json.getJSONArray("orderHistory")));
-	                vendor.setReviews(JsonUtils.jsonArrayToList(json.getJSONArray("reviews")));
+					// Convert JSON arrays to List<String>
+					vendor.setOrderHistory(JsonUtils.jsonArrayToList(json.getJSONArray("orderHistory")));
+					vendor.setReviews(JsonUtils.jsonArrayToList(json.getJSONArray("reviews")));
 
-	                return vendor; // Return the found vendor
-	            }
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error reading vendor file: " + e.getMessage());
-	    }
+					return vendor; // Return the found vendor
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading vendor file: " + e.getMessage());
+		}
 
-	    System.out.println("Vendor with ID " + id + " not found.");
-	    return null; // Return null if not found
+		System.out.println("Vendor with ID " + id + " not found.");
+		return null; // Return null if not found
 	}
-	
+
+	// Method to read all vendors from the text file
+	public List<VendorDTO> readAllVendor() {
+		String filePath = SYS_PATH + "vendor.txt";
+		List<VendorDTO> vendors = new ArrayList<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				VendorDTO vendor = new VendorDTO();
+				vendor.setId(json.getString("id"));
+				vendor.setName(json.getString("name"));
+				vendor.setPhoneNumber(json.getString("phoneNumber"));
+				vendor.setAddress(json.getString("address"));
+				vendor.setEmailAddress(json.getString("email"));
+				vendor.setVendorName(json.getString("vendorName"));
+
+				// Reading items (HashMap)
+				HashMap<String, Integer> items = new HashMap<>();
+				JSONObject itemsJson = json.getJSONObject("items");
+				for (String key : itemsJson.keySet()) {
+					items.put(key, itemsJson.getInt(key));
+				}
+				vendor.setItems(items);
+
+				// Reading orderHistory and reviews (Lists)
+				vendor.setOrderHistory(JsonUtils.jsonArrayToList(json.getJSONArray("orderHistory")));
+				vendor.setReviews(JsonUtils.jsonArrayToList(json.getJSONArray("reviews")));
+
+				vendors.add(vendor); // Add to the list
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading vendors from file: " + e.getMessage());
+		} catch (JSONException e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
+
+		return vendors; // Return the list of vendors
+	}
+
 	// Method to update vendor
 	public void updateVendor(VendorDTO updatedVendor) {
-		
-	    String filePath = SYS_PATH + "vendor.txt";
-	    
-	    List<String> updatedLines = new ArrayList<>();
-	    boolean found = false;
 
-	    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-	        String line;
+		String filePath = SYS_PATH + "vendor.txt";
 
-	        while ((line = br.readLine()) != null) {
-	            JSONObject json = new JSONObject(line);
+		List<String> updatedLines = new ArrayList<>();
+		boolean found = false;
 
-	            // Check if the current vendor matches the ID
-	            if (json.getString("id").equals(updatedVendor.getId())) {
-	                // Update JSON object with new vendor data
-	                json.put("name", updatedVendor.getName());
-	                json.put("phoneNumber", updatedVendor.getPhoneNumber());
-	                json.put("address", updatedVendor.getAddress());
-	                json.put("email", updatedVendor.getEmailAddress());
-	                json.put("vendorName", updatedVendor.getVendorName());
-	                json.put("items", new JSONArray(updatedVendor.getItems()));
-	                json.put("orderHistory", new JSONArray(updatedVendor.getOrderHistory()));
-	                json.put("reviews", new JSONArray(updatedVendor.getReviews()));
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
 
-	                found = true;
-	            }
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
 
-	            // Add the (possibly updated) line to the list
-	            updatedLines.add(json.toString());
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error reading vendor file: " + e.getMessage());
-	        return;
-	    }
+				// Check if the current vendor matches the ID
+				if (json.getString("id").equals(updatedVendor.getId())) {
+					// Update JSON object with new vendor data
+					json.put("name", updatedVendor.getName());
+					json.put("phoneNumber", updatedVendor.getPhoneNumber());
+					json.put("address", updatedVendor.getAddress());
+					json.put("email", updatedVendor.getEmailAddress());
+					json.put("vendorName", updatedVendor.getVendorName());
+					json.put("items", new JSONArray(updatedVendor.getItems()));
+					json.put("orderHistory", new JSONArray(updatedVendor.getOrderHistory()));
+					json.put("reviews", new JSONArray(updatedVendor.getReviews()));
 
-	    // Write the updated content back to the file
-	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
-	        for (String updatedLine : updatedLines) {
-	            bw.write(updatedLine);
-	            bw.newLine();
-	        }
-	        if (found) {
-	            System.out.println("Vendor with ID " + updatedVendor.getId() + " updated successfully.");
-	        } else {
-	            System.out.println("Vendor with ID " + updatedVendor.getId() + " not found.");
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error writing updated vendor data: " + e.getMessage());
-	    }
+					found = true;
+				}
+
+				// Add the (possibly updated) line to the list
+				updatedLines.add(json.toString());
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading vendor file: " + e.getMessage());
+			return;
+		}
+
+		// Write the updated content back to the file
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
+			for (String updatedLine : updatedLines) {
+				bw.write(updatedLine);
+				bw.newLine();
+			}
+			if (found) {
+				System.out.println("Vendor with ID " + updatedVendor.getId() + " updated successfully.");
+			} else {
+				System.out.println("Vendor with ID " + updatedVendor.getId() + " not found.");
+			}
+		} catch (IOException e) {
+			System.err.println("Error writing updated vendor data: " + e.getMessage());
+		}
 	}
 
 	// Method to delete a vendor
 	public void deleteVendor(String id) {
-	    String filePath = SYS_PATH + "vendor.txt";
-	    List<String> updatedLines = new ArrayList<>();
-	    boolean found = false;
+		String filePath = SYS_PATH + "vendor.txt";
+		List<String> updatedLines = new ArrayList<>();
+		boolean found = false;
 
-	    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-	        String line;
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
 
-	        while ((line = br.readLine()) != null) {
-	            JSONObject json = new JSONObject(line);
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
 
-	            // Skip the line if the ID matches (deleting this record)
-	            if (json.getString("id").equals(id)) {
-	                found = true; // Mark as found
-	                continue;     // Skip adding this record to the updated list
-	            }
-	            updatedLines.add(json.toString());
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error reading vendor file: " + e.getMessage());
-	        return;
-	    }
+				// Skip the line if the ID matches (deleting this record)
+				if (json.getString("id").equals(id)) {
+					found = true; // Mark as found
+					continue;     // Skip adding this record to the updated list
+				}
+				updatedLines.add(json.toString());
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading vendor file: " + e.getMessage());
+			return;
+		}
 
-	    // Write the updated list back to the file
-	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
-	        for (String updatedLine : updatedLines) {
-	            bw.write(updatedLine);
-	            bw.newLine();
-	        }
-	        if (found) {
-	            System.out.println("Vendor with ID " + id + " deleted successfully.");
-	        } else {
-	            System.out.println("Vendor with ID " + id + " not found.");
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error writing updated vendor data: " + e.getMessage());
-	    }
+		// Write the updated list back to the file
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
+			for (String updatedLine : updatedLines) {
+				bw.write(updatedLine);
+				bw.newLine();
+			}
+			if (found) {
+				System.out.println("Vendor with ID " + id + " deleted successfully.");
+			} else {
+				System.out.println("Vendor with ID " + id + " not found.");
+			}
+		} catch (IOException e) {
+			System.err.println("Error writing updated vendor data: " + e.getMessage());
+		}
 	}
 
 }

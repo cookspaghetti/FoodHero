@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import dto.CustomerDTO;
@@ -50,7 +51,7 @@ public class CustomerService {
 
 	// Method to read customer info
 	public CustomerDTO readCustomer(String id) {
-		
+
 		String filePath = SYS_PATH + "customer.txt";
 
 		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -89,103 +90,140 @@ public class CustomerService {
 		System.out.println("Customer with ID " + id + " not found.");
 		return null; // Return null if not found
 	}
-	
+
+	// Method to read all customers from the text file
+	public List<CustomerDTO> readAllCustomer() {
+		String filePath = SYS_PATH + "customer.txt";
+		List<CustomerDTO> customers = new ArrayList<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				CustomerDTO customer = new CustomerDTO();
+				customer.setId(json.getString("id"));
+				customer.setName(json.getString("name"));
+				customer.setPhoneNumber(json.getString("phoneNumber"));
+				customer.setAddress(json.getString("address"));
+				customer.setEmailAddress(json.getString("email"));
+				customer.setCredit(json.getDouble("credit"));
+
+				// Reading orderHistory, vendorReviews, runnerReviews, complains, transactions, deliveryAddresses
+				customer.setOrderHistory(JsonUtils.jsonArrayToList(json.getJSONArray("orderHistory")));
+				customer.setVendorReviews(JsonUtils.jsonArrayToList(json.getJSONArray("vendorReviews")));
+				customer.setRunnerReviews(JsonUtils.jsonArrayToList(json.getJSONArray("runnerReviews")));
+				customer.setComplains(JsonUtils.jsonArrayToList(json.getJSONArray("complains")));
+				customer.setTransactions(JsonUtils.jsonArrayToList(json.getJSONArray("transactions")));
+				customer.setDeliveryAddresses(JsonUtils.jsonArrayToList(json.getJSONArray("deliveryAddreJsonUtils")));
+				customers.add(customer); // Add to the list
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading customers from file: " + e.getMessage());
+		} catch (JSONException e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
+
+		return customers; // Return the list of customers
+	}
+
 	// Method to update customer
 	public void updateCustomer(CustomerDTO updatedCustomer) {
-		
-	    String filePath = SYS_PATH + "customer.txt";
-	    
-	    List<String> updatedLines = new ArrayList<>();
-	    boolean found = false;
 
-	    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-	        String line;
+		String filePath = SYS_PATH + "customer.txt";
 
-	        while ((line = br.readLine()) != null) {
-	            JSONObject json = new JSONObject(line);
+		List<String> updatedLines = new ArrayList<>();
+		boolean found = false;
 
-	            // Check if the current customer matches the ID
-	            if (json.getString("id").equals(updatedCustomer.getId())) {
-	                // Update JSON object with new customer data
-	                json.put("name", updatedCustomer.getName());
-	                json.put("phoneNumber", updatedCustomer.getPhoneNumber());
-	                json.put("address", updatedCustomer.getAddress());
-	                json.put("email", updatedCustomer.getEmailAddress());
-	                json.put("credit", updatedCustomer.getCredit());
-	                json.put("orderHistory", updatedCustomer.getOrderHistory());
-	                json.put("vendorReviews", updatedCustomer.getVendorReviews());
-	                json.put("runnerReviews", updatedCustomer.getRunnerReviews());
-	                json.put("complains", updatedCustomer.getComplains());
-	                json.put("transactions", updatedCustomer.getTransactions());
-	                json.put("deliveryAddresses", updatedCustomer.getDeliveryAddresses());
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
 
-	                found = true;
-	            }
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
 
-	            // Add the updated line to the list
-	            updatedLines.add(json.toString());
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error reading customer file: " + e.getMessage());
-	        return;
-	    }
+				// Check if the current customer matches the ID
+				if (json.getString("id").equals(updatedCustomer.getId())) {
+					// Update JSON object with new customer data
+					json.put("name", updatedCustomer.getName());
+					json.put("phoneNumber", updatedCustomer.getPhoneNumber());
+					json.put("address", updatedCustomer.getAddress());
+					json.put("email", updatedCustomer.getEmailAddress());
+					json.put("credit", updatedCustomer.getCredit());
+					json.put("orderHistory", updatedCustomer.getOrderHistory());
+					json.put("vendorReviews", updatedCustomer.getVendorReviews());
+					json.put("runnerReviews", updatedCustomer.getRunnerReviews());
+					json.put("complains", updatedCustomer.getComplains());
+					json.put("transactions", updatedCustomer.getTransactions());
+					json.put("deliveryAddresses", updatedCustomer.getDeliveryAddresses());
 
-	    // Write the updated content back to the file
-	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
-	        for (String updatedLine : updatedLines) {
-	            bw.write(updatedLine);
-	            bw.newLine();
-	        }
-	        if (found) {
-	            System.out.println("Customer with ID " + updatedCustomer.getId() + " updated successfully.");
-	        } else {
-	            System.out.println("Customer with ID " + updatedCustomer.getId() + " not found.");
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error writing updated customer data: " + e.getMessage());
-	    }
+					found = true;
+				}
+
+				// Add the updated line to the list
+				updatedLines.add(json.toString());
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading customer file: " + e.getMessage());
+			return;
+		}
+
+		// Write the updated content back to the file
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
+			for (String updatedLine : updatedLines) {
+				bw.write(updatedLine);
+				bw.newLine();
+			}
+			if (found) {
+				System.out.println("Customer with ID " + updatedCustomer.getId() + " updated successfully.");
+			} else {
+				System.out.println("Customer with ID " + updatedCustomer.getId() + " not found.");
+			}
+		} catch (IOException e) {
+			System.err.println("Error writing updated customer data: " + e.getMessage());
+		}
 	}
-	
+
 	// Method to delete a customer
 	public void deleteCustomer(String id) {
-		
-	    String filePath = SYS_PATH + "customer.txt";
-	    
-	    List<String> updatedLines = new ArrayList<>();
-	    boolean found = false;
 
-	    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-	        String line;
+		String filePath = SYS_PATH + "customer.txt";
 
-	        while ((line = br.readLine()) != null) {
-	            JSONObject json = new JSONObject(line);
+		List<String> updatedLines = new ArrayList<>();
+		boolean found = false;
 
-	            // Skip the line if the ID matches (deleting this record)
-	            if (json.getString("id").equals(id)) {
-	                found = true; // Mark as found
-	                continue;     // Skip adding this record to the updated list
-	            }
-	            updatedLines.add(json.toString());
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error reading customer file: " + e.getMessage());
-	        return;
-	    }
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
 
-	    // Write the updated list back to the file
-	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
-	        for (String updatedLine : updatedLines) {
-	            bw.write(updatedLine);
-	            bw.newLine();
-	        }
-	        if (found) {
-	            System.out.println("Customer with ID " + id + " deleted successfully.");
-	        } else {
-	            System.out.println("Customer with ID " + id + " not found.");
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error writing updated customer data: " + e.getMessage());
-	    }
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				// Skip the line if the ID matches (deleting this record)
+				if (json.getString("id").equals(id)) {
+					found = true; // Mark as found
+					continue;     // Skip adding this record to the updated list
+				}
+				updatedLines.add(json.toString());
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading customer file: " + e.getMessage());
+			return;
+		}
+
+		// Write the updated list back to the file
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
+			for (String updatedLine : updatedLines) {
+				bw.write(updatedLine);
+				bw.newLine();
+			}
+			if (found) {
+				System.out.println("Customer with ID " + id + " deleted successfully.");
+			} else {
+				System.out.println("Customer with ID " + id + " not found.");
+			}
+		} catch (IOException e) {
+			System.err.println("Error writing updated customer data: " + e.getMessage());
+		}
 	}
 
 }

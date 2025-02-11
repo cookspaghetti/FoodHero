@@ -54,7 +54,7 @@ public class ItemService {
 	                item.setId(json.getString("id"));
 	                item.setName(json.getString("name"));
 	                item.setPrice(json.getDouble("price"));
-	                item.setVendorId(json.getLong("vendorId"));
+	                item.setVendorId(json.getString("vendorId"));
 	                item.setDescription(json.getString("description"));
 	                item.setAvailability(json.getBoolean("availability"));
 
@@ -70,6 +70,36 @@ public class ItemService {
 	    System.out.println("Item with ID " + id + " not found.");
 	    return null; // Return null if the item is not found
 	}
+	
+	// Method to read all items from the text file
+    public List<ItemDTO> readAllItem() {
+        String filePath = SYS_PATH + "item.txt";
+        List<ItemDTO> items = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                JSONObject json = new JSONObject(line);
+
+                ItemDTO item = new ItemDTO();
+                item.setId(json.getString("id"));
+                item.setName(json.getString("name"));
+                item.setPrice(json.getDouble("price"));
+                item.setVendorId(json.getString("vendorId"));
+                item.setDescription(json.getString("description"));
+                item.setAvailability(json.getBoolean("availability"));
+
+                items.add(item); // Add to the list
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading items from file: " + e.getMessage());
+        } catch (JSONException e) {
+            System.err.println("Error parsing JSON: " + e.getMessage());
+        }
+
+        return items; // Return the list of items
+    }
 	
 	// Method to update an item in the text file
 	public void updateItem(ItemDTO updatedItem) {

@@ -6,11 +6,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import dto.RunnerDTO;
 import service.utils.JsonUtils;
@@ -73,7 +75,7 @@ public class RunnerService {
 					// Convert JSON arrays to List<String>
 					runner.setTasks(JsonUtils.jsonArrayToList(json.getJSONArray("tasks")));
 					runner.setReviews(JsonUtils.jsonArrayToList(json.getJSONArray("reviews")));
-					
+
 					runner.setLastDeliveredAddress(json.getString("lastDeliveredAddress"));
 
 					// Parse lastDeliveryDate as LocalDateTime
@@ -92,102 +94,144 @@ public class RunnerService {
 		System.out.println("Runner with ID " + id + " not found.");
 		return null; // Return null if not found
 	}
-	
+
+	// Method to read all runners from the text file
+	public List<RunnerDTO> readAllRunner() {
+		String filePath = SYS_PATH + "runner.txt";
+		List<RunnerDTO> runners = new ArrayList<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				RunnerDTO runner = new RunnerDTO();
+				runner.setId(json.getString("id"));
+				runner.setName(json.getString("name"));
+				runner.setPhoneNumber(json.getString("phoneNumber"));
+				runner.setAddress(json.getString("address"));
+				runner.setEmailAddress(json.getString("email"));
+				runner.setPlateNumber(json.getString("plateNumber"));
+				runner.setEarnings(json.getDouble("earnings"));
+				runner.setLastDeliveredAddress(json.getString("lastDeliveredAddress"));
+
+				// Reading tasks and reviews (Lists)
+				runner.setTasks(JsonUtils.jsonArrayToList(json.getJSONArray("tasks")));
+				runner.setReviews(JsonUtils.jsonArrayToList(json.getJSONArray("reviews")));
+
+				// Reading lastDeliveryDate (Optional)
+				if (!json.isNull("lastDeliveryDate")) {
+					DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+					runner.setLastDeliveryDate(LocalDateTime.parse(json.getString("lastDeliveryDate"), formatter));
+				}
+
+				runners.add(runner); // Add to the list
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading runners from file: " + e.getMessage());
+		} catch (JSONException e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
+
+		return runners; // Return the list of runners
+	}
+
 	// Method to update runner
 	public void updateRunner(RunnerDTO updatedRunner) {
-	    String filePath = SYS_PATH + "runner.txt";
-	    List<String> updatedLines = new ArrayList<>();
-	    boolean found = false;
+		String filePath = SYS_PATH + "runner.txt";
+		List<String> updatedLines = new ArrayList<>();
+		boolean found = false;
 
-	    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-	        String line;
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
 
-	        while ((line = br.readLine()) != null) {
-	            JSONObject json = new JSONObject(line);
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
 
-	            // Check if the current runner matches the ID
-	            if (json.getString("id").equals(updatedRunner.getId())) {
-	                // Update JSON object with new runner data
-	                json.put("name", updatedRunner.getName());
-	                json.put("phoneNumber", updatedRunner.getPhoneNumber());
-	                json.put("address", updatedRunner.getAddress());
-	                json.put("email", updatedRunner.getEmailAddress());
-	                json.put("plateNumber", updatedRunner.getPlateNumber());
-	                json.put("tasks", new JSONArray(updatedRunner.getTasks()));
-	                json.put("earnings", updatedRunner.getEarnings());
-	                json.put("reviews", new JSONArray(updatedRunner.getReviews()));
-	                json.put("lastDeliveredAddress", updatedRunner.getLastDeliveredAddress());
-	                json.put("lastDeliveryDate", 
-	                         updatedRunner.getLastDeliveryDate() != null ? 
-	                         updatedRunner.getLastDeliveryDate().toString() : "");
+				// Check if the current runner matches the ID
+				if (json.getString("id").equals(updatedRunner.getId())) {
+					// Update JSON object with new runner data
+					json.put("name", updatedRunner.getName());
+					json.put("phoneNumber", updatedRunner.getPhoneNumber());
+					json.put("address", updatedRunner.getAddress());
+					json.put("email", updatedRunner.getEmailAddress());
+					json.put("plateNumber", updatedRunner.getPlateNumber());
+					json.put("tasks", new JSONArray(updatedRunner.getTasks()));
+					json.put("earnings", updatedRunner.getEarnings());
+					json.put("reviews", new JSONArray(updatedRunner.getReviews()));
+					json.put("lastDeliveredAddress", updatedRunner.getLastDeliveredAddress());
+					json.put("lastDeliveryDate", 
+							updatedRunner.getLastDeliveryDate() != null ? 
+									updatedRunner.getLastDeliveryDate().toString() : "");
 
-	                found = true;
-	            }
+					found = true;
+				}
 
-	            // Add the (possibly updated) line to the list
-	            updatedLines.add(json.toString());
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error reading runner file: " + e.getMessage());
-	        return;
-	    }
+				// Add the (possibly updated) line to the list
+				updatedLines.add(json.toString());
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading runner file: " + e.getMessage());
+			return;
+		}
 
-	    // Write the updated content back to the file
-	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
-	        for (String updatedLine : updatedLines) {
-	            bw.write(updatedLine);
-	            bw.newLine();
-	        }
-	        if (found) {
-	            System.out.println("Runner with ID " + updatedRunner.getId() + " updated successfully.");
-	        } else {
-	            System.out.println("Runner with ID " + updatedRunner.getId() + " not found.");
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error writing updated runner data: " + e.getMessage());
-	    }
+		// Write the updated content back to the file
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
+			for (String updatedLine : updatedLines) {
+				bw.write(updatedLine);
+				bw.newLine();
+			}
+			if (found) {
+				System.out.println("Runner with ID " + updatedRunner.getId() + " updated successfully.");
+			} else {
+				System.out.println("Runner with ID " + updatedRunner.getId() + " not found.");
+			}
+		} catch (IOException e) {
+			System.err.println("Error writing updated runner data: " + e.getMessage());
+		}
 	}
-	
+
 	// Method to delete a runner
 	public void deleteRunner(String id) {
-		
-	    String filePath = SYS_PATH + "runner.txt";
-	    
-	    List<String> updatedLines = new ArrayList<>();
-	    boolean found = false;
 
-	    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-	        String line;
+		String filePath = SYS_PATH + "runner.txt";
 
-	        while ((line = br.readLine()) != null) {
-	            JSONObject json = new JSONObject(line);
+		List<String> updatedLines = new ArrayList<>();
+		boolean found = false;
 
-	            // Skip the line if the ID matches (deleting this record)
-	            if (json.getString("id").equals(id)) {
-	                found = true; // Mark as found
-	                continue;     // Skip adding this record to the updated list
-	            }
-	            updatedLines.add(json.toString());
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error reading runner file: " + e.getMessage());
-	        return;
-	    }
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
 
-	    // Write the updated list back to the file
-	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
-	        for (String updatedLine : updatedLines) {
-	            bw.write(updatedLine);
-	            bw.newLine();
-	        }
-	        if (found) {
-	            System.out.println("Runner with ID " + id + " deleted successfully.");
-	        } else {
-	            System.out.println("Runner with ID " + id + " not found.");
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error writing updated runner data: " + e.getMessage());
-	    }
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				// Skip the line if the ID matches (deleting this record)
+				if (json.getString("id").equals(id)) {
+					found = true; // Mark as found
+					continue;     // Skip adding this record to the updated list
+				}
+				updatedLines.add(json.toString());
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading runner file: " + e.getMessage());
+			return;
+		}
+
+		// Write the updated list back to the file
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
+			for (String updatedLine : updatedLines) {
+				bw.write(updatedLine);
+				bw.newLine();
+			}
+			if (found) {
+				System.out.println("Runner with ID " + id + " deleted successfully.");
+			} else {
+				System.out.println("Runner with ID " + id + " not found.");
+			}
+		} catch (IOException e) {
+			System.err.println("Error writing updated runner data: " + e.getMessage());
+		}
 	}
 
 }

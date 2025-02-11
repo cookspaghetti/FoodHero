@@ -79,6 +79,43 @@ public class TaskService {
 		return null;
 	}
 
+	// Method to read all tasks from the text file
+	public List<TaskDTO> readAllTask() {
+		String filePath = SYS_PATH + "task.txt";
+		List<TaskDTO> tasks = new ArrayList<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				TaskDTO task = new TaskDTO();
+				task.setId(json.getString("id"));
+				task.setOrderId(json.getString("orderId"));
+				task.setRunnerId(json.getString("runnerId"));
+				task.setStatus(json.getString("status"));
+				task.setTaskDetails(json.getString("taskDetails"));
+
+				// Parse optional datetime fields
+				if (json.has("acceptanceTime") && !json.isNull("acceptanceTime")) {
+					task.setAcceptanceTime(LocalDateTime.parse(json.getString("acceptanceTime")));
+				}
+				if (json.has("completionTime") && !json.isNull("completionTime")) {
+					task.setCompletionTime(LocalDateTime.parse(json.getString("completionTime")));
+				}
+
+				tasks.add(task); // Add to the list
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading tasks from file: " + e.getMessage());
+		} catch (JSONException e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
+
+		return tasks; // Return the list of tasks
+	}
+
 	// Method to update a task in the text file
 	public void updateTask(String id, TaskDTO updatedTask) {
 		String filePath = SYS_PATH + "task.txt";

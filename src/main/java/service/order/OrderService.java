@@ -102,11 +102,60 @@ public class OrderService {
 		return null;
 	}
 
+	// Method to read all orders from the text file
+	public List<OrderDTO> readAllOrder() {
+		String filePath = SYS_PATH + "order.txt";
+		List<OrderDTO> orders = new ArrayList<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				OrderDTO order = new OrderDTO();
+				order.setId(json.getString("id"));
+				order.setCustomerId(json.getString("customerId"));
+				order.setVendorId(json.getString("vendorId"));
+				order.setRunnerId(json.getString("runnerId"));
+
+				// Convert items (stored as JSON) to HashMap<String, Integer>
+				JSONObject itemsJson = json.getJSONObject("items");
+				HashMap<String, Integer> items = new HashMap<>();
+				for (String key : itemsJson.keySet()) {
+					items.put(key, itemsJson.getInt(key));
+				}
+				order.setItems(items);
+
+				order.setStatus(json.getString("status"));
+				order.setTotalAmount(json.getDouble("totalAmount"));
+				order.setDeliveryFee(json.getDouble("deliveryFee"));
+				order.setPlacementTime(LocalDateTime.parse(json.getString("placementTime")));
+
+				// Optional fields
+				if (json.has("completionTime") && !json.isNull("completionTime")) {
+					order.setCompletionTime(LocalDateTime.parse(json.getString("completionTime")));
+				}
+
+				order.setNotes(json.optString("notes", ""));
+				order.setDeliveryAddress(json.getString("deliveryAddress"));
+
+				orders.add(order); // Add to the list
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading orders from file: " + e.getMessage());
+		} catch (JSONException e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
+
+		return orders; // Return the list of orders
+	}
+
 	// Method to update an existing order
 	public void updateOrder(String id, OrderDTO updatedOrder) {
-		
+
 		String filePath = SYS_PATH + "order.txt";
-		
+
 		List<String> updatedLines = new ArrayList<>();
 		boolean isUpdated = false;
 
@@ -170,9 +219,9 @@ public class OrderService {
 
 	// Method to delete an order from the text file
 	public void deleteOrder(String id) {
-		
+
 		String filePath = SYS_PATH + "order.txt";
-		
+
 		List<String> updatedLines = new ArrayList<>();
 		boolean isDeleted = false;
 

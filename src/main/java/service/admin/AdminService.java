@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import dto.AdminDTO;
@@ -71,11 +72,40 @@ public class AdminService {
 		return null; // Return null if not found
 	}
 
+	// Method to read all admins from the text file
+	public List<AdminDTO> readAllAdmin() {
+		String filePath = SYS_PATH + "admin.txt";
+		List<AdminDTO> admins = new ArrayList<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				AdminDTO admin = new AdminDTO();
+				admin.setId(json.getString("id"));
+				admin.setName(json.getString("name"));
+				admin.setPhoneNumber(json.getString("phoneNumber"));
+				admin.setAddress(json.getString("address"));
+				admin.setEmailAddress(json.getString("email"));
+
+				admins.add(admin); // Add to the list
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading admins from file: " + e.getMessage());
+		} catch (JSONException e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
+
+		return admins; // Return the list of admins
+	}
+
 	// Method to update admin
 	public void updateAdmin(AdminDTO updatedAdmin) {
-		
+
 		String filePath = SYS_PATH + "admin.txt";
-		
+
 		List<String> updatedLines = new ArrayList<>();
 		boolean found = false;
 
@@ -119,47 +149,47 @@ public class AdminService {
 			System.err.println("Error writing updated admin data: " + e.getMessage());
 		}
 	}
-	
+
 	// Method to delete an admin
 	public void deleteAdmin(String id) {
-		
-	    String filePath = SYS_PATH + "admin.txt";
-	    
-	    List<String> updatedLines = new ArrayList<>();
-	    boolean found = false;
 
-	    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-	        String line;
+		String filePath = SYS_PATH + "admin.txt";
 
-	        while ((line = br.readLine()) != null) {
-	            JSONObject json = new JSONObject(line);
+		List<String> updatedLines = new ArrayList<>();
+		boolean found = false;
 
-	            // Skip the line if the ID matches (deleting this record)
-	            if (json.getString("id").equals(id)) {
-	                found = true; // Mark as found
-	                continue;     // Skip adding this record to the updated list
-	            }
-	            updatedLines.add(json.toString());
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error reading admin file: " + e.getMessage());
-	        return;
-	    }
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
 
-	    // Write the updated list back to the file
-	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
-	        for (String updatedLine : updatedLines) {
-	            bw.write(updatedLine);
-	            bw.newLine();
-	        }
-	        if (found) {
-	            System.out.println("Admin with ID " + id + " deleted successfully.");
-	        } else {
-	            System.out.println("Admin with ID " + id + " not found.");
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error writing updated admin data: " + e.getMessage());
-	    }
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				// Skip the line if the ID matches (deleting this record)
+				if (json.getString("id").equals(id)) {
+					found = true; // Mark as found
+					continue;     // Skip adding this record to the updated list
+				}
+				updatedLines.add(json.toString());
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading admin file: " + e.getMessage());
+			return;
+		}
+
+		// Write the updated list back to the file
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
+			for (String updatedLine : updatedLines) {
+				bw.write(updatedLine);
+				bw.newLine();
+			}
+			if (found) {
+				System.out.println("Admin with ID " + id + " deleted successfully.");
+			} else {
+				System.out.println("Admin with ID " + id + " not found.");
+			}
+		} catch (IOException e) {
+			System.err.println("Error writing updated admin data: " + e.getMessage());
+		}
 	}
 
 
