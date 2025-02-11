@@ -16,13 +16,14 @@ import dto.AddTransactionDTO;
 import dto.DeductTransactionDTO;
 import dto.TransactionDTO;
 import enumeration.PaymentMethod;
+import enumeration.ResponseCode;
 
 public class TransactionService {
 
 	private static final String SYS_PATH = "src\\main\\resources\\database\\transaction\\";
 
 	// Method to create an AddTransaction and save to a text file in JSON format
-	public void createAddTransaction(AddTransactionDTO transaction) {
+	public ResponseCode createAddTransaction(AddTransactionDTO transaction) {
 
 		String filePath = SYS_PATH + "add_transaction.txt";
 
@@ -40,8 +41,10 @@ public class TransactionService {
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
 			System.out.println("AddTransaction created successfully!");
+			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing AddTransaction to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
@@ -80,7 +83,7 @@ public class TransactionService {
 	}
 
 	// Method to read all AddTransaction from the text file
-	public List<AddTransactionDTO> readAllAddTransaction() {
+	public List<AddTransactionDTO> readAllAddTransaction(String customerId) {
 
 		String filePath = SYS_PATH + "add_transaction.txt";
 
@@ -94,19 +97,21 @@ public class TransactionService {
 				try {
 					JSONObject json = new JSONObject(line);
 
-					AddTransactionDTO transaction = new AddTransactionDTO();
-					transaction.setId(json.getString("id"));
-					transaction.setCustomerId(json.getString("customerId"));
-					transaction.setAmount(json.getDouble("amount"));
-					transaction.setDate(LocalDateTime.parse(json.getString("date")));
-					transaction.setDescription(json.getString("description"));
-					transaction.setAdminId(json.getString("adminId"));
-					transaction.setPaymentMethod(PaymentMethod.valueOf(json.getString("paymentMethod")));
+					if (json.getString("customerId").equals(customerId)) {
+						AddTransactionDTO transaction = new AddTransactionDTO();
+						transaction.setId(json.getString("id"));
+						transaction.setCustomerId(json.getString("customerId"));
+						transaction.setAmount(json.getDouble("amount"));
+						transaction.setDate(LocalDateTime.parse(json.getString("date")));
+						transaction.setDescription(json.getString("description"));
+						transaction.setAdminId(json.getString("adminId"));
+						transaction.setPaymentMethod(PaymentMethod.valueOf(json.getString("paymentMethod")));
 
-					addTransactions.add(transaction);
-					
+						addTransactions.add(transaction);
+					}
+
 				} catch (JSONException e) {
-					System.err.println("Error parsing DeductTransaction JSON: " + e.getMessage());
+					System.err.println("Error parsing AddTransaction JSON: " + e.getMessage());
 				}
 			}
 		} catch (IOException e) {
@@ -117,7 +122,7 @@ public class TransactionService {
 	}
 
 	// Method to delete an AddTransaction from the text file
-	public void deleteAddTransaction(String id) {
+	public ResponseCode deleteAddTransaction(String id) {
 
 		String filePath = SYS_PATH + "add_transaction.txt";
 
@@ -138,7 +143,7 @@ public class TransactionService {
 			}
 		} catch (IOException e) {
 			System.err.println("Error reading AddTransaction from file: " + e.getMessage());
-			return;
+			return ResponseCode.IO_EXCEPTION;
 		}
 
 		if (isDeleted) {
@@ -147,16 +152,19 @@ public class TransactionService {
 					writer.write(transaction + System.lineSeparator());
 				}
 				System.out.println("AddTransaction with ID " + id + " deleted successfully!");
+				return ResponseCode.SUCCESS;
 			} catch (IOException e) {
 				System.err.println("Error writing AddTransaction to file: " + e.getMessage());
+				return ResponseCode.IO_EXCEPTION;
 			}
 		} else {
 			System.out.println("AddTransaction with ID " + id + " not found.");
+			return ResponseCode.RECORD_NOT_FOUND;
 		}
 	}
 
 	// Method to create a DeductTransaction and save it to a text file in JSON format
-	public void createDeductTransaction(DeductTransactionDTO transaction) {
+	public ResponseCode createDeductTransaction(DeductTransactionDTO transaction) {
 
 		String filePath = SYS_PATH + "deduct_transaction.txt";
 
@@ -173,8 +181,10 @@ public class TransactionService {
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
 			System.out.println("DeductTransaction created successfully!");
+			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing DeductTransaction to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
@@ -212,7 +222,7 @@ public class TransactionService {
 	}
 
 	// Method to read all DeductTransaction from the text file
-	public List<DeductTransactionDTO> readAllDeductTransaction() {
+	public List<DeductTransactionDTO> readAllDeductTransaction(String customerId) {
 
 		String filePath = SYS_PATH + "deduct_transaction.txt";
 
@@ -226,15 +236,17 @@ public class TransactionService {
 				try { 
 					JSONObject json = new JSONObject(line);
 
-					DeductTransactionDTO transaction = new DeductTransactionDTO();
-					transaction.setId(json.getString("id"));
-					transaction.setCustomerId(json.getString("customerId"));
-					transaction.setAmount(json.getDouble("amount"));
-					transaction.setDate(LocalDateTime.parse(json.getString("date")));
-					transaction.setDescription(json.getString("description"));
-					transaction.setOrderId(json.getString("orderId"));
+					if (json.getString("customerId").equals(customerId)) {
+						DeductTransactionDTO transaction = new DeductTransactionDTO();
+						transaction.setId(json.getString("id"));
+						transaction.setCustomerId(json.getString("customerId"));
+						transaction.setAmount(json.getDouble("amount"));
+						transaction.setDate(LocalDateTime.parse(json.getString("date")));
+						transaction.setDescription(json.getString("description"));
+						transaction.setOrderId(json.getString("orderId"));
 
-					deductTransactions.add(transaction);
+						deductTransactions.add(transaction);
+					}
 				} catch (JSONException e) {
 					System.err.println("Error parsing JSON: " + e.getMessage());
 				}
@@ -247,7 +259,7 @@ public class TransactionService {
 	}
 
 	// Method to delete a DeductTransaction from the text file
-	public void deleteDeductTransaction(String id) {
+	public ResponseCode deleteDeductTransaction(String id) {
 
 		String filePath = SYS_PATH + "deduct_transaction.txt";
 
@@ -268,7 +280,7 @@ public class TransactionService {
 			}
 		} catch (IOException e) {
 			System.err.println("Error reading DeductTransaction from file: " + e.getMessage());
-			return;
+			return ResponseCode.IO_EXCEPTION;
 		}
 
 		if (found) {
@@ -278,19 +290,22 @@ public class TransactionService {
 					writer.newLine();
 				}
 				System.out.println("DeductTransaction with ID " + id + " deleted successfully.");
+				return ResponseCode.SUCCESS;
 			} catch (IOException e) {
 				System.err.println("Error writing DeductTransaction to file: " + e.getMessage());
+				return ResponseCode.IO_EXCEPTION;
 			}
 		} else {
 			System.out.println("DeductTransaction with ID " + id + " not found.");
+			return ResponseCode.RECORD_NOT_FOUND;
 		}
 	}
 
 	// Method to read all transactions from both files
-	public List<TransactionDTO> readAllTransaction() {
+	public List<TransactionDTO> readAllTransaction(String customerId) {
 		List<TransactionDTO> transactions = new ArrayList<>();
-		transactions.addAll(readAllAddTransaction());
-		transactions.addAll(readAllDeductTransaction());
+		transactions.addAll(readAllAddTransaction(customerId));
+		transactions.addAll(readAllDeductTransaction(customerId));
 		return transactions;
 	}
 }

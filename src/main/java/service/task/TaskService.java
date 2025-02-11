@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import dto.TaskDTO;
+import enumeration.ResponseCode;
 import enumeration.TaskStatus;
 
 public class TaskService {
@@ -19,7 +20,7 @@ public class TaskService {
 	private static final String SYS_PATH = "src\\main\\resources\\database\\";
 
 	// Method to create a task and save to a text file in JSON format
-	public void createTask(TaskDTO task) {
+	public ResponseCode createTask(TaskDTO task) {
 		String filePath = SYS_PATH + "task.txt";
 
 		// Construct JSON Object
@@ -36,8 +37,10 @@ public class TaskService {
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
 			System.out.println("Task created successfully!");
+			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing task to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
@@ -118,7 +121,7 @@ public class TaskService {
 	}
 
 	// Method to update a task in the text file
-	public void updateTask(String id, TaskDTO updatedTask) {
+	public ResponseCode updateTask(String id, TaskDTO updatedTask) {
 		String filePath = SYS_PATH + "task.txt";
 		List<String> updatedLines = new ArrayList<>();
 
@@ -155,18 +158,22 @@ public class TaskService {
 					}
 				}
 				System.out.println("Task with ID " + id + " updated successfully!");
+				return ResponseCode.SUCCESS;
 			} else {
 				System.out.println("Task with ID " + id + " not found.");
+				return ResponseCode.RECORD_NOT_FOUND;
 			}
 		} catch (IOException e) {
 			System.err.println("Error updating task: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		} catch (JSONException e) {
 			System.err.println("Error parsing JSON: " + e.getMessage());
+			return ResponseCode.JSON_EXCEPTION;
 		}
 	}
 
 	// Method to delete a task from the text file
-	public void deleteTask(String id) {
+	public ResponseCode deleteTask(String id) {
 		String filePath = SYS_PATH + "task.txt";
 		List<String> remainingTasks = new ArrayList<>();
 		boolean isDeleted = false;
@@ -192,13 +199,17 @@ public class TaskService {
 					}
 				}
 				System.out.println("Task with ID " + id + " deleted successfully!");
+				return ResponseCode.SUCCESS;
 			} else {
 				System.out.println("Task with ID " + id + " not found.");
+				return ResponseCode.RECORD_NOT_FOUND;
 			}
 		} catch (IOException e) {
 			System.err.println("Error deleting task: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		} catch (JSONException e) {
 			System.err.println("Error parsing JSON: " + e.getMessage());
+			return ResponseCode.JSON_EXCEPTION;
 		}
 	}
 

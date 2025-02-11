@@ -16,13 +16,14 @@ import org.json.JSONObject;
 
 import dto.OrderDTO;
 import enumeration.OrderStatus;
+import enumeration.ResponseCode;
 
 public class OrderService {
 
 	private static final String SYS_PATH = "src\\main\\resources\\database\\order\\";
 
 	// Method to create an order and save to a text file in JSON format
-	public void createOrder(OrderDTO order) {
+	public ResponseCode createOrder(OrderDTO order) {
 
 		String filePath = SYS_PATH + "order.txt";
 
@@ -48,8 +49,10 @@ public class OrderService {
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
 			System.out.println("Order created successfully!");
+			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing order to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
@@ -153,7 +156,7 @@ public class OrderService {
 	}
 
 	// Method to update an existing order
-	public void updateOrder(String id, OrderDTO updatedOrder) {
+	public ResponseCode updateOrder(String id, OrderDTO updatedOrder) {
 
 		String filePath = SYS_PATH + "order.txt";
 
@@ -195,10 +198,10 @@ public class OrderService {
 			}
 		} catch (IOException e) {
 			System.err.println("Error reading orders from file: " + e.getMessage());
-			return;
+			return ResponseCode.IO_EXCEPTION;
 		} catch (JSONException e) {
 			System.err.println("Error parsing JSON: " + e.getMessage());
-			return;
+			return ResponseCode.JSON_EXCEPTION;
 		}
 
 		// Write the updated data back to the file
@@ -210,16 +213,19 @@ public class OrderService {
 
 			if (isUpdated) {
 				System.out.println("Order with ID " + id + " updated successfully.");
+				return ResponseCode.SUCCESS;
 			} else {
 				System.out.println("Order with ID " + id + " not found.");
+				return ResponseCode.RECORD_NOT_FOUND;
 			}
 		} catch (IOException e) {
 			System.err.println("Error writing orders to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
 	// Method to delete an order from the text file
-	public void deleteOrder(String id) {
+	public ResponseCode deleteOrder(String id) {
 
 		String filePath = SYS_PATH + "order.txt";
 
@@ -241,10 +247,10 @@ public class OrderService {
 			}
 		} catch (IOException e) {
 			System.err.println("Error reading orders from file: " + e.getMessage());
-			return;
+			return ResponseCode.IO_EXCEPTION;
 		} catch (JSONException e) {
 			System.err.println("Error parsing JSON: " + e.getMessage());
-			return;
+			return ResponseCode.JSON_EXCEPTION;
 		}
 
 		// Write the remaining orders back to the file
@@ -256,11 +262,14 @@ public class OrderService {
 
 			if (isDeleted) {
 				System.out.println("Order with ID " + id + " deleted successfully.");
+				return ResponseCode.SUCCESS;
 			} else {
 				System.out.println("Order with ID " + id + " not found.");
+				return ResponseCode.RECORD_NOT_FOUND;
 			}
 		} catch (IOException e) {
 			System.err.println("Error writing orders to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 

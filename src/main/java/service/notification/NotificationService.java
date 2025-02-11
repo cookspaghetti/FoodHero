@@ -13,13 +13,14 @@ import java.util.List;
 import org.json.JSONObject;
 
 import dto.NotificationDTO;
+import enumeration.ResponseCode;
 
 public class NotificationService {
 
 	private static final String SYS_PATH = "src\\main\\resources\\database\\notification\\";
 
 	// Method to create a notification and save it to a text file in JSON format
-	public void createNotification(NotificationDTO notification) {
+	public ResponseCode createNotification(NotificationDTO notification) {
 
 		String filePath = SYS_PATH + "notification.txt";
 
@@ -36,8 +37,10 @@ public class NotificationService {
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
 			System.out.println("Notification created successfully!");
+			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing notification to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
@@ -74,45 +77,48 @@ public class NotificationService {
 	}
 
 	// Method to delete a notification from the text file
-    public void deleteNotification(String id) {
-    	
-        String filePath = SYS_PATH + "notification.txt";
-        
-        List<String> updatedNotifications = new ArrayList<>();
-        boolean isDeleted = false;
+	public ResponseCode deleteNotification(String id) {
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
+		String filePath = SYS_PATH + "notification.txt";
 
-            while ((line = reader.readLine()) != null) {
-                JSONObject json = new JSONObject(line);
+		List<String> updatedNotifications = new ArrayList<>();
+		boolean isDeleted = false;
 
-                if (json.getString("id").equals(id)) {
-                    isDeleted = true; // Found and marked for deletion
-                } else {
-                    updatedNotifications.add(line); // Keep other notifications
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading notifications from file: " + e.getMessage());
-            return;
-        }
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
 
-        // Write back the updated list without the deleted notification
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (String notification : updatedNotifications) {
-                writer.write(notification);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.err.println("Error writing updated notifications to file: " + e.getMessage());
-            return;
-        }
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
 
-        if (isDeleted) {
-            System.out.println("Notification with ID " + id + " deleted successfully.");
-        } else {
-            System.out.println("Notification with ID " + id + " not found.");
-        }
-    }
+				if (json.getString("id").equals(id)) {
+					isDeleted = true; // Found and marked for deletion
+				} else {
+					updatedNotifications.add(line); // Keep other notifications
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading notifications from file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
+		}
+
+		// Write back the updated list without the deleted notification
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+			for (String notification : updatedNotifications) {
+				writer.write(notification);
+				writer.newLine();
+			}
+		} catch (IOException e) {
+			System.err.println("Error writing updated notifications to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
+		}
+
+		if (isDeleted) {
+			System.out.println("Notification with ID " + id + " deleted successfully.");
+			return ResponseCode.SUCCESS;
+		} else {
+			System.out.println("Notification with ID " + id + " not found.");
+			return ResponseCode.RECORD_NOT_FOUND;
+		}
+	}
+	
 }
