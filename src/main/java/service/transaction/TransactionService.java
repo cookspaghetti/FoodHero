@@ -14,8 +14,8 @@ import org.json.JSONObject;
 
 import dto.AddTransactionDTO;
 import dto.DeductTransactionDTO;
-import dto.TaskDTO;
 import dto.TransactionDTO;
+import enumeration.PaymentMethod;
 
 public class TransactionService {
 
@@ -64,7 +64,7 @@ public class TransactionService {
 					transaction.setDate(LocalDateTime.parse(json.getString("date")));
 					transaction.setDescription(json.getString("description"));
 					transaction.setAdminId(json.getString("adminId"));
-					transaction.setPaymentMethod(json.getString("paymentMethod"));
+					transaction.setPaymentMethod(PaymentMethod.valueOf(json.getString("paymentMethod")));
 
 					return transaction;
 				}
@@ -101,7 +101,7 @@ public class TransactionService {
 					transaction.setDate(LocalDateTime.parse(json.getString("date")));
 					transaction.setDescription(json.getString("description"));
 					transaction.setAdminId(json.getString("adminId"));
-					transaction.setPaymentMethod(json.getString("paymentMethod"));
+					transaction.setPaymentMethod(PaymentMethod.valueOf(json.getString("paymentMethod")));
 
 					addTransactions.add(transaction);
 					

@@ -15,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import dto.OrderDTO;
+import enumeration.OrderStatus;
 
 public class OrderService {
 
@@ -69,7 +70,7 @@ public class OrderService {
 					order.setCustomerId(json.getString("customerId"));
 					order.setVendorId(json.getString("vendorId"));
 					order.setRunnerId(json.getString("runnerId"));
-					order.setStatus(json.getString("status"));
+					order.setStatus(OrderStatus.valueOf(json.getString("status")));
 					order.setTotalAmount(json.getDouble("totalAmount"));
 					order.setDeliveryFee(json.getDouble("deliveryFee"));
 					order.setNotes(json.getString("notes"));
@@ -127,7 +128,7 @@ public class OrderService {
 				}
 				order.setItems(items);
 
-				order.setStatus(json.getString("status"));
+				order.setStatus(OrderStatus.valueOf(json.getString("status")));
 				order.setTotalAmount(json.getDouble("totalAmount"));
 				order.setDeliveryFee(json.getDouble("deliveryFee"));
 				order.setPlacementTime(LocalDateTime.parse(json.getString("placementTime")));

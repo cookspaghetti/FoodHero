@@ -3,6 +3,8 @@ package dto;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
+import enumeration.OrderStatus;
+
 public class OrderDTO {
 	
 	private String id;
@@ -10,7 +12,7 @@ public class OrderDTO {
     private String vendorId;
     private String runnerId;
     private HashMap<String, Integer> items; // item id, amount
-    private String status;
+    private OrderStatus status;
     private double totalAmount;
     private double deliveryFee;
     private LocalDateTime placementTime;
@@ -49,10 +51,10 @@ public class OrderDTO {
 	public void setItems(HashMap<String, Integer> items) {
 		this.items = items;
 	}
-	public String getStatus() {
+	public OrderStatus getStatus() {
 		return status;
 	}
-	public void setStatus(String status) {
+	public void setStatus(OrderStatus status) {
 		this.status = status;
 	}
 	public double getTotalAmount() {

@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import dto.ComplainDTO;
+import enumeration.ComplainStatus;
 
 public class ComplainService {
 
@@ -55,7 +56,7 @@ public class ComplainService {
 					complain.setCustomerId(json.getString("customerId"));
 					complain.setOrderId(json.getString("orderId"));
 					complain.setDescription(json.getString("description"));
-					complain.setStatus(json.getString("status"));
+					complain.setStatus(ComplainStatus.valueOf(json.getString("status")));
 					complain.setSolution(json.getString("solution"));
 
 					return complain; // Complain found, return it
@@ -87,7 +88,7 @@ public class ComplainService {
                 complain.setCustomerId(json.getString("customerId"));
                 complain.setOrderId(json.getString("orderId"));
                 complain.setDescription(json.getString("description"));
-                complain.setStatus(json.getString("status"));
+                complain.setStatus(ComplainStatus.valueOf(json.getString("status")));
                 complain.setSolution(json.getString("solution"));
 
                 complaints.add(complain); // Add to the list

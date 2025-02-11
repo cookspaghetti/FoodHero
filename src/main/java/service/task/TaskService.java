@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import dto.TaskDTO;
+import enumeration.TaskStatus;
 
 public class TaskService {
 
@@ -55,7 +56,7 @@ public class TaskService {
 					task.setId(json.getString("id"));
 					task.setOrderId(json.getString("orderId"));
 					task.setRunnerId(json.getString("runnerId"));
-					task.setStatus(json.getString("status"));
+					task.setStatus(TaskStatus.valueOf(json.getString("status")));
 					task.setTaskDetails(json.getString("taskDetails"));
 
 					// Handling nullable LocalDateTime fields
@@ -94,7 +95,7 @@ public class TaskService {
 				task.setId(json.getString("id"));
 				task.setOrderId(json.getString("orderId"));
 				task.setRunnerId(json.getString("runnerId"));
-				task.setStatus(json.getString("status"));
+				task.setStatus(TaskStatus.valueOf(json.getString("status")));
 				task.setTaskDetails(json.getString("taskDetails"));
 
 				// Parse optional datetime fields

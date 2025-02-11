@@ -1,9 +1,11 @@
 package dto;
 
+import enumeration.PaymentMethod;
+
 public class AddTransactionDTO extends TransactionDTO {
 
 	private String adminId;
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
     
     // Getters and Setters
 	public String getAdminId() {
@@ -12,10 +14,10 @@ public class AddTransactionDTO extends TransactionDTO {
 	public void setAdminId(String adminId) {
 		this.adminId = adminId;
 	}
-	public String getPaymentMethod() {
+	public PaymentMethod getPaymentMethod() {
 		return paymentMethod;
 	}
-	public void setPaymentMethod(String paymentMethod) {
+	public void setPaymentMethod(PaymentMethod paymentMethod) {
 		this.paymentMethod = paymentMethod;
 	}
     

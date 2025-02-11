@@ -2,12 +2,14 @@ package dto;
 
 import java.time.LocalDateTime;
 
+import enumeration.TaskStatus;
+
 public class TaskDTO {
 
 	private String id;
     private String orderId;
     private String runnerId;
-    private String status;
+    private TaskStatus status;
     private String taskDetails;
     private LocalDateTime acceptanceTime;
     private LocalDateTime completionTime;
@@ -31,10 +33,10 @@ public class TaskDTO {
 	public void setRunnerId(String runnerId) {
 		this.runnerId = runnerId;
 	}
-	public String getStatus() {
+	public TaskStatus getStatus() {
 		return status;
 	}
-	public void setStatus(String status) {
+	public void setStatus(TaskStatus status) {
 		this.status = status;
 	}
 	public String getTaskDetails() {
