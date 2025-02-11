@@ -5,7 +5,7 @@ public class ItemDTO {
 	private String id;
     private String name;
     private double price;
-    private Long vendorId;
+    private String vendorId;
     private String description;
     private boolean availability;
     
@@ -28,10 +28,10 @@ public class ItemDTO {
 	public void setPrice(double price) {
 		this.price = price;
 	}
-	public Long getVendorId() {
+	public String getVendorId() {
 		return vendorId;
 	}
-	public void setVendorId(Long vendorId) {
+	public void setVendorId(String vendorId) {
 		this.vendorId = vendorId;
 	}
 	public String getDescription() {
