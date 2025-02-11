@@ -7,13 +7,6 @@ public class AddTransactionDTO extends TransactionDTO {
 	private String adminId;
     private PaymentMethod paymentMethod;
     
-    // Constructor
-    public AddTransactionDTO(String adminId, PaymentMethod paymentMethod) {
-		super();
-		this.adminId = adminId;
-		this.paymentMethod = paymentMethod;
-	}
-    
 	// Getters and Setters
 	public String getAdminId() {
 		return adminId;

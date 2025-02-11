@@ -11,17 +11,6 @@ public class VendorDTO extends UserDTO {
     private double ratings;
     private List<String> reviews;
     
-    // Constructor
-    public VendorDTO(String vendorName, HashMap<String, Integer> items, List<String> orderHistory, double ratings,
-			List<String> reviews) {
-		super();
-		this.vendorName = vendorName;
-		this.items = items;
-		this.orderHistory = orderHistory;
-		this.ratings = ratings;
-		this.reviews = reviews;
-	}
-    
 	// Getters and Setters
 	public String getVendorName() {
 		return vendorName;

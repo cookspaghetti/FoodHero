@@ -14,19 +14,6 @@ public class TaskDTO {
     private LocalDateTime acceptanceTime;
     private LocalDateTime completionTime;
     
-    // Constructor
-    public TaskDTO(String id, String orderId, String runnerId, TaskStatus status, String taskDetails,
-			LocalDateTime acceptanceTime, LocalDateTime completionTime) {
-		super();
-		this.id = id;
-		this.orderId = orderId;
-		this.runnerId = runnerId;
-		this.status = status;
-		this.taskDetails = taskDetails;
-		this.acceptanceTime = acceptanceTime;
-		this.completionTime = completionTime;
-	}
-    
 	// Getters and Setters
 	public String getId() {
 		return id;

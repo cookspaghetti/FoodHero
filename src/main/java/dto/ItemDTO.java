@@ -9,17 +9,6 @@ public class ItemDTO {
     private String description;
     private boolean availability;
     
-    // Constructor
-    public ItemDTO(String id, String name, double price, String vendorId, String description, boolean availability) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.price = price;
-		this.vendorId = vendorId;
-		this.description = description;
-		this.availability = availability;
-	}
-    
 	// Getters and Setters
 	public String getId() {
 		return id;

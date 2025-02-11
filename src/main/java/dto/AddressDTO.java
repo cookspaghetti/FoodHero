@@ -10,19 +10,6 @@ public class AddressDTO {
     private String postalCode;
     private String country;
     
-    // Constructor
-    public AddressDTO(String id, String userId, String street, String city, String state, String postalCode,
-    		String country) {
-    	super();
-    	this.id = id;
-    	this.userId = userId;
-    	this.street = street;
-    	this.city = city;
-    	this.state = state;
-    	this.postalCode = postalCode;
-    	this.country = country;
-    }
-    
     // Getters and Setters
 	public String getId() {
 		return id;
