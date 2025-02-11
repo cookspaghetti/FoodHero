@@ -8,8 +8,9 @@ public abstract class UserDTO {
     private String addressId;
     private String emailAddress;
     private String password;
+    private Boolean status;
     
-    // Getters and Setters
+	// Getters and Setters
 	public String getId() {
 		return id;
 	}
@@ -28,10 +29,10 @@ public abstract class UserDTO {
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
-	public String getAddress() {
+	public String getAddressId() {
 		return addressId;
 	}
-	public void setAddress(String addressId) {
+	public void setAddressId(String addressId) {
 		this.addressId = addressId;
 	}
 	public String getEmailAddress() {
@@ -45,6 +46,12 @@ public abstract class UserDTO {
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	public Boolean getStatus() {
+		return status;
+	}
+	public void setStatus(Boolean status) {
+		this.status = status;
 	}
     
 }

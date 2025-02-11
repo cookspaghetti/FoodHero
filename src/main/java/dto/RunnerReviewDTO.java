@@ -3,6 +3,12 @@ package dto;
 public class RunnerReviewDTO extends ReviewDTO {
 	
 	private String runnerId;
+	
+	// Constructor
+	public RunnerReviewDTO(String runnerId) {
+		super();
+		this.runnerId = runnerId;
+	}
 
 	// Getters and Setters
 	public String getRunnerId() {

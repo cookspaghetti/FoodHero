@@ -11,7 +11,19 @@ public class ComplainDTO {
     private ComplainStatus status;
     private String solution;
     
-    // Getters and Setters
+    // Constructor
+    public ComplainDTO(String id, String customerId, String orderId, String description, ComplainStatus status,
+			String solution) {
+		super();
+		this.id = id;
+		this.customerId = customerId;
+		this.orderId = orderId;
+		this.description = description;
+		this.status = status;
+		this.solution = solution;
+	}
+    
+	// Getters and Setters
 	public String getId() {
 		return id;
 	}

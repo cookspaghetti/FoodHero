@@ -11,7 +11,19 @@ public class NotificationDTO {
     private LocalDateTime timestamp;
     private boolean isRead;
     
-    // Getters and Setters
+    // Constructor
+    public NotificationDTO(String id, String userId, String title, String message, LocalDateTime timestamp,
+			boolean isRead) {
+		super();
+		this.id = id;
+		this.userId = userId;
+		this.title = title;
+		this.message = message;
+		this.timestamp = timestamp;
+		this.isRead = isRead;
+	}
+    
+	// Getters and Setters
 	public String getId() {
 		return id;
 	}

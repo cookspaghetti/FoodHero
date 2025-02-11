@@ -8,11 +8,24 @@ public class RunnerDTO extends UserDTO {
 	private String plateNumber;
     private List<String> tasks;
     private double earnings;
+    private double ratings;
     private List<String> reviews;
     private String lastDeliveredAddress;
     private LocalDateTime lastDeliveryDate;
     
-    // Getters and Setters
+    // Constructor
+    public RunnerDTO(String plateNumber, List<String> tasks, double earnings, double ratings, List<String> reviews,
+			String lastDeliveredAddress, LocalDateTime lastDeliveryDate) {
+		super();
+		this.plateNumber = plateNumber;
+		this.tasks = tasks;
+		this.earnings = earnings;
+		this.ratings = ratings;
+		this.reviews = reviews;
+		this.lastDeliveredAddress = lastDeliveredAddress;
+		this.lastDeliveryDate = lastDeliveryDate;
+	}
+	// Getters and Setters
 	public String getPlateNumber() {
 		return plateNumber;
 	}
@@ -48,6 +61,12 @@ public class RunnerDTO extends UserDTO {
 	}
 	public void setLastDeliveryDate(LocalDateTime lastDeliveryDate) {
 		this.lastDeliveryDate = lastDeliveryDate;
+	}
+	public double getRatings() {
+		return ratings;
+	}
+	public void setRatings(double ratings) {
+		this.ratings = ratings;
 	}
     
 }

@@ -12,7 +12,20 @@ public class CustomerDTO extends UserDTO {
     private List<String> transactions;
     private List<String> deliveryAddresses;
     
-    // Getters and Setters
+    // Constructor
+    public CustomerDTO(double credit, List<String> orderHistory, List<String> vendorReviews, List<String> runnerReviews,
+			List<String> complains, List<String> transactions, List<String> deliveryAddresses) {
+		super();
+		this.credit = credit;
+		this.orderHistory = orderHistory;
+		this.vendorReviews = vendorReviews;
+		this.runnerReviews = runnerReviews;
+		this.complains = complains;
+		this.transactions = transactions;
+		this.deliveryAddresses = deliveryAddresses;
+	}
+    
+	// Getters and Setters
 	public double getCredit() {
 		return credit;
 	}

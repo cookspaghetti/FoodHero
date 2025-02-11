@@ -20,7 +20,26 @@ public class OrderDTO {
     private String notes;
     private String deliveryAddress; // address id
     
-    // Getters and Setters
+    // Constructor
+    public OrderDTO(String id, String customerId, String vendorId, String runnerId, HashMap<String, Integer> items,
+			OrderStatus status, double totalAmount, double deliveryFee, LocalDateTime placementTime,
+			LocalDateTime completionTime, String notes, String deliveryAddress) {
+		super();
+		this.id = id;
+		this.customerId = customerId;
+		this.vendorId = vendorId;
+		this.runnerId = runnerId;
+		this.items = items;
+		this.status = status;
+		this.totalAmount = totalAmount;
+		this.deliveryFee = deliveryFee;
+		this.placementTime = placementTime;
+		this.completionTime = completionTime;
+		this.notes = notes;
+		this.deliveryAddress = deliveryAddress;
+	}
+    
+	// Getters and Setters
 	public String getId() {
 		return id;
 	}

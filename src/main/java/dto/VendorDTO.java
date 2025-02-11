@@ -8,9 +8,21 @@ public class VendorDTO extends UserDTO {
 	private String vendorName;
     private HashMap<String, Integer> items; // item id, stocks left
     private List<String> orderHistory;
+    private double ratings;
     private List<String> reviews;
     
-    // Getters and Setters
+    // Constructor
+    public VendorDTO(String vendorName, HashMap<String, Integer> items, List<String> orderHistory, double ratings,
+			List<String> reviews) {
+		super();
+		this.vendorName = vendorName;
+		this.items = items;
+		this.orderHistory = orderHistory;
+		this.ratings = ratings;
+		this.reviews = reviews;
+	}
+    
+	// Getters and Setters
 	public String getVendorName() {
 		return vendorName;
 	}
@@ -34,6 +46,12 @@ public class VendorDTO extends UserDTO {
 	}
 	public void setReviews(List<String> reviews) {
 		this.reviews = reviews;
+	}
+	public double getRatings() {
+		return ratings;
+	}
+	public void setRatings(double ratings) {
+		this.ratings = ratings;
 	}
     
 }
