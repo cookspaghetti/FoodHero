@@ -8,6 +8,9 @@ public enum ResponseCode {
     // File Errors
     RECORD_NOT_FOUND(404, "Record not found. "),
     FAILED_TO_CREATE_FILE(400, "Failed to create file. "),
+    
+    // Access Errors
+    ACCESS_DENIED(444, "Access denied for current role. "),
 
     // Exception Errors
     IO_EXCEPTION(501, "Input/Output Exception Occurred. "),
