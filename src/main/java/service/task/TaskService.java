@@ -16,7 +16,7 @@ import enumeration.TaskStatus;
 
 public class TaskService {
 
-	private static final String SYS_PATH = "/FoodHero/src/main/resources/database/";
+	private static final String SYS_PATH = "src\\main\\resources\\database\\";
 
 	// Method to create a task and save to a text file in JSON format
 	public void createTask(TaskDTO task) {

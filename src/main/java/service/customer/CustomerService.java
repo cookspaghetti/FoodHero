@@ -10,16 +10,18 @@ import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import dto.CustomerDTO;
+import enumeration.ResponseCode;
 import service.utils.JsonUtils;
 
 public class CustomerService {
 
-	private static final String SYS_PATH = "/FoodHero/src/main/resources/database/";
+	private static final String SYS_PATH = "src\\main\\resources\\database\\user\\";
 
 	// Method to create an customer and save to a text file in JSON format
-	public void createCustomer(CustomerDTO customer) {
+	public ResponseCode createCustomer(CustomerDTO customer) {
 
 		String filePath = SYS_PATH + "customer.txt";
 
@@ -28,24 +30,28 @@ public class CustomerService {
 		json.put("id", customer.getId());
 		json.put("name", customer.getName());
 		json.put("phoneNumber", customer.getPhoneNumber());
-		json.put("address", customer.getAddress());
-		json.put("email", customer.getEmailAddress());
+		json.put("addressId", customer.getAddressId());                // Fixed field name
+		json.put("emailAddress", customer.getEmailAddress());          // Fixed field name
+		json.put("password", customer.getPassword());                  // Added password
+		json.put("status", customer.getStatus());                      // Added status
 		json.put("credit", customer.getCredit());
 
 		// Add Lists of IDs
-		json.put("orderHistory", customer.getOrderHistory());
-		json.put("vendorReviews", customer.getVendorReviews());
-		json.put("runnerReviews", customer.getRunnerReviews());
-		json.put("complains", customer.getComplains());
-		json.put("transactions", customer.getTransactions());
-		json.put("deliveryAddresses", customer.getDeliveryAddresses());
+		json.put("orderHistory", customer.getOrderHistory() != null ? new JSONArray(customer.getOrderHistory()) : new JSONArray());
+		json.put("vendorReviews", customer.getVendorReviews() != null ? new JSONArray(customer.getVendorReviews()) : new JSONArray());
+		json.put("runnerReviews", customer.getRunnerReviews() != null ? new JSONArray(customer.getRunnerReviews()) : new JSONArray());
+		json.put("complains", customer.getComplains() != null ? new JSONArray(customer.getComplains()) : new JSONArray());
+		json.put("transactions", customer.getTransactions() != null ? new JSONArray(customer.getTransactions()) : new JSONArray());
+		json.put("deliveryAddresses", customer.getDeliveryAddresses() != null ? new JSONArray(customer.getDeliveryAddresses()) : new JSONArray());
 
 		// Write JSON to text file
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
 			System.out.println("Customer created successfully!");
+			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing customer to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
@@ -68,17 +74,19 @@ public class CustomerService {
 					customer.setId(json.getString("id"));
 					customer.setName(json.getString("name"));
 					customer.setPhoneNumber(json.getString("phoneNumber"));
-					customer.setAddress(json.getString("address"));
-					customer.setEmailAddress(json.getString("email"));
-					customer.setCredit(json.getDouble("credit"));
+					customer.setAddressId(json.optString("addressId", ""));            // Fixed field name
+					customer.setEmailAddress(json.optString("emailAddress", ""));      // Fixed field name
+					customer.setPassword(json.optString("password", ""));              // Added password
+					customer.setStatus(json.optBoolean("status", true));               // Added status with default true
+					customer.setCredit(json.optDouble("credit", 0.0));
 
-					// Convert JSON arrays to List<String>
-					customer.setOrderHistory(JsonUtils.jsonArrayToList(json.getJSONArray("orderHistory")));
-					customer.setVendorReviews(JsonUtils.jsonArrayToList(json.getJSONArray("vendorReviews")));
-					customer.setRunnerReviews(JsonUtils.jsonArrayToList(json.getJSONArray("runnerReviews")));
-					customer.setComplains(JsonUtils.jsonArrayToList(json.getJSONArray("complains")));
-					customer.setTransactions(JsonUtils.jsonArrayToList(json.getJSONArray("transactions")));
-					customer.setDeliveryAddresses(JsonUtils.jsonArrayToList(json.getJSONArray("deliveryAddresses")));
+					// Convert JSON arrays to List<String> with null safety
+					customer.setOrderHistory(JsonUtils.jsonArrayToList(json.optJSONArray("orderHistory")));
+					customer.setVendorReviews(JsonUtils.jsonArrayToList(json.optJSONArray("vendorReviews")));
+					customer.setRunnerReviews(JsonUtils.jsonArrayToList(json.optJSONArray("runnerReviews")));
+					customer.setComplains(JsonUtils.jsonArrayToList(json.optJSONArray("complains")));
+					customer.setTransactions(JsonUtils.jsonArrayToList(json.optJSONArray("transactions")));
+					customer.setDeliveryAddresses(JsonUtils.jsonArrayToList(json.optJSONArray("deliveryAddresses")));
 
 					return customer; // Return the found customer
 				}
@@ -106,17 +114,19 @@ public class CustomerService {
 				customer.setId(json.getString("id"));
 				customer.setName(json.getString("name"));
 				customer.setPhoneNumber(json.getString("phoneNumber"));
-				customer.setAddress(json.getString("address"));
-				customer.setEmailAddress(json.getString("email"));
-				customer.setCredit(json.getDouble("credit"));
+				customer.setAddressId(json.optString("addressId", ""));            // Fixed field name
+				customer.setEmailAddress(json.optString("emailAddress", ""));      // Fixed field name
+				customer.setPassword(json.optString("password", ""));              // Added password
+				customer.setStatus(json.optBoolean("status", true));               // Added status with default true
+				customer.setCredit(json.optDouble("credit", 0.0));
 
-				// Reading orderHistory, vendorReviews, runnerReviews, complains, transactions, deliveryAddresses
-				customer.setOrderHistory(JsonUtils.jsonArrayToList(json.getJSONArray("orderHistory")));
-				customer.setVendorReviews(JsonUtils.jsonArrayToList(json.getJSONArray("vendorReviews")));
-				customer.setRunnerReviews(JsonUtils.jsonArrayToList(json.getJSONArray("runnerReviews")));
-				customer.setComplains(JsonUtils.jsonArrayToList(json.getJSONArray("complains")));
-				customer.setTransactions(JsonUtils.jsonArrayToList(json.getJSONArray("transactions")));
-				customer.setDeliveryAddresses(JsonUtils.jsonArrayToList(json.getJSONArray("deliveryAddreJsonUtils")));
+				// Convert JSON arrays to List<String> with null safety
+				customer.setOrderHistory(JsonUtils.jsonArrayToList(json.optJSONArray("orderHistory")));
+				customer.setVendorReviews(JsonUtils.jsonArrayToList(json.optJSONArray("vendorReviews")));
+				customer.setRunnerReviews(JsonUtils.jsonArrayToList(json.optJSONArray("runnerReviews")));
+				customer.setComplains(JsonUtils.jsonArrayToList(json.optJSONArray("complains")));
+				customer.setTransactions(JsonUtils.jsonArrayToList(json.optJSONArray("transactions")));
+				customer.setDeliveryAddresses(JsonUtils.jsonArrayToList(json.optJSONArray("deliveryAddresses")));
 				customers.add(customer); // Add to the list
 			}
 		} catch (IOException e) {
@@ -129,7 +139,7 @@ public class CustomerService {
 	}
 
 	// Method to update customer
-	public void updateCustomer(CustomerDTO updatedCustomer) {
+	public ResponseCode updateCustomer(CustomerDTO updatedCustomer) {
 
 		String filePath = SYS_PATH + "customer.txt";
 
@@ -147,15 +157,19 @@ public class CustomerService {
 					// Update JSON object with new customer data
 					json.put("name", updatedCustomer.getName());
 					json.put("phoneNumber", updatedCustomer.getPhoneNumber());
-					json.put("address", updatedCustomer.getAddress());
-					json.put("email", updatedCustomer.getEmailAddress());
+					json.put("addressId", updatedCustomer.getAddressId());                // Fixed field name
+					json.put("emailAddress", updatedCustomer.getEmailAddress());          // Fixed field name
+					json.put("password", updatedCustomer.getPassword());                  // Added password
+					json.put("status", updatedCustomer.getStatus());                       // Added status
 					json.put("credit", updatedCustomer.getCredit());
-					json.put("orderHistory", updatedCustomer.getOrderHistory());
-					json.put("vendorReviews", updatedCustomer.getVendorReviews());
-					json.put("runnerReviews", updatedCustomer.getRunnerReviews());
-					json.put("complains", updatedCustomer.getComplains());
-					json.put("transactions", updatedCustomer.getTransactions());
-					json.put("deliveryAddresses", updatedCustomer.getDeliveryAddresses());
+
+					// Convert Lists to JSONArrays
+					json.put("orderHistory", new JSONArray(updatedCustomer.getOrderHistory()));
+					json.put("vendorReviews", new JSONArray(updatedCustomer.getVendorReviews()));
+					json.put("runnerReviews", new JSONArray(updatedCustomer.getRunnerReviews()));
+					json.put("complains", new JSONArray(updatedCustomer.getComplains()));
+					json.put("transactions", new JSONArray(updatedCustomer.getTransactions()));
+					json.put("deliveryAddresses", new JSONArray(updatedCustomer.getDeliveryAddresses()));
 
 					found = true;
 				}
@@ -165,7 +179,7 @@ public class CustomerService {
 			}
 		} catch (IOException e) {
 			System.err.println("Error reading customer file: " + e.getMessage());
-			return;
+			return ResponseCode.IO_EXCEPTION;
 		}
 
 		// Write the updated content back to the file
@@ -176,16 +190,19 @@ public class CustomerService {
 			}
 			if (found) {
 				System.out.println("Customer with ID " + updatedCustomer.getId() + " updated successfully.");
+				return ResponseCode.SUCCESS;
 			} else {
 				System.out.println("Customer with ID " + updatedCustomer.getId() + " not found.");
+				return ResponseCode.RECORD_NOT_FOUND;
 			}
 		} catch (IOException e) {
 			System.err.println("Error writing updated customer data: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
 	// Method to delete a customer
-	public void deleteCustomer(String id) {
+	public ResponseCode deleteCustomer(String id) {
 
 		String filePath = SYS_PATH + "customer.txt";
 
@@ -207,7 +224,7 @@ public class CustomerService {
 			}
 		} catch (IOException e) {
 			System.err.println("Error reading customer file: " + e.getMessage());
-			return;
+			return ResponseCode.IO_EXCEPTION;
 		}
 
 		// Write the updated list back to the file
@@ -218,11 +235,14 @@ public class CustomerService {
 			}
 			if (found) {
 				System.out.println("Customer with ID " + id + " deleted successfully.");
+				return ResponseCode.SUCCESS;
 			} else {
 				System.out.println("Customer with ID " + id + " not found.");
+				return ResponseCode.RECORD_NOT_FOUND;
 			}
 		} catch (IOException e) {
 			System.err.println("Error writing updated customer data: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 

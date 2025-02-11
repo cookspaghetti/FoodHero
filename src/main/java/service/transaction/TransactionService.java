@@ -19,7 +19,7 @@ import enumeration.PaymentMethod;
 
 public class TransactionService {
 
-	private static final String SYS_PATH = "/FoodHero/src/main/resources/database/";
+	private static final String SYS_PATH = "src\\main\\resources\\database\\transaction\\";
 
 	// Method to create an AddTransaction and save to a text file in JSON format
 	public void createAddTransaction(AddTransactionDTO transaction) {

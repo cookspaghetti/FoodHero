@@ -16,7 +16,7 @@ import enumeration.ComplainStatus;
 
 public class ComplainService {
 
-	private static final String SYS_PATH = "/FoodHero/src/main/resources/database/";
+	private static final String SYS_PATH = "src\\main\\resources\\database\\complain\\";
 
 	// Method to create a complain and save it to a text file in JSON format
 	public void createComplain(ComplainDTO complain) {

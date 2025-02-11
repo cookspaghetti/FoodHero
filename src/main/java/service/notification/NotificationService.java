@@ -16,7 +16,7 @@ import dto.NotificationDTO;
 
 public class NotificationService {
 
-	private static final String SYS_PATH = "/FoodHero/src/main/resources/database/";
+	private static final String SYS_PATH = "src\\main\\resources\\database\\notification\\";
 
 	// Method to create a notification and save it to a text file in JSON format
 	public void createNotification(NotificationDTO notification) {

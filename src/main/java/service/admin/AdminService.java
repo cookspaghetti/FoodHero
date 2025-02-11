@@ -12,30 +12,35 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import dto.AdminDTO;
+import enumeration.ResponseCode;
 
 public class AdminService {
 
-	private static final String SYS_PATH = "/FoodHero/src/main/resources/database/";
+	private static final String SYS_PATH = "src\\main\\resources\\database\\user\\";
 
 	// Method to create an admin and save to a text file in JSON format
-	public void createAdmin(AdminDTO admin) {
+	public ResponseCode createAdmin(AdminDTO admin) {
 
 		String filePath = SYS_PATH + "admin.txt";
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
 		json.put("id", admin.getId());
-		json.put("name", admin.getName());
-		json.put("phoneNumber", admin.getPhoneNumber());
-		json.put("address", admin.getAddress());
-		json.put("email", admin.getEmailAddress());
+	    json.put("name", admin.getName());
+	    json.put("phoneNumber", admin.getPhoneNumber());
+	    json.put("addressId", admin.getAddressId());
+	    json.put("emailAddress", admin.getEmailAddress());
+	    json.put("password", admin.getPassword());
+	    json.put("status", admin.getStatus());
 
 		// Write JSON to text file
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
 			System.out.println("Admin created successfully!");
+			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing admin to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
@@ -56,10 +61,12 @@ public class AdminService {
 					// Construct Admin object
 					AdminDTO admin = new AdminDTO();
 					admin.setId(json.getString("id"));
-					admin.setName(json.getString("name"));
-					admin.setPhoneNumber(json.getString("phoneNumber"));
-					admin.setAddress(json.getString("address"));
-					admin.setEmailAddress(json.getString("email"));
+	                admin.setName(json.getString("name"));
+	                admin.setPhoneNumber(json.getString("phoneNumber"));
+	                admin.setAddressId(json.getString("addressId")); // Fixed key
+	                admin.setEmailAddress(json.getString("emailAddress")); // Fixed key
+	                admin.setPassword(json.getString("password")); // Added password
+	                admin.setStatus(json.getBoolean("status"));
 
 					return admin; // Return the found admin
 				}
@@ -85,10 +92,12 @@ public class AdminService {
 
 				AdminDTO admin = new AdminDTO();
 				admin.setId(json.getString("id"));
-				admin.setName(json.getString("name"));
-				admin.setPhoneNumber(json.getString("phoneNumber"));
-				admin.setAddress(json.getString("address"));
-				admin.setEmailAddress(json.getString("email"));
+                admin.setName(json.getString("name"));
+                admin.setPhoneNumber(json.getString("phoneNumber"));
+                admin.setAddressId(json.getString("addressId")); // Fixed key
+                admin.setEmailAddress(json.getString("emailAddress")); // Fixed key
+                admin.setPassword(json.getString("password")); // Added password
+                admin.setStatus(json.getBoolean("status"));
 
 				admins.add(admin); // Add to the list
 			}
@@ -102,7 +111,7 @@ public class AdminService {
 	}
 
 	// Method to update admin
-	public void updateAdmin(AdminDTO updatedAdmin) {
+	public ResponseCode updateAdmin(AdminDTO updatedAdmin) {
 
 		String filePath = SYS_PATH + "admin.txt";
 
@@ -119,9 +128,11 @@ public class AdminService {
 				if (json.getString("id").equals(updatedAdmin.getId())) {
 					// Update JSON object with new admin data
 					json.put("name", updatedAdmin.getName());
-					json.put("phoneNumber", updatedAdmin.getPhoneNumber());
-					json.put("address", updatedAdmin.getAddress());
-					json.put("email", updatedAdmin.getEmailAddress());
+	                json.put("phoneNumber", updatedAdmin.getPhoneNumber());
+	                json.put("addressId", updatedAdmin.getAddressId()); // Fixed key
+	                json.put("emailAddress", updatedAdmin.getEmailAddress()); // Fixed key
+	                json.put("password", updatedAdmin.getPassword()); // Added password
+	                json.put("status", updatedAdmin.getStatus()); // Added status
 
 					found = true;
 				}
@@ -131,7 +142,7 @@ public class AdminService {
 			}
 		} catch (IOException e) {
 			System.err.println("Error reading admin file: " + e.getMessage());
-			return;
+			return ResponseCode.IO_EXCEPTION;
 		}
 
 		// Write the updated content back to the file
@@ -142,16 +153,19 @@ public class AdminService {
 			}
 			if (found) {
 				System.out.println("Admin with ID " + updatedAdmin.getId() + " updated successfully.");
+				return ResponseCode.SUCCESS;
 			} else {
 				System.out.println("Admin with ID " + updatedAdmin.getId() + " not found.");
+				return ResponseCode.RECORD_NOT_FOUND;
 			}
 		} catch (IOException e) {
 			System.err.println("Error writing updated admin data: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
 	// Method to delete an admin
-	public void deleteAdmin(String id) {
+	public ResponseCode deleteAdmin(String id) {
 
 		String filePath = SYS_PATH + "admin.txt";
 
@@ -173,7 +187,7 @@ public class AdminService {
 			}
 		} catch (IOException e) {
 			System.err.println("Error reading admin file: " + e.getMessage());
-			return;
+			return ResponseCode.IO_EXCEPTION;
 		}
 
 		// Write the updated list back to the file
@@ -184,13 +198,15 @@ public class AdminService {
 			}
 			if (found) {
 				System.out.println("Admin with ID " + id + " deleted successfully.");
+				return ResponseCode.SUCCESS;
 			} else {
 				System.out.println("Admin with ID " + id + " not found.");
+				return ResponseCode.RECORD_NOT_FOUND;
 			}
 		} catch (IOException e) {
 			System.err.println("Error writing updated admin data: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
-
 
 }

@@ -19,7 +19,7 @@ import enumeration.OrderStatus;
 
 public class OrderService {
 
-	private static final String SYS_PATH = "/FoodHero/src/main/resources/database/";
+	private static final String SYS_PATH = "src\\main\\resources\\database\\order\\";
 
 	// Method to create an order and save to a text file in JSON format
 	public void createOrder(OrderDTO order) {
