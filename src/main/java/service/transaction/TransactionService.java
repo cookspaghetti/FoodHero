@@ -21,6 +21,7 @@ public class TransactionService {
 
 	// Method to create an AddTransaction and save to a text file in JSON format
 	public void createAddTransaction(AddTransactionDTO transaction) {
+		
 		String filePath = SYS_PATH + "add_transaction.txt";
 
 		// Construct JSON Object
@@ -44,6 +45,7 @@ public class TransactionService {
 
 	// Method to read an AddTransaction from the text file
 	public AddTransactionDTO readAddTransaction(String id) {
+		
 		String filePath = SYS_PATH + "add_transaction.txt";
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -77,7 +79,9 @@ public class TransactionService {
 
 	// Method to delete an AddTransaction from the text file
 	public void deleteAddTransaction(String id) {
+		
 		String filePath = SYS_PATH + "add_transaction.txt";
+		
 		List<String> updatedTransactions = new ArrayList<>();
 		boolean isDeleted = false;
 
@@ -114,6 +118,7 @@ public class TransactionService {
 
 	// Method to create a DeductTransaction and save it to a text file in JSON format
 	public void createDeductTransaction(DeductTransactionDTO transaction) {
+		
 		String filePath = SYS_PATH + "deduct_transaction.txt";
 
 		// Construct JSON Object
@@ -136,6 +141,7 @@ public class TransactionService {
 
 	// Method to read a DeductTransaction from the text file
 	public DeductTransactionDTO readDeductTransaction(String id) {
+		
 		String filePath = SYS_PATH + "deduct_transaction.txt";
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -168,7 +174,9 @@ public class TransactionService {
 
 	// Method to delete a DeductTransaction from the text file
 	public void deleteDeductTransaction(String id) {
+		
 		String filePath = SYS_PATH + "deduct_transaction.txt";
+		
 		List<String> updatedTransactions = new ArrayList<>();
 		boolean found = false;
 
