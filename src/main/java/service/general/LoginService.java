@@ -15,16 +15,17 @@ import dto.CustomerDTO;
 import dto.ManagerDTO;
 import dto.RunnerDTO;
 import dto.VendorDTO;
+import enumeration.ResponseCode;
 import enumeration.Role;
 import service.utils.JsonUtils;
 
 public class LoginService {
 
-	private static final String SYS_PATH = "src\\main\\resources\\database\\";
+	private static final String SYS_PATH = "src\\main\\resources\\database\\user\\";
 
 	private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
 
-	public static boolean login(Role role, String email, String password) {
+	public static ResponseCode login(Role role, String email, String password) {
 
 		String filePath = SYS_PATH + getFileNameByRole(role);
 
@@ -34,19 +35,20 @@ public class LoginService {
 				JSONObject json = new JSONObject(line);
 
 				// Check for matching email and password
-				if (json.getString("email").equals(email) && json.getString("password").equals(password)) {
+				if (json.getString("emailAddress").equals(email) && json.getString("password").equals(password)) {
 					System.out.println(role + " logged in successfully!");
 					setCurrentUserInfo(role, json);
 					System.out.println("Current session: " + SessionControlService.getRole());
-					return true;
+					return ResponseCode.SUCCESS;
 				}
 			}
 		} catch (IOException e) {
 			System.err.println("Error reading from file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 
 		System.out.println("Login failed for role: " + role);
-		return false;
+		return ResponseCode.RECORD_NOT_FOUND;
 	}
 
 	// Get file name based on enum value
@@ -100,15 +102,15 @@ public class LoginService {
 		case RUNNER:
 			RunnerDTO runner = new RunnerDTO();
 			runner.setId(json.getString("id"));
-            runner.setName(json.getString("name"));
-            runner.setPhoneNumber(json.getString("phoneNumber"));
-            runner.setAddressId(json.optString("addressId", ""));  // Fixed field name
-            runner.setEmailAddress(json.optString("emailAddress", "")); // Fixed field name
-            runner.setPassword(json.optString("password", ""));    // Added password
-            runner.setStatus(json.optBoolean("status", true));     // Added status (default true)
-            runner.setPlateNumber(json.optString("plateNumber", ""));
-            runner.setEarnings(json.optDouble("earnings", 0.0));
-            runner.setRatings(json.optDouble("ratings", 0.0));
+			runner.setName(json.getString("name"));
+			runner.setPhoneNumber(json.getString("phoneNumber"));
+			runner.setAddressId(json.optString("addressId", ""));  // Fixed field name
+			runner.setEmailAddress(json.optString("emailAddress", "")); // Fixed field name
+			runner.setPassword(json.optString("password", ""));    // Added password
+			runner.setStatus(json.optBoolean("status", true));     // Added status (default true)
+			runner.setPlateNumber(json.optString("plateNumber", ""));
+			runner.setEarnings(json.optDouble("earnings", 0.0));
+			runner.setRatings(json.optDouble("ratings", 0.0));
 
 			// Convert JSON arrays to List<String>
 			runner.setTasks(JsonUtils.jsonArrayToList(json.getJSONArray("tasks")));
@@ -151,27 +153,27 @@ public class LoginService {
 
 			SessionControlService.setSession(vendor);
 			break;
-		
+
 		case CUSTOMER:
 			CustomerDTO customer = new CustomerDTO();
 			customer.setId(json.getString("id"));
-            customer.setName(json.getString("name"));
-            customer.setPhoneNumber(json.getString("phoneNumber"));
-            customer.setAddressId(json.optString("addressId", ""));            // Fixed field name
-            customer.setEmailAddress(json.optString("emailAddress", ""));      // Fixed field name
-            customer.setPassword(json.optString("password", ""));              // Added password
-            customer.setStatus(json.optBoolean("status", true));               // Added status with default true
-            customer.setCredit(json.optDouble("credit", 0.0));
+			customer.setName(json.getString("name"));
+			customer.setPhoneNumber(json.getString("phoneNumber"));
+			customer.setAddressId(json.optString("addressId", ""));            // Fixed field name
+			customer.setEmailAddress(json.optString("emailAddress", ""));      // Fixed field name
+			customer.setPassword(json.optString("password", ""));              // Added password
+			customer.setStatus(json.optBoolean("status", true));               // Added status with default true
+			customer.setCredit(json.optDouble("credit", 0.0));
 
-            // Convert JSON arrays to List<String> with null safety
-            customer.setOrderHistory(JsonUtils.jsonArrayToList(json.optJSONArray("orderHistory")));
-            customer.setVendorReviews(JsonUtils.jsonArrayToList(json.optJSONArray("vendorReviews")));
-            customer.setRunnerReviews(JsonUtils.jsonArrayToList(json.optJSONArray("runnerReviews")));
-            customer.setComplains(JsonUtils.jsonArrayToList(json.optJSONArray("complains")));
-            customer.setTransactions(JsonUtils.jsonArrayToList(json.optJSONArray("transactions")));
-            customer.setDeliveryAddresses(JsonUtils.jsonArrayToList(json.optJSONArray("deliveryAddresses")));
-            
-            SessionControlService.setSession(customer);
+			// Convert JSON arrays to List<String> with null safety
+			customer.setOrderHistory(JsonUtils.jsonArrayToList(json.optJSONArray("orderHistory")));
+			customer.setVendorReviews(JsonUtils.jsonArrayToList(json.optJSONArray("vendorReviews")));
+			customer.setRunnerReviews(JsonUtils.jsonArrayToList(json.optJSONArray("runnerReviews")));
+			customer.setComplains(JsonUtils.jsonArrayToList(json.optJSONArray("complains")));
+			customer.setTransactions(JsonUtils.jsonArrayToList(json.optJSONArray("transactions")));
+			customer.setDeliveryAddresses(JsonUtils.jsonArrayToList(json.optJSONArray("deliveryAddresses")));
+
+			SessionControlService.setSession(customer);
 			break;
 
 		default:

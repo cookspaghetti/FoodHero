@@ -19,7 +19,7 @@ public class AdminService {
 	private static final String SYS_PATH = "src\\main\\resources\\database\\user\\";
 
 	// Method to create an admin and save to a text file in JSON format
-	public ResponseCode createAdmin(AdminDTO admin) {
+	public static ResponseCode createAdmin(AdminDTO admin) {
 
 		String filePath = SYS_PATH + "admin.txt";
 

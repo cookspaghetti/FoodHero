@@ -6,6 +6,7 @@ import java.util.List;
 public class VendorDTO extends UserDTO {
 	
 	private String vendorName;
+	private Boolean open;
     private HashMap<String, Integer> items; // item id, stocks left
     private List<String> orderHistory;
     private double ratings;
@@ -41,6 +42,12 @@ public class VendorDTO extends UserDTO {
 	}
 	public void setRatings(double ratings) {
 		this.ratings = ratings;
+	}
+	public Boolean getOpen() {
+		return open;
+	}
+	public void setOpen(Boolean open) {
+		this.open = open;
 	}
     
 }

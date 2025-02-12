@@ -13,7 +13,10 @@ import dto.VendorDTO;
 import enumeration.Role;
 
 public class SessionControlService {
-
+	
+	// User DTO
+	private static UserDTO user;
+	
 	// Common user information
 	private static String id;
 	private static String name;
@@ -47,6 +50,7 @@ public class SessionControlService {
 	// === Set Session for Admin ===
 	public static void setSession(AdminDTO admin) {
 		clearSession();
+		user = admin;
 		role = Role.ADMIN;
 		setCommonUserInfo(admin);
 	}
@@ -54,6 +58,7 @@ public class SessionControlService {
 	// === Set Session for Manager ===
 	public static void setSession(ManagerDTO manager) {
 		clearSession();
+		user = manager;
 		role = Role.MANAGER;
 		setCommonUserInfo(manager);
 	}
@@ -61,6 +66,7 @@ public class SessionControlService {
 	// === Set Session for Runner ===
 	public static void setSession(RunnerDTO runner) {
 		clearSession();
+		user = runner;
 		role = Role.RUNNER;
 		setCommonUserInfo(runner);
 
@@ -76,6 +82,7 @@ public class SessionControlService {
 	// === Set Session for Vendor ===
 	public static void setSession(VendorDTO vendor) {
 		clearSession();
+		user = vendor;
 		role = Role.VENDOR;
 		setCommonUserInfo(vendor);
 
@@ -89,6 +96,7 @@ public class SessionControlService {
 	// === Set Session for Vendor ===
 	public static void setSession(CustomerDTO customer) {
 		clearSession();
+		user = customer;
 		role = Role.VENDOR;
 		setCommonUserInfo(customer);
 
@@ -103,6 +111,7 @@ public class SessionControlService {
 
 	// === Clear Session (Logout) ===
 	public static void clearSession() {
+		user = null;
 		id = name = phoneNumber = addressId = emailAddress = password = null;
 		status = null;
 		role = null;
@@ -126,6 +135,7 @@ public class SessionControlService {
 	}
 
 	// === Getters for Session Info ===
+	public static UserDTO getUser() { return user; };
 	public static String getId() { return id; }
 	public static String getName() { return name; }
 	public static String getPhoneNumber() { return phoneNumber; }

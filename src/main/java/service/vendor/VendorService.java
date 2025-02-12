@@ -33,15 +33,16 @@ public class VendorService {
 		json.put("id", vendor.getId());
 	    json.put("name", vendor.getName());
 	    json.put("phoneNumber", vendor.getPhoneNumber());
-	    json.put("addressId", vendor.getAddressId());                      // Fixed field name
-	    json.put("emailAddress", vendor.getEmailAddress());               // Fixed field name
-	    json.put("password", vendor.getPassword());                       // Added password
+	    json.put("addressId", vendor.getAddressId());                    
+	    json.put("emailAddress", vendor.getEmailAddress());              
+	    json.put("password", vendor.getPassword());                       
 	    json.put("status", vendor.getStatus());
 	    json.put("vendorName", vendor.getVendorName());
-	    json.put("items", new JSONObject(vendor.getItems()));             // Convert HashMap to JSONObject
-	    json.put("orderHistory", new JSONArray(vendor.getOrderHistory())); // Correct JSONArray conversion
+	    json.put("items", new JSONObject(vendor.getItems()));             
+	    json.put("orderHistory", new JSONArray(vendor.getOrderHistory()));
 	    json.put("ratings", vendor.getRatings());
-	    json.put("reviews", new JSONArray(vendor.getReviews()));          // Correct JSONArray conversion
+	    json.put("reviews", new JSONArray(vendor.getReviews()));  
+	    json.put("open", vendor.getOpen());
 
 		// Write JSON to text file
 		try (FileWriter file = new FileWriter(filePath, true)) {
@@ -94,6 +95,7 @@ public class VendorService {
 					vendor.setVendorName(json.getString("vendorName"));
 					vendor.setRatings(json.getDouble("ratings"));
 					vendor.setPassword(json.getString("password"));
+					vendor.setOpen(json.getBoolean("open"));
 
 					// Convert JSON Object (items) to HashMap<String, Integer>
 					HashMap<String, Integer> itemsMap = new HashMap<>();
@@ -143,7 +145,8 @@ public class VendorService {
 					vendor.setVendorName(json.getString("vendorName"));
 					vendor.setRatings(json.getDouble("ratings"));
 					vendor.setPassword(json.getString("password"));
-
+					vendor.setOpen(json.getBoolean("open"));
+					
 					// Convert JSON Object (items) to HashMap<String, Integer>
 					HashMap<String, Integer> itemsMap = new HashMap<>();
 					JSONObject itemsJson = json.getJSONObject("items");
@@ -190,6 +193,7 @@ public class VendorService {
 				vendor.setVendorName(json.getString("vendorName"));
 				vendor.setRatings(json.getDouble("ratings"));
 				vendor.setPassword(json.getString("password"));
+				vendor.setOpen(json.getBoolean("open"));
 
 				// Convert JSON Object (items) to HashMap<String, Integer>
 				HashMap<String, Integer> itemsMap = new HashMap<>();
@@ -243,6 +247,7 @@ public class VendorService {
 				    json.put("orderHistory", new JSONArray(updatedVendor.getOrderHistory())); // Correct JSONArray conversion
 				    json.put("ratings", updatedVendor.getRatings());
 				    json.put("reviews", new JSONArray(updatedVendor.getReviews()));
+				    json.put("open", updatedVendor.getOpen());
 
 					found = true;
 				}
