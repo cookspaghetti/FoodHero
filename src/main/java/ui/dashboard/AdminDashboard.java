@@ -6,7 +6,9 @@ import java.awt.GridLayout;
 
 import javax.swing.*;
 import dto.AdminDTO; // Assuming you have AdminDTO for user details
+import enumeration.Role;
 import ui.login.LoginInterface;
+import ui.user.AdminPage;
 
 public class AdminDashboard extends JFrame {
 	private AdminDTO admin;
@@ -36,19 +38,19 @@ public class AdminDashboard extends JFrame {
 		JMenu userMenu = new JMenu("User");
 
 		JMenuItem adminItem = new JMenuItem("Admin");
-		adminItem.addActionListener(e -> openUserPage("Admin"));
+		adminItem.addActionListener(e -> openUserPage(Role.ADMIN));
 
 		JMenuItem managerItem = new JMenuItem("Manager");
-		managerItem.addActionListener(e -> openUserPage("Manager"));
+		managerItem.addActionListener(e -> openUserPage(Role.MANAGER));
 
 		JMenuItem customerItem = new JMenuItem("Customer");
-		customerItem.addActionListener(e -> openUserPage("Customer"));
+		customerItem.addActionListener(e -> openUserPage(Role.CUSTOMER));
 
 		JMenuItem vendorItem = new JMenuItem("Vendor");
-		vendorItem.addActionListener(e -> openUserPage("Vendor"));
+		vendorItem.addActionListener(e -> openUserPage(Role.VENDOR));
 
 		JMenuItem runnerItem = new JMenuItem("Runner");
-		runnerItem.addActionListener(e -> openUserPage("Runner"));
+		runnerItem.addActionListener(e -> openUserPage(Role.RUNNER));
 
 		userMenu.add(adminItem);
 		userMenu.add(managerItem);
@@ -113,10 +115,14 @@ public class AdminDashboard extends JFrame {
 		JOptionPane.showMessageDialog(this, "Dashboard opened.");
 	}
 
-	private void openUserPage(String userType) {
-		JOptionPane.showMessageDialog(this, userType + " page opened.");
-		// You can replace this with the actual JFrame for each user
-		// Example: new AdminPage().setVisible(true);
+	private void openUserPage(Role role) {
+		
+		switch (role) {
+		
+		case ADMIN:
+			new AdminPage().setVisible(true);
+		}
+			
 	}
 
 	private void openTopUpPage() {
