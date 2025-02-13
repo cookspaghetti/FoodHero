@@ -40,7 +40,8 @@ public class RunnerService {
 		// Handle lists properly
 		json.put("tasks", runner.getTasks() != null ? new JSONArray(runner.getTasks()) : new JSONArray());
 		json.put("reviews", runner.getReviews() != null ? new JSONArray(runner.getReviews()) : new JSONArray());
-
+		
+		json.put("available", runner.isAvailable());
 		json.put("earnings", runner.getEarnings());
 		json.put("ratings", runner.getRatings());     // Added ratings field
 		json.put("lastDeliveredAddress", runner.getLastDeliveredAddress() != null ? runner.getLastDeliveredAddress() : "");
@@ -62,7 +63,7 @@ public class RunnerService {
 	}
 
 	// Method to read runner info
-	public RunnerDTO readRunner(String id) {
+	public static RunnerDTO readRunner(String id) {
 		String filePath = SYS_PATH + "runner.txt";
 
 		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -86,6 +87,7 @@ public class RunnerService {
 					runner.setPlateNumber(json.optString("plateNumber", ""));
 					runner.setEarnings(json.optDouble("earnings", 0.0));
 					runner.setRatings(json.optDouble("ratings", 0.0));
+					runner.setAvailable(json.optBoolean("available"));
 
 					// Convert JSON arrays to List<String>
 					runner.setTasks(JsonUtils.jsonArrayToList(json.getJSONArray("tasks")));
@@ -132,7 +134,8 @@ public class RunnerService {
 				runner.setPlateNumber(json.optString("plateNumber", ""));
 				runner.setEarnings(json.optDouble("earnings", 0.0));
 				runner.setRatings(json.optDouble("ratings", 0.0));
-
+				runner.setAvailable(json.optBoolean("available"));
+				
 				// Reading tasks and reviews (Lists)
 				runner.setTasks(JsonUtils.jsonArrayToList(json.getJSONArray("tasks")));
 				runner.setReviews(JsonUtils.jsonArrayToList(json.getJSONArray("reviews")));
@@ -178,7 +181,8 @@ public class RunnerService {
 					json.put("plateNumber", updatedRunner.getPlateNumber());
 					json.put("earnings", updatedRunner.getEarnings());
 					json.put("ratings", updatedRunner.getRatings());                    // Added ratings
-
+					json.put("available", updatedRunner.isAvailable());
+					
 					// Convert Lists to JSON Arrays safely
 					json.put("tasks", updatedRunner.getTasks() != null ? new JSONArray(updatedRunner.getTasks()) : new JSONArray());
 					json.put("reviews", updatedRunner.getReviews() != null ? new JSONArray(updatedRunner.getReviews()) : new JSONArray());

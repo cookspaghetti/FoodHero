@@ -9,6 +9,7 @@ public class RunnerDTO extends UserDTO {
     private List<String> tasks;
     private double earnings;
     private double ratings;
+    private Boolean available;
     private List<String> reviews;
     private String lastDeliveredAddress;
     private LocalDateTime lastDeliveryDate;
@@ -55,6 +56,12 @@ public class RunnerDTO extends UserDTO {
 	}
 	public void setRatings(double ratings) {
 		this.ratings = ratings;
+	}
+	public Boolean isAvailable() {
+		return available;
+	}
+	public void setAvailable(Boolean available) {
+		this.available = available;
 	}
     
 }
