@@ -8,14 +8,24 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import enumeration.ButtonMode;
+
 public class ButtonRenderer extends JPanel implements TableCellRenderer {
 	private final JButton editButton = new JButton("Edit");
     private final JButton deleteButton = new JButton("Delete");
 
-    public ButtonRenderer() {
-        setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
-        add(editButton);
-        add(deleteButton);
+    public ButtonRenderer(ButtonMode mode) {
+    	if (mode == ButtonMode.EDIT) {
+    		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
+            add(editButton);
+    	} else if (mode == ButtonMode.DELETE) {
+    		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
+            add(deleteButton);
+    	} else if (mode == ButtonMode.EDITDELETE) {
+    		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
+            add(editButton);
+            add(deleteButton);
+    	}
     }
 
     @Override
