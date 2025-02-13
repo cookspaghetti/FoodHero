@@ -45,6 +45,7 @@ public class ItemService {
 		json.put("id", item.getId());
 		json.put("name", item.getName());
 		json.put("price", item.getPrice());
+		json.put("defaultAmount", item.getDefaultAmount());
 		json.put("vendorId", item.getVendorId());
 		json.put("description", item.getDescription());
 		json.put("availability", item.isAvailability());
@@ -76,6 +77,7 @@ public class ItemService {
 					item.setId(json.getString("id"));
 					item.setName(json.getString("name"));
 					item.setPrice(json.getDouble("price"));
+					item.setDefaultAmount(json.getInt("defaultAmount"));
 					item.setVendorId(json.getString("vendorId"));
 					item.setDescription(json.getString("description"));
 					item.setAvailability(json.getBoolean("availability"));
@@ -111,6 +113,7 @@ public class ItemService {
 				item.setId(json.getString("id"));
 				item.setName(json.getString("name"));
 				item.setPrice(json.getDouble("price"));
+				item.setDefaultAmount(json.getInt("defaultAmount"));
 				item.setVendorId(json.getString("vendorId"));
 				item.setDescription(json.getString("description"));
 				item.setAvailability(json.getBoolean("availability"));
@@ -157,6 +160,7 @@ public class ItemService {
 					// Update the item's details
 					json.put("name", updatedItem.getName());
 					json.put("price", updatedItem.getPrice());
+					json.put("defaultAmount", updatedItem.getDefaultAmount());
 					json.put("vendorId", updatedItem.getVendorId());
 					json.put("description", updatedItem.getDescription());
 					json.put("availability", updatedItem.isAvailability());
@@ -185,7 +189,7 @@ public class ItemService {
 	}
 
 	// Method to delete an item from the text file
-	public ResponseCode deleteItem(String vendorId, String itemId) {
+	public static ResponseCode deleteItem(String vendorId, String itemId) {
 
 		// Construct the file name
 		String filePath = SYS_PATH + "item_" + vendorId + ".txt";

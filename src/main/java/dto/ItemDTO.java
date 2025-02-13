@@ -5,6 +5,7 @@ public class ItemDTO {
 	private String id;
     private String name;
     private double price;
+    private int defaultAmount;
     private String vendorId;
     private String description;
     private boolean availability;
@@ -45,6 +46,12 @@ public class ItemDTO {
 	}
 	public void setAvailability(boolean availability) {
 		this.availability = availability;
+	}
+	public int getDefaultAmount() {
+		return defaultAmount;
+	}
+	public void setDefaultAmount(int defaultAmount) {
+		this.defaultAmount = defaultAmount;
 	}
     
 }
