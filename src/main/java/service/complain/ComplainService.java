@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import dto.ComplainDTO;
 import enumeration.ComplainStatus;
+import enumeration.ResponseCode;
 
 public class ComplainService {
 
@@ -71,36 +72,88 @@ public class ComplainService {
 		System.out.println("Complain with ID " + id + " not found.");
 		return null; // If no matching complain is found
 	}
-	
+
 	// Method to read all complaints from the text file
-    public List<ComplainDTO> readAllComplain() {
-        String filePath = SYS_PATH + "complain.txt";
-        List<ComplainDTO> complaints = new ArrayList<>();
+	public List<ComplainDTO> readAllComplain() {
+		String filePath = SYS_PATH + "complain.txt";
+		List<ComplainDTO> complaints = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
 
-            while ((line = reader.readLine()) != null) {
-                JSONObject json = new JSONObject(line);
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
 
-                ComplainDTO complain = new ComplainDTO();
-                complain.setId(json.getString("id"));
-                complain.setCustomerId(json.getString("customerId"));
-                complain.setOrderId(json.getString("orderId"));
-                complain.setDescription(json.getString("description"));
-                complain.setStatus(ComplainStatus.valueOf(json.getString("status")));
-                complain.setSolution(json.getString("solution"));
+				ComplainDTO complain = new ComplainDTO();
+				complain.setId(json.getString("id"));
+				complain.setCustomerId(json.getString("customerId"));
+				complain.setOrderId(json.getString("orderId"));
+				complain.setDescription(json.getString("description"));
+				complain.setStatus(ComplainStatus.valueOf(json.getString("status")));
+				complain.setSolution(json.getString("solution"));
 
-                complaints.add(complain); // Add to the list
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading complaints from file: " + e.getMessage());
-        } catch (JSONException e) {
-            System.err.println("Error parsing JSON: " + e.getMessage());
-        }
+				complaints.add(complain); // Add to the list
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading complaints from file: " + e.getMessage());
+		} catch (JSONException e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
 
-        return complaints; // Return the list of complaints
-    }
+		return complaints; // Return the list of complaints
+	}
+
+	// Method to update complain
+	public ResponseCode updateComplain(ComplainDTO updatedComplain) {
+		String filePath = SYS_PATH + "complain.txt";
+		List<String> updatedLines = new ArrayList<>();
+		boolean found = false;
+
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				// Check if the current complain matches the ID
+				if (json.getString("id").equals(updatedComplain.getId())) {
+					// Update JSON object with new Complain data
+					json.put("id", updatedComplain.getId());
+					json.put("customerId", updatedComplain.getCustomerId());
+					json.put("orderId", updatedComplain.getOrderId());
+					json.put("description", updatedComplain.getDescription());
+					json.put("status", updatedComplain.getStatus());
+					json.put("solution", updatedComplain.getSolution());
+
+					found = true;
+				}
+
+				// Add the (possibly updated) line to the list
+				updatedLines.add(json.toString());
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading complain file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
+		}
+
+		// Write the updated content back to the file
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
+			for (String updatedLine : updatedLines) {
+				bw.write(updatedLine);
+				bw.newLine();
+			}
+			if (found) {
+				System.out.println("Complain with ID " + updatedComplain.getId() + " updated successfully.");
+				return ResponseCode.SUCCESS;
+			} else {
+				System.out.println("Complain with ID " + updatedComplain.getId() + " not found.");
+				return ResponseCode.RECORD_NOT_FOUND;
+			}
+		} catch (IOException e) {
+			System.err.println("Error writing updated complain data: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
+		}
+	}
 
 	// Method to delete a complain from the text file
 	public void deleteComplain(String id) {
