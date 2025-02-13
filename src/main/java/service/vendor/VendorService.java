@@ -71,7 +71,7 @@ public class VendorService {
 	}
 
 	// Method to read vendor info
-	public VendorDTO readVendor(String id) {
+	public static VendorDTO readVendor(String id) {
 		
 		String filePath = SYS_PATH + "vendor.txt";
 
@@ -283,7 +283,7 @@ public class VendorService {
 	}
 
 	// Method to delete a vendor
-	public ResponseCode deleteVendor(String id) {
+	public static ResponseCode deleteVendor(String id) {
 	    String filePath = SYS_PATH + "vendor.txt";
 	    List<String> updatedLines = new ArrayList<>();
 	    boolean found = false;

@@ -45,7 +45,7 @@ public class ManagerService {
 	}
 
 	// Method to read manager info
-	public ManagerDTO readAdmin(String id) {
+	public static ManagerDTO readManager(String id) {
 
 		String filePath = SYS_PATH + "manager.txt";
 
@@ -164,7 +164,7 @@ public class ManagerService {
 	}
 
 	// Method to delete a manager
-	public ResponseCode deleteManager(String id) {
+	public static ResponseCode deleteManager(String id) {
 
 		String filePath = SYS_PATH + "manager.txt";
 

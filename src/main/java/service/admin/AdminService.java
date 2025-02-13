@@ -45,7 +45,7 @@ public class AdminService {
 	}
 
 	// Method to read admin info
-	public AdminDTO readAdmin(String id) {
+	public static AdminDTO readAdmin(String id) {
 
 		String filePath = SYS_PATH + "admin.txt";
 
@@ -165,7 +165,7 @@ public class AdminService {
 	}
 
 	// Method to delete an admin
-	public ResponseCode deleteAdmin(String id) {
+	public static ResponseCode deleteAdmin(String id) {
 
 		String filePath = SYS_PATH + "admin.txt";
 

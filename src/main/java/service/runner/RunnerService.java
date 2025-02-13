@@ -226,7 +226,7 @@ public class RunnerService {
 	}
 
 	// Method to delete a runner
-	public ResponseCode deleteRunner(String id) {
+	public static ResponseCode deleteRunner(String id) {
 
 		String filePath = SYS_PATH + "runner.txt";
 

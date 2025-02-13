@@ -56,7 +56,7 @@ public class CustomerService {
 	}
 
 	// Method to read customer info
-	public CustomerDTO readCustomer(String id) {
+	public static CustomerDTO readCustomer(String id) {
 
 		String filePath = SYS_PATH + "customer.txt";
 
@@ -202,7 +202,7 @@ public class CustomerService {
 	}
 
 	// Method to delete a customer
-	public ResponseCode deleteCustomer(String id) {
+	public static ResponseCode deleteCustomer(String id) {
 
 		String filePath = SYS_PATH + "customer.txt";
 
