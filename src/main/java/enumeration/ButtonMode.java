@@ -4,5 +4,7 @@ public enum ButtonMode {
 	
 	EDIT,
 	DELETE,
-	EDITDELETE
+	EDITDELETE,
+	DISABLE,
+	DISABLEDELETE
 }

@@ -32,6 +32,7 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 	private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 6));
 	private final JButton editButton = new JButton("Edit");
 	private final JButton deleteButton = new JButton("Delete");
+    private final JButton disableButton = new JButton("Disable");
 	private String itemId;
 	private String vendorId; // specifically for itemPage
 	private ServiceType type;
@@ -64,6 +65,19 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 			});
 
 			panel.add(editButton);
+			panel.add(deleteButton);
+		} else if (mode == ButtonMode.DISABLEDELETE) {
+			disableButton.addActionListener(e -> {
+				System.out.println("Disable clicked for Admin ID: " + itemId);
+				handleDisableAction();
+			});
+
+			deleteButton.addActionListener(e -> {
+				System.out.println("Delete clicked for Admin ID: " + itemId);
+				handleDeleteAction();
+			});
+
+			panel.add(disableButton);
 			panel.add(deleteButton);
 		}
 		
@@ -125,6 +139,22 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 //		case NOTIFICATION -> NotificationService.deleteNotification(itemId);
 		default -> JOptionPane.showMessageDialog(null, "Invalid type for deletion.");
 		}
+	}
+	
+	private void handleDisableAction() {
+		if (type == null) {
+			JOptionPane.showMessageDialog(null, "Unknown type. Cannot delete.");
+			return;
+		}
+		
+		int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to disable this item?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+		if (confirm != JOptionPane.YES_OPTION) {
+			return;
+		}
+		
+		// Update the item availability
+		
+		// Send notification to vendor
 	}
 
 	private ServiceType getDataTypeFromId(String id) {

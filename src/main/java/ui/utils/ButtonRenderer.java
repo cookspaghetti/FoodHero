@@ -13,6 +13,7 @@ import enumeration.ButtonMode;
 public class ButtonRenderer extends JPanel implements TableCellRenderer {
 	private final JButton editButton = new JButton("Edit");
     private final JButton deleteButton = new JButton("Delete");
+    private final JButton disableButton = new JButton("Disable");
 
     public ButtonRenderer(ButtonMode mode) {
     	if (mode == ButtonMode.EDIT) {
@@ -24,6 +25,10 @@ public class ButtonRenderer extends JPanel implements TableCellRenderer {
     	} else if (mode == ButtonMode.EDITDELETE) {
     		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
             add(editButton);
+            add(deleteButton);
+    	} else if (mode == ButtonMode.DISABLEDELETE) {
+    		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
+            add(disableButton);
             add(deleteButton);
     	}
     }

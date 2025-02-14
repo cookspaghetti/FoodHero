@@ -2,13 +2,30 @@ package ui.dashboard;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 
-import javax.swing.*;
-import dto.AdminDTO; // Assuming you have AdminDTO for user details
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
+
+import dto.AdminDTO;
+import dto.ManagerDTO;
 import enumeration.Role;
 import service.general.SessionControlService;
+import ui.complaint.ComplaintPage;
+import ui.item.ItemPage;
 import ui.login.LoginInterface;
+import ui.performance.PerformancePage;
+import ui.revenue.RevenuePage;
 import ui.topup.TopUpPage;
 import ui.user.AdminPage;
 import ui.user.CustomerPage;
@@ -16,18 +33,16 @@ import ui.user.ManagerPage;
 import ui.user.RunnerPage;
 import ui.user.VendorPage;
 
-import java.awt.Font;
+public class ManagerDashboard extends JFrame {
+	private ManagerDTO manager;
 
-public class AdminDashboard extends JFrame {
-	private AdminDTO admin;
-
-	public AdminDashboard(AdminDTO admin) {
-		this.admin = admin;
+	public ManagerDashboard(ManagerDTO manager) {
+		this.manager = manager;
 		initComponents();
 	}
 
 	private void initComponents() {
-		setTitle("Admin Dashboard");
+		setTitle("Manager Dashboard");
 		setSize(800, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null); // Center the window
@@ -42,46 +57,42 @@ public class AdminDashboard extends JFrame {
 		dashboardItem.addActionListener(e -> showDashboard());
 		homeMenu.add(dashboardItem);
 
-		// User Menu
-		JMenu userMenu = new JMenu("User");
+		// Item Menu
+		JMenu itemMenu = new JMenu("Item");
+		JMenuItem itemMenuItem = new JMenuItem("Item Management");
+		itemMenuItem.addActionListener(e -> openItemPage());
+		itemMenu.add(itemMenuItem);
 
-		JMenuItem adminItem = new JMenuItem("Admin");
-		adminItem.addActionListener(e -> openUserPage(Role.ADMIN));
+		// Revenue Menu
+		JMenu revenueMenu = new JMenu("Revenue");
+		JMenuItem revenueItem = new JMenuItem("Revenue Management");
+		revenueItem.addActionListener(e -> openRevenuePage());
+		revenueMenu.add(revenueItem);
 
-		JMenuItem managerItem = new JMenuItem("Manager");
-		managerItem.addActionListener(e -> openUserPage(Role.MANAGER));
+		// Revenue Menu
+		JMenu performanceMenu = new JMenu("Performance");
+		JMenuItem performanceItem = new JMenuItem("Performance Management");
+		performanceItem.addActionListener(e -> openPerformancePage());
+		performanceMenu.add(performanceItem);
 
-		JMenuItem customerItem = new JMenuItem("Customer");
-		customerItem.addActionListener(e -> openUserPage(Role.CUSTOMER));
-
-		JMenuItem vendorItem = new JMenuItem("Vendor");
-		vendorItem.addActionListener(e -> openUserPage(Role.VENDOR));
-
-		JMenuItem runnerItem = new JMenuItem("Runner");
-		runnerItem.addActionListener(e -> openUserPage(Role.RUNNER));
-
-		userMenu.add(adminItem);
-		userMenu.add(managerItem);
-		userMenu.add(customerItem);
-		userMenu.add(vendorItem);
-		userMenu.add(runnerItem);
-
-		// Top Up Menu
-		JMenu topUpMenu = new JMenu("Top Up");
-		JMenuItem topUpItem = new JMenuItem("Add Balance");
-		topUpItem.addActionListener(e -> openTopUpPage());
-		topUpMenu.add(topUpItem);
+		// Complaint Menu
+		JMenu complaintMenu = new JMenu("Complaint");
+		JMenuItem complaintItem = new JMenuItem("Complaint Management");
+		complaintItem.addActionListener(e -> openComplaintPage());
+		complaintMenu.add(complaintItem);
 
 		// Add menus to the menu bar
 		menuBar.add(homeMenu);
-		menuBar.add(userMenu);
-		menuBar.add(topUpMenu);
+		menuBar.add(itemMenu);
+		menuBar.add(revenueMenu);
+		menuBar.add(performanceMenu);
+		menuBar.add(complaintMenu);
 
 		setJMenuBar(menuBar);
 
 		// ======= Header Panel (Welcome & Logout) =======
 		JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		JLabel welcomeLabel = new JLabel("Welcome, " + admin.getName());
+		JLabel welcomeLabel = new JLabel("Welcome, " + manager.getName());
 		JButton logoutButton = new JButton("Logout");
 		logoutButton.setFocusable(false);
 
@@ -128,41 +139,28 @@ public class AdminDashboard extends JFrame {
 	// ======= Menu Action Methods =======
 	private void showDashboard() {
 		this.dispose();
-		new AdminDashboard((AdminDTO) SessionControlService.getUser()).setVisible(true);
+		new ManagerDashboard((ManagerDTO) SessionControlService.getUser()).setVisible(true);
 	}
 
-	private void openUserPage(Role role) {
-		
-		switch (role) {
-		case ADMIN:
-			new AdminPage().setVisible(true);
-			break;
-		case MANAGER:
-			new ManagerPage().setVisible(true);
-			break;
-		case CUSTOMER:
-			new CustomerPage().setVisible(true);
-			break;
-		case VENDOR:
-			new VendorPage().setVisible(true);
-			break;
-		case RUNNER:
-			new RunnerPage().setVisible(true);
-			break;
-		default:
-			JOptionPane.showMessageDialog(this, "Unknown error occured. Please try again. ");
-			break;
-		}
-			
-	}
-
-	private void openTopUpPage() {
-		new TopUpPage().setVisible(true);
+	private void openItemPage() {
+		new ItemPage().setVisible(true);
 	}
 	
+	private void openRevenuePage() {
+//		new RevenuePage().setVisible(true);
+	}
+	
+	private void openPerformancePage() {
+//		new PerformancePage().setVisible(true);
+	}
+	
+	private void openComplaintPage() {
+//		new ComplaintPage().setVisible(true);
+	}
+
 	public static void main(String[] args) {
-		AdminDTO admin = new AdminDTO();
-		admin.setName("Alex"); // Example admin name
-		new AdminDashboard(admin).setVisible(true);
+		ManagerDTO manager =  new ManagerDTO();
+		manager.setName("Alex"); // Example admin name
+		new ManagerDashboard(manager).setVisible(true);
 	}
 }
