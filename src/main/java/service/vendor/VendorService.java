@@ -15,6 +15,7 @@ import org.json.JSONException;
 
 import dto.VendorDTO;
 import enumeration.ResponseCode;
+import enumeration.VendorType;
 import service.item.ItemService;
 import service.review.ReviewService;
 import service.utils.JsonUtils;
@@ -38,6 +39,7 @@ public class VendorService {
 	    json.put("password", vendor.getPassword());                       
 	    json.put("status", vendor.getStatus());
 	    json.put("vendorName", vendor.getVendorName());
+	    json.put("vendorType", vendor.getVendorType());
 	    json.put("items", new JSONObject(vendor.getItems()));             
 	    json.put("orderHistory", new JSONArray(vendor.getOrderHistory()));
 	    json.put("ratings", vendor.getRatings());
@@ -93,6 +95,7 @@ public class VendorService {
 					vendor.setEmailAddress(json.getString("email"));
 					vendor.setStatus(json.getBoolean("status"));
 					vendor.setVendorName(json.getString("vendorName"));
+					vendor.setVendorType(VendorType.valueOf(json.getString("vendorType")));
 					vendor.setRatings(json.getDouble("ratings"));
 					vendor.setPassword(json.getString("password"));
 					vendor.setOpen(json.getBoolean("open"));
@@ -143,6 +146,7 @@ public class VendorService {
 					vendor.setEmailAddress(json.getString("email"));
 					vendor.setStatus(json.getBoolean("status"));
 					vendor.setVendorName(json.getString("vendorName"));
+					vendor.setVendorType(VendorType.valueOf(json.getString("vendorType")));
 					vendor.setRatings(json.getDouble("ratings"));
 					vendor.setPassword(json.getString("password"));
 					vendor.setOpen(json.getBoolean("open"));
@@ -191,6 +195,7 @@ public class VendorService {
 				vendor.setEmailAddress(json.getString("email"));
 				vendor.setStatus(json.getBoolean("status"));
 				vendor.setVendorName(json.getString("vendorName"));
+				vendor.setVendorType(VendorType.valueOf(json.getString("vendorType")));
 				vendor.setRatings(json.getDouble("ratings"));
 				vendor.setPassword(json.getString("password"));
 				vendor.setOpen(json.getBoolean("open"));
@@ -243,6 +248,7 @@ public class VendorService {
 				    json.put("password", updatedVendor.getPassword());                       // Added password
 				    json.put("status", updatedVendor.getStatus());
 				    json.put("vendorName", updatedVendor.getVendorName());
+				    json.put("vendorType", updatedVendor.getVendorType());
 				    json.put("items", new JSONObject(updatedVendor.getItems()));             // Convert HashMap to JSONObject
 				    json.put("orderHistory", new JSONArray(updatedVendor.getOrderHistory())); // Correct JSONArray conversion
 				    json.put("ratings", updatedVendor.getRatings());

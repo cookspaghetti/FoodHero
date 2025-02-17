@@ -7,7 +7,8 @@ public enum PaymentMethod {
     ONLINE_BANKING,    // Payment through online banking
     EWALLET,           // Payment using e-wallets like GrabPay, Touch 'n Go
     CASH,              // Cash payment
-    REFUND			   // Refunds	
+    REFUND,			   // Refunds
+    WALLET
     
 }
 

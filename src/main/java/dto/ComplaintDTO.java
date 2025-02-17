@@ -1,14 +1,14 @@
 package dto;
 
-import enumeration.ComplainStatus;
+import enumeration.ComplaintStatus;
 
-public class ComplainDTO {
+public class ComplaintDTO {
 	
 	private String id;
     private String customerId;
     private String orderId;
     private String description;
-    private ComplainStatus status;
+    private ComplaintStatus status;
     private String solution;
     
 	// Getters and Setters
@@ -36,10 +36,10 @@ public class ComplainDTO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public ComplainStatus getStatus() {
+	public ComplaintStatus getStatus() {
 		return status;
 	}
-	public void setStatus(ComplainStatus status) {
+	public void setStatus(ComplaintStatus status) {
 		this.status = status;
 	}
 	public String getSolution() {

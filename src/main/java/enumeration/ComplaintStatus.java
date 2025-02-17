@@ -1,6 +1,6 @@
 package enumeration;
 
-public enum ComplainStatus {
+public enum ComplaintStatus {
 	
     PENDING,        // Complaint submitted but not yet reviewed
     IN_REVIEW,      // Complaint is being reviewed

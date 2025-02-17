@@ -9,9 +9,13 @@ import dto.CustomerDTO;
 import dto.ManagerDTO;
 import enumeration.ButtonMode;
 import enumeration.OrderStatus;
+import enumeration.VendorType;
 import service.general.SessionControlService;
+import ui.complaint.CustomerComplaintPage;
 import ui.item.ManagerItemPage;
 import ui.login.LoginInterface;
+import ui.order.CustomerOrderPage;
+import ui.transaction.CustomerTransactionPage;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
 import ui.vendor.CustomerVendorPage;
@@ -90,24 +94,24 @@ public class CustomerDashboard extends JFrame {
 		JPanel activeOrdersPanel = new JPanel(new BorderLayout());
 		JLabel activeOrdersLabel = new JLabel("Active Orders");
 
-		String[] columnNames = {"Order ID", "Vendor Name", "Item", "Progress", "Status", "Actions"};
+		String[] columnNames = {"Order ID", "Vendor Name", "Vendor Type", "Item", "Progress", "Status", "Actions"};
 		DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
 			@Override
 		    public boolean isCellEditable(int row, int column) {
-		        return column == 5; // Make only the "Action" column editable
+		        return column == 6; // Make only the "Action" column editable
 		    }
 		};
 		JTable activeOrdersTable = new JTable(tableModel);
 		activeOrdersTable.setRowHeight(40);
 		
-		activeOrdersTable.getColumnModel().getColumn(0).setPreferredWidth(50);
-		activeOrdersTable.getColumnModel().getColumn(2).setPreferredWidth(250);
+		activeOrdersTable.getColumn("Order ID").setPreferredWidth(50);
+		activeOrdersTable.getColumn("Vendor Name").setPreferredWidth(200);
 		
         // Adding sample data
         Object[][] sampleData = {
-            {"ORD00001", "Vendor A", "Burger", 50, OrderStatus.ON_THE_WAY, "Cancel"},
-            {"ORD00002", "Vendor B", "Pizza", 75, OrderStatus.ON_THE_WAY, "Cancel"},
-            {"ORD00003", "Vendor C", "Pasta", 30, OrderStatus.ON_THE_WAY, "Cancel"}
+            {"ORD00001", "Vendor A", VendorType.CHINESE, "Burger", 50, OrderStatus.ON_THE_WAY, "Cancel"},
+            {"ORD00002", "Vendor B", VendorType.MALAY, "Pizza", 75, OrderStatus.ON_THE_WAY, "Cancel"},
+            {"ORD00003", "Vendor C", VendorType.INDIAN, "Pasta", 30, OrderStatus.ON_THE_WAY, "Cancel"}
         };
         for (Object[] row : sampleData) {
             tableModel.addRow(row);
@@ -122,8 +126,8 @@ public class CustomerDashboard extends JFrame {
 		});
 		
 		// Rendering buttons on Actions column
-		activeOrdersTable.getColumnModel().getColumn(5).setCellRenderer(new ButtonRenderer(ButtonMode.VIEW));
-		activeOrdersTable.getColumnModel().getColumn(5).setCellEditor(new ButtonEditor(activeOrdersTable, ButtonMode.VIEW));
+		activeOrdersTable.getColumn("Actions").setCellRenderer(new ButtonRenderer(ButtonMode.VIEW));
+		activeOrdersTable.getColumn("Actions").setCellEditor(new ButtonEditor(activeOrdersTable, ButtonMode.VIEW));
 
 		JScrollPane tableScrollPane = new JScrollPane(activeOrdersTable);
 		activeOrdersPanel.add(activeOrdersLabel, BorderLayout.NORTH);

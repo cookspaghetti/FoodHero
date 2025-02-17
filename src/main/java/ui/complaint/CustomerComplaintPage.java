@@ -1,7 +1,15 @@
 package ui.complaint;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import enumeration.ButtonMode;
@@ -10,7 +18,7 @@ import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
 import ui.utils.MultiLineRenderer;
 
-public class ManagerComplaintPage extends JFrame {
+public class CustomerComplaintPage extends JFrame {
 	private JTextField searchField;
 	private JButton searchButton;
 	private JComboBox<ComplaintStatus> statusFilter;
@@ -18,7 +26,7 @@ public class ManagerComplaintPage extends JFrame {
 	private JScrollPane tableScrollPane;
 	private DefaultTableModel tableModel;
 
-	public ManagerComplaintPage() {
+	public CustomerComplaintPage() {
 		setTitle("Complaint Management");
 		setSize(800, 600);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -82,7 +90,6 @@ public class ManagerComplaintPage extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		new ManagerComplaintPage();
+		new CustomerComplaintPage();
 	}
 }
-

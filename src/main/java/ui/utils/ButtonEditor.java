@@ -11,17 +11,23 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
 import enumeration.ButtonMode;
+import enumeration.Role;
 import enumeration.ServiceType;
 import service.admin.AdminService;
+import service.complain.ComplaintService;
 import service.customer.CustomerService;
+import service.general.SessionControlService;
 import service.item.ItemService;
 import service.manager.ManagerService;
 import service.order.OrderService;
 import service.runner.RunnerService;
 import service.vendor.VendorService;
 import ui.form.AdminDetailsForm;
+import ui.form.CustomerComplaintDetailsForm;
 import ui.form.CustomerDetailsForm;
 import ui.form.CustomerOrderDetailsForm;
+import ui.form.CustomerOrderHistoryForm;
+import ui.form.ManagerComplaintDetailsForm;
 import ui.form.ManagerDetailsForm;
 import ui.form.RunnerDetailsForm;
 import ui.form.VendorDetailsForm;
@@ -101,6 +107,13 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 			viewButton.addActionListener(e -> {
 				System.out.println("View clicked for Order ID: " + itemId);
 				handleViewOrderAction();
+			});
+
+			panel.add(viewButton);
+		} else if (mode == ButtonMode.VIEWORDERHISTORY) {
+			viewButton.addActionListener(e -> {
+				System.out.println("View clicked for Order ID: " + itemId);
+				handleViewOrderHistoryAction();
 			});
 
 			panel.add(viewButton);
@@ -201,10 +214,17 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 		}
 
 		switch (type) {
-		case RUNNER -> new RunnerReviewPage(itemId).setVisible(true);
-		case ORDER -> new VendorOrderHistoryForm(OrderService.readOrder(itemId)).setVisible(true);
-		default -> JOptionPane.showMessageDialog(null, "Invalid type for viewing.");
-		}
+	    case RUNNER -> new RunnerReviewPage(itemId).setVisible(true);
+	    case ORDER -> new VendorOrderHistoryForm(OrderService.readOrder(itemId)).setVisible(true);
+	    case COMPLAIN -> {
+	        if (SessionControlService.getRole() == Role.CUSTOMER) {
+	            new CustomerComplaintDetailsForm(ComplaintService.readComplaint(itemId)).setVisible(true);
+	        } else {
+	            new ManagerComplaintDetailsForm(ComplaintService.readComplaint(itemId)).setVisible(true);
+	        }
+	    }
+	    default -> JOptionPane.showMessageDialog(null, "Invalid type for viewing.");
+	}
 	}
 
 	private void handleViewOrderAction() {
@@ -214,6 +234,15 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 		}
 
 		new CustomerOrderDetailsForm(OrderService.readOrder(itemId)).setVisible(true);
+	}
+
+	private void handleViewOrderHistoryAction() {
+		if (type == null) {
+			JOptionPane.showMessageDialog(null, "Unknown type. Cannot view.");
+			return;
+		}
+
+		new CustomerOrderHistoryForm(OrderService.readOrder(itemId)).setVisible(true);
 	}
 
 	private ServiceType getDataTypeFromId(String id) {

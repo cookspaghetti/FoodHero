@@ -10,9 +10,10 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import dto.VendorDTO;
+import enumeration.VendorType;
 
 public class VendorDetailsForm extends JFrame {
-    private JTextField idField, nameField, phoneField, addressField, emailField, passwordField;
+    private JTextField idField, nameField, phoneField, addressField, emailField, passwordField, vendorNameField, vendorTypeField;
     private JCheckBox statusCheckBox;
     private JButton saveButton, closeButton;
 
@@ -20,7 +21,7 @@ public class VendorDetailsForm extends JFrame {
         setTitle("Vendor Information");
         setSize(400, 350);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new GridLayout(8, 2, 5, 5));
+        setLayout(new GridLayout(10, 2, 5, 5));
 
         add(new JLabel("ID:"));
         idField = new JTextField(vendor.getId());
@@ -49,6 +50,15 @@ public class VendorDetailsForm extends JFrame {
         add(new JLabel("Status:"));
         statusCheckBox = new JCheckBox("Active", vendor.getStatus());
         add(statusCheckBox);
+        
+        add(new JLabel("Vendor Name:"));
+        vendorNameField = new JTextField(vendor.getVendorName());
+        add(vendorNameField);
+        
+        add(new JLabel("Vendor Type"));
+        vendorTypeField = new JTextField(vendor.getVendorType().toString());
+        vendorTypeField.setEditable(false);
+        add(vendorTypeField);
 
         saveButton = new JButton("Save");
         closeButton = new JButton("Close");
@@ -63,6 +73,8 @@ public class VendorDetailsForm extends JFrame {
 
     public static void main(String[] args) {
         VendorDTO vendor = new VendorDTO(); // Replace with actual Vendor object
+        vendor.setStatus(true);
+        vendor.setVendorType(VendorType.CHINESE);
         new VendorDetailsForm(vendor);
     }
 }

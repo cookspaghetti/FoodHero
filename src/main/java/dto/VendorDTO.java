@@ -3,9 +3,12 @@ package dto;
 import java.util.HashMap;
 import java.util.List;
 
+import enumeration.VendorType;
+
 public class VendorDTO extends UserDTO {
 	
 	private String vendorName;
+	private VendorType vendorType;
 	private Boolean open;
     private HashMap<String, Integer> items; // item id, stocks left
     private List<String> orderHistory;
@@ -48,6 +51,12 @@ public class VendorDTO extends UserDTO {
 	}
 	public void setOpen(Boolean open) {
 		this.open = open;
+	}
+	public VendorType getVendorType() {
+		return vendorType;
+	}
+	public void setVendorType(VendorType vendorType) {
+		this.vendorType = vendorType;
 	}
     
 }

@@ -16,7 +16,7 @@ public class CustomerOrderDetailsForm extends JFrame {
         getContentPane().add(new JLabel("Order ID:"));
         getContentPane().add(new JLabel(order.getId()));
 
-        getContentPane().add(new JLabel("Customer ID:"));
+        getContentPane().add(new JLabel("Vendor Name:"));
         getContentPane().add(new JLabel(order.getCustomerId()));
 
         getContentPane().add(new JLabel("Items:"));

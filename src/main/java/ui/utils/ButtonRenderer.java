@@ -38,6 +38,12 @@ public class ButtonRenderer extends JPanel implements TableCellRenderer {
     	} else if (mode == ButtonMode.VIEW) {
     		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
             add(viewButton);
+    	} else if (mode == ButtonMode.VIEWORDER) {
+    		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
+            add(viewButton);
+    	} else if (mode == ButtonMode.VIEWORDERHISTORY) {
+    		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
+            add(viewButton);
     	}
     }
 
