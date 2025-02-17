@@ -36,6 +36,9 @@ public class IdGenerationUtils {
 		case ITEM: 
 			filePath = "src\\main\\resources\\database\\item\\item_" + SessionControlService.getId() + ".txt";
 			abbreviation = "ITM";
+		case ORDER:
+			filePath = "src\\main\\resources\\database\\order\\order.txt";
+			abbreviation = "ORD";
 		case VENDOR_REVIEW:
 			filePath = "src\\main\\resources\\database\\review\\vendor_" + vendorId + ".txt";
 			abbreviation = "VRE";
@@ -49,7 +52,7 @@ public class IdGenerationUtils {
 			filePath = "src\\main\\resources\\database\\transaction\\deduct_transaction.txt";
 			abbreviation = "DED";
 		case TASK:
-			filePath = "src\\main\\resources\\database\\item\\task\\task.txt";
+			filePath = "src\\main\\resources\\database\\task\\task.txt";
 			abbreviation = "TAK";
 		case COMPLAIN:
 			filePath = "src\\main\\resources\\database\\complain\\complain.txt";

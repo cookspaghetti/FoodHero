@@ -10,8 +10,8 @@ import javax.swing.JLabel;
 
 import enumeration.PaymentMethod;
 
-public class PaymentDialog extends JDialog {
-    public PaymentDialog(JFrame parent, String customerName, String customerPhone) {
+public class TopUpPaymentDialog extends JDialog {
+    public TopUpPaymentDialog(JFrame parent, String customerName, String customerPhone) {
         super(parent, "Select Payment Method", true);
         setSize(300, 200);
         getContentPane().setLayout(new GridLayout(4, 1, 5, 5));

@@ -62,7 +62,7 @@ public class ItemService {
 	}
 
 	// Method to read item information from a text file
-	public ItemDTO readItem(String vendorId, String id) {
+	public static ItemDTO readItem(String vendorId, String id) {
 
 		// Construct the file name
 		String filePath = SYS_PATH + "item_" + vendorId + ".txt";

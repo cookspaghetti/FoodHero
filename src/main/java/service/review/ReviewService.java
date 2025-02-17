@@ -263,7 +263,7 @@ public class ReviewService {
 	}
 
 	// Method to read all RunnerReviews for a specific runnerId
-	public List<RunnerReviewDTO> readAllRunnerReview(String runnerId) {
+	public static List<RunnerReviewDTO> readAllRunnerReview(String runnerId) {
 
 		String filePath = SYS_PATH + "runner_" + runnerId + "_review.txt";
 

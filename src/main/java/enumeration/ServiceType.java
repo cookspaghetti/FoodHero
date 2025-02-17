@@ -8,6 +8,7 @@ public enum ServiceType {
 	VENDOR,
 	RUNNER,
 	ITEM,
+	ORDER,
 	VENDOR_REVIEW,
 	RUNNER_REVIEW,
 	ADD_TRANSACTION,

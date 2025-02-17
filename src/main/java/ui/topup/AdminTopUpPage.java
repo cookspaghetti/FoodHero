@@ -2,17 +2,17 @@ package ui.topup;
 
 import javax.swing.*;
 
-import ui.dialog.PaymentDialog;
+import ui.dialog.TopUpPaymentDialog;
 
 import java.awt.*;
 
-public class TopUpPage extends JFrame {
+public class AdminTopUpPage extends JFrame {
     private JTextField searchField;
     private JButton searchButton;
     private JLabel idLabel, nameLabel, phoneLabel, addressLabel, emailLabel, statusLabel;
     private JButton topUpButton, closeButton;
 
-    public TopUpPage() {
+    public AdminTopUpPage() {
         setTitle("Add Balance for Customer");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -71,13 +71,13 @@ public class TopUpPage extends JFrame {
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
         closeButton.addActionListener(e -> dispose());
-        topUpButton.addActionListener(e -> new PaymentDialog(this, nameLabel.getText(), phoneLabel.getText()));
+        topUpButton.addActionListener(e -> new TopUpPaymentDialog(this, nameLabel.getText(), phoneLabel.getText()));
 
         setVisible(true);
     }
 
     public static void main(String[] args) {
-        new TopUpPage();
+        new AdminTopUpPage();
     }
 }
 

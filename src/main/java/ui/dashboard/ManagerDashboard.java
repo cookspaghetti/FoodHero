@@ -21,12 +21,12 @@ import dto.AdminDTO;
 import dto.ManagerDTO;
 import enumeration.Role;
 import service.general.SessionControlService;
-import ui.complaint.ComplaintPage;
-import ui.item.ItemPage;
+import ui.complaint.ManagerComplaintPage;
+import ui.item.ManagerItemPage;
 import ui.login.LoginInterface;
-import ui.performance.PerformancePage;
-import ui.revenue.RevenuePage;
-import ui.topup.TopUpPage;
+import ui.performance.ManagerPerformancePage;
+import ui.revenue.ManagerRevenuePage;
+import ui.topup.AdminTopUpPage;
 import ui.user.AdminPage;
 import ui.user.CustomerPage;
 import ui.user.ManagerPage;
@@ -69,7 +69,7 @@ public class ManagerDashboard extends JFrame {
 		revenueItem.addActionListener(e -> openRevenuePage());
 		revenueMenu.add(revenueItem);
 
-		// Revenue Menu
+		// Performance Menu
 		JMenu performanceMenu = new JMenu("Performance");
 		JMenuItem performanceItem = new JMenuItem("Performance Management");
 		performanceItem.addActionListener(e -> openPerformancePage());
@@ -120,7 +120,7 @@ public class ManagerDashboard extends JFrame {
 		runnersLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		JList<String> runnersList = new JList<>(new String[]{"Runner X", "Runner Y"});
 
-		JLabel ordersLabel = new JLabel("Active Orders:");
+		JLabel ordersLabel = new JLabel("New Complaints:");
 		ordersLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		ordersLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		JList<String> ordersList = new JList<>(new String[]{"Order #123", "Order #456"});
@@ -143,19 +143,19 @@ public class ManagerDashboard extends JFrame {
 	}
 
 	private void openItemPage() {
-		new ItemPage().setVisible(true);
+		new ManagerItemPage().setVisible(true);
 	}
 	
 	private void openRevenuePage() {
-//		new RevenuePage().setVisible(true);
+		new ManagerRevenuePage().setVisible(true);
 	}
 	
 	private void openPerformancePage() {
-//		new PerformancePage().setVisible(true);
+		new ManagerPerformancePage().setVisible(true);
 	}
 	
 	private void openComplaintPage() {
-//		new ComplaintPage().setVisible(true);
+		new ManagerComplaintPage().setVisible(true);
 	}
 
 	public static void main(String[] args) {

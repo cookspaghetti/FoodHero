@@ -14,6 +14,8 @@ public class ButtonRenderer extends JPanel implements TableCellRenderer {
 	private final JButton editButton = new JButton("Edit");
     private final JButton deleteButton = new JButton("Delete");
     private final JButton disableButton = new JButton("Disable");
+    private final JButton updateButton = new JButton("Update");
+    private final JButton viewButton = new JButton("View");
 
     public ButtonRenderer(ButtonMode mode) {
     	if (mode == ButtonMode.EDIT) {
@@ -30,6 +32,12 @@ public class ButtonRenderer extends JPanel implements TableCellRenderer {
     		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
             add(disableButton);
             add(deleteButton);
+    	} else if (mode ==  ButtonMode.UPDATE) {
+    		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
+            add(updateButton);
+    	} else if (mode == ButtonMode.VIEW) {
+    		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
+            add(viewButton);
     	}
     }
 

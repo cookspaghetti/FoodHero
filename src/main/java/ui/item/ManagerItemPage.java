@@ -12,7 +12,7 @@ import enumeration.ButtonMode;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
 
-public class ItemPage extends JFrame {
+public class ManagerItemPage extends JFrame {
 	private JTextField searchField;
 	private JButton searchButton;
 	private JButton filterButton;
@@ -20,7 +20,7 @@ public class ItemPage extends JFrame {
 	private JTable itemTable;
 	private DefaultTableModel tableModel;
 
-	public ItemPage() {
+	public ManagerItemPage() {
 		setTitle("Item Management");
 		setSize(800, 600);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -123,7 +123,7 @@ public class ItemPage extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		new ItemPage();
+		new ManagerItemPage();
 	}
 }
 

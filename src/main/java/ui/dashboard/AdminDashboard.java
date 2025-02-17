@@ -9,7 +9,7 @@ import dto.AdminDTO; // Assuming you have AdminDTO for user details
 import enumeration.Role;
 import service.general.SessionControlService;
 import ui.login.LoginInterface;
-import ui.topup.TopUpPage;
+import ui.topup.AdminTopUpPage;
 import ui.user.AdminPage;
 import ui.user.CustomerPage;
 import ui.user.ManagerPage;
@@ -157,7 +157,7 @@ public class AdminDashboard extends JFrame {
 	}
 
 	private void openTopUpPage() {
-		new TopUpPage().setVisible(true);
+		new AdminTopUpPage().setVisible(true);
 	}
 	
 	public static void main(String[] args) {

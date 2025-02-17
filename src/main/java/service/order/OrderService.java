@@ -57,7 +57,7 @@ public class OrderService {
 	}
 
 	// Method to read an order from the text file
-	public OrderDTO readOrder(String id) {
+	public static OrderDTO readOrder(String id) {
 
 		String filePath = SYS_PATH + "order.txt";
 
@@ -104,6 +104,55 @@ public class OrderService {
 
 		System.out.println("Order with ID " + id + " not found.");
 		return null;
+	}
+
+	// Method to read runner orders from the text file
+	public static List<OrderDTO> readRunnerOrders(String runnerId) {
+		String filePath = SYS_PATH + "order.txt";
+		List<OrderDTO> orders = new ArrayList<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("runnerId").equals(runnerId)) {
+					OrderDTO order = new OrderDTO();
+					order.setId(json.getString("id"));
+					order.setCustomerId(json.getString("customerId"));
+					order.setVendorId(json.getString("vendorId"));
+					order.setRunnerId(json.getString("runnerId"));
+					order.setStatus(OrderStatus.valueOf(json.getString("status")));
+					order.setTotalAmount(json.getDouble("totalAmount"));
+					order.setDeliveryFee(json.getDouble("deliveryFee"));
+					order.setNotes(json.getString("notes"));
+					order.setDeliveryAddress(json.getString("deliveryAddress"));
+
+					// Parse placementTime and completionTime
+					order.setPlacementTime(LocalDateTime.parse(json.getString("placementTime")));
+					if (json.has("completionTime") && !json.getString("completionTime").isEmpty()) {
+						order.setCompletionTime(LocalDateTime.parse(json.getString("completionTime")));
+					}
+
+					// Parse items (HashMap<String, Integer>)
+					JSONObject itemsJson = json.getJSONObject("items");
+					HashMap<String, Integer> items = new HashMap<>();
+					for (String key : itemsJson.keySet()) {
+						items.put(key, itemsJson.getInt(key));
+					}
+					order.setItems(items);
+
+					orders.add(order);  // Add to the list
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading orders from file: " + e.getMessage());
+		} catch (JSONException e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
+
+		return orders;  // Return the list of orders
 	}
 
 	// Method to read all orders from the text file
