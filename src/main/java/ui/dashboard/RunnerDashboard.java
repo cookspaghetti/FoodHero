@@ -25,7 +25,12 @@ import service.task.TaskService;
 import ui.complaint.CustomerComplaintPage;
 import ui.form.RunnerCurrentTaskForm;
 import ui.login.LoginInterface;
+import ui.notification.NotificationPage;
 import ui.order.CustomerOrderPage;
+import ui.profile.RunnerProfilePage;
+import ui.revenue.RunnerRevenuePage;
+import ui.review.RunnerReviewPage;
+import ui.task.RunnerTaskHistoryPage;
 import ui.transaction.CustomerTransactionPage;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
@@ -80,7 +85,21 @@ public class RunnerDashboard extends JFrame {
 		revenueItem.addActionListener(e -> openRunnerRevenuePage());
 		revenueMenu.add(revenueItem);
 		menuBar.add(revenueMenu);
-
+		
+		// Notification Menu
+		JMenu notificationMenu = new JMenu("Notification");
+		JMenuItem notificationItem = new JMenuItem("View Notifications");
+		notificationItem.addActionListener(e -> openNotificationPage());
+		notificationMenu.add(notificationItem);
+		menuBar.add(notificationMenu);
+		
+		// Profile Menu
+		JMenu profileMenu = new JMenu("Profile");
+		JMenuItem profileItem = new JMenuItem("Profile Management");
+		profileItem.addActionListener(e -> openProfilePage());
+		profileMenu.add(profileItem);
+		menuBar.add(profileMenu);
+		
 		setJMenuBar(menuBar);
 
 		// ======= Header Panel (Welcome & Logout) =======
@@ -150,7 +169,7 @@ public class RunnerDashboard extends JFrame {
 	}
 
 	private void openRunnerReviewPage() {
-		new RunnerReviewPage().setVisible(true);
+		new RunnerReviewPage(SessionControlService.getId()).setVisible(true);
 	}
 
 	private void openRunnerRevenuePage() {
@@ -159,6 +178,14 @@ public class RunnerDashboard extends JFrame {
 	
 	private void openRunnerCurrentTaskPage() {
 		new RunnerCurrentTaskForm(TaskService.readTask(SessionControlService.getCurrentTask())).setVisible(true);
+	}
+	
+	private void openNotificationPage() {
+		new NotificationPage().setVisible(true);
+	}
+
+	private void openProfilePage() {
+		new RunnerProfilePage((RunnerDTO) SessionControlService.getUser()).setVisible(true);
 	}
 	
 	public static void main(String[] args) {

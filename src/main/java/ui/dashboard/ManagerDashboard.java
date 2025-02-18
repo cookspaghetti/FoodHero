@@ -12,26 +12,19 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
-import dto.AdminDTO;
 import dto.ManagerDTO;
-import enumeration.Role;
 import service.general.SessionControlService;
 import ui.complaint.ManagerComplaintPage;
 import ui.item.ManagerItemPage;
 import ui.login.LoginInterface;
+import ui.notification.NotificationPage;
 import ui.performance.ManagerPerformancePage;
+import ui.profile.ManagerProfilePage;
 import ui.revenue.ManagerRevenuePage;
-import ui.topup.AdminTopUpPage;
-import ui.user.AdminPage;
-import ui.user.CustomerPage;
-import ui.user.ManagerPage;
-import ui.user.RunnerPage;
-import ui.user.VendorPage;
 
 public class ManagerDashboard extends JFrame {
 	private ManagerDTO manager;
@@ -80,6 +73,18 @@ public class ManagerDashboard extends JFrame {
 		JMenuItem complaintItem = new JMenuItem("Complaint Management");
 		complaintItem.addActionListener(e -> openComplaintPage());
 		complaintMenu.add(complaintItem);
+
+		// Notification Menu
+		JMenu notificationMenu = new JMenu("Notification");
+		JMenuItem notificationItem = new JMenuItem("View Notifications");
+		notificationItem.addActionListener(e -> openNotificationPage());
+		notificationMenu.add(notificationItem);
+
+		// Profile Menu
+		JMenu profileMenu = new JMenu("Profile");
+		JMenuItem profileItem = new JMenuItem("Profile Management");
+		profileItem.addActionListener(e -> openProfilePage());
+		profileMenu.add(profileItem);
 
 		// Add menus to the menu bar
 		menuBar.add(homeMenu);
@@ -156,6 +161,14 @@ public class ManagerDashboard extends JFrame {
 	
 	private void openComplaintPage() {
 		new ManagerComplaintPage().setVisible(true);
+	}
+
+	private void openNotificationPage() {
+		new NotificationPage().setVisible(true);
+	}
+
+	private void openProfilePage() {
+		new ManagerProfilePage((ManagerDTO) SessionControlService.getUser()).setVisible(true);
 	}
 
 	public static void main(String[] args) {

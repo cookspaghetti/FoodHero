@@ -28,13 +28,20 @@ public class OrderHistoryPage extends JFrame {
 		setLocationRelativeTo(null);
 		setLayout(new BorderLayout());
 
-		// Filter Panel
+		// First ComboBox - OrderStatus
 		JPanel filterPanel = new JPanel();
-		filterPanel.add(new JLabel("Filter by Status:"));
-		filterComboBox = new JComboBox<>(OrderStatus.values());
-		filterPanel.add(filterComboBox);
-		add(filterPanel, BorderLayout.NORTH);
+        JComboBox<OrderStatus> orderStatusComboBox = new JComboBox<>(OrderStatus.values());
+        filterPanel.add(new JLabel("Filter by Order Status:"));
+        filterPanel.add(orderStatusComboBox);
 
+        // Second ComboBox - Time Range
+        filterPanel.add(new JLabel("Filter by Time Range:"));
+        String[] timeRanges = { "Today", "This Week", "This Month", "6 Months", "This Year" };
+        JComboBox<String> timeRangeComboBox = new JComboBox<>(timeRanges);
+        filterPanel.add(timeRangeComboBox);
+        
+        add(filterPanel, BorderLayout.NORTH);
+		
 		// Table Setup
 		String[] columnNames = {"Order Id", "Placement Time", "Completed Time", "Items", "Amount", "Status", "Actions"};
 		tableModel = new DefaultTableModel(columnNames, 0) {

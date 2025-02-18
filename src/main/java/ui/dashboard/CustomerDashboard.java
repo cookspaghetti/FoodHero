@@ -6,15 +6,15 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 import dto.CustomerDTO;
-import dto.ManagerDTO;
 import enumeration.ButtonMode;
 import enumeration.OrderStatus;
 import enumeration.VendorType;
 import service.general.SessionControlService;
 import ui.complaint.CustomerComplaintPage;
-import ui.item.ManagerItemPage;
 import ui.login.LoginInterface;
+import ui.notification.NotificationPage;
 import ui.order.CustomerOrderPage;
+import ui.profile.CustomerProfilePage;
 import ui.transaction.CustomerTransactionPage;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
@@ -73,10 +73,23 @@ public class CustomerDashboard extends JFrame {
 		complaintMenu.add(complaintManagementItem);
 		menuBar.add(complaintMenu);
 
+		// Notification Menu
+		JMenu notificationMenu = new JMenu("Notification");
+		JMenuItem notificationItem = new JMenuItem("View Notifications");
+		notificationItem.addActionListener(e -> openNotificationPage());
+		notificationMenu.add(notificationItem);
+
+		// Profile Menu
+		JMenu profileMenu = new JMenu("Profile");
+		JMenuItem editProfileItem = new JMenuItem("Profile Management");
+		editProfileItem.addActionListener(e -> openProfilePage());
+		profileMenu.add(editProfileItem);
+
 		setJMenuBar(menuBar);
 
 		// ======= Header Panel (Welcome & Logout) =======
 		JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		JLabel balanceLabel = new JLabel("Account Balance: " + customer.getCredit());
 		JLabel welcomeLabel = new JLabel("Welcome, " + customer.getName());
 		JButton logoutButton = new JButton("Logout");
 		logoutButton.setFocusable(false);
@@ -85,7 +98,8 @@ public class CustomerDashboard extends JFrame {
 			new LoginInterface().setVisible(true);
 			this.dispose();
 		});
-
+		
+		headerPanel.add(balanceLabel);
 		headerPanel.add(welcomeLabel);
 		headerPanel.add(logoutButton);
 		getContentPane().add(headerPanel, BorderLayout.NORTH);
@@ -156,9 +170,18 @@ public class CustomerDashboard extends JFrame {
 		new CustomerComplaintPage().setVisible(true);
 	}
 
+	private void openNotificationPage() {
+		new NotificationPage().setVisible(true);
+	}
+
+	private void openProfilePage() {
+		new CustomerProfilePage((CustomerDTO) SessionControlService.getUser()).setVisible(true);
+	}
+
 	public static void main(String[] args) {
 		CustomerDTO customer =  new CustomerDTO();
 		customer.setName("Alex"); // Example customer name
+		customer.setCredit(1000);
 		new CustomerDashboard(customer).setVisible(true);
 	}
 }

@@ -9,6 +9,8 @@ import dto.AdminDTO; // Assuming you have AdminDTO for user details
 import enumeration.Role;
 import service.general.SessionControlService;
 import ui.login.LoginInterface;
+import ui.notification.NotificationPage;
+import ui.profile.AdminProfilePage;
 import ui.topup.AdminTopUpPage;
 import ui.user.AdminPage;
 import ui.user.CustomerPage;
@@ -72,10 +74,24 @@ public class AdminDashboard extends JFrame {
 		topUpItem.addActionListener(e -> openTopUpPage());
 		topUpMenu.add(topUpItem);
 
+		// Notification Menu
+		JMenu notificationMenu = new JMenu("Notification");
+		JMenuItem notificationItem = new JMenuItem("View Notifications");
+		notificationItem.addActionListener(e -> openNotificationPage());
+		notificationMenu.add(notificationItem);
+		
+		// Profile Menu
+		JMenu profileMenu = new JMenu("Profile");
+		JMenuItem profileItem = new JMenuItem("Profile Management");
+		profileItem.addActionListener(e -> openProfilePage());
+		profileMenu.add(profileItem);
+
 		// Add menus to the menu bar
 		menuBar.add(homeMenu);
 		menuBar.add(userMenu);
 		menuBar.add(topUpMenu);
+		menuBar.add(notificationMenu);
+		menuBar.add(profileMenu);
 
 		setJMenuBar(menuBar);
 
@@ -158,6 +174,14 @@ public class AdminDashboard extends JFrame {
 
 	private void openTopUpPage() {
 		new AdminTopUpPage().setVisible(true);
+	}
+
+	private void openNotificationPage() {
+		new NotificationPage().setVisible(true);
+	}
+
+	private void openProfilePage() {
+		new AdminProfilePage((AdminDTO) SessionControlService.getUser()).setVisible(true);
 	}
 	
 	public static void main(String[] args) {

@@ -6,11 +6,12 @@ import dto.VendorDTO;
 import service.general.SessionControlService;
 import ui.item.VendorItemPage;
 import ui.login.LoginInterface;
+import ui.notification.NotificationPage;
 import ui.order.OrderHistoryPage;
 import ui.order.VendorOrderPage;
+import ui.profile.VendorProfilePage;
 import ui.revenue.VendorRevenuePage;
 import ui.review.VendorReviewPage;
-import ui.topup.AdminTopUpPage;
 import java.awt.*;
 
 public class VendorDashboard extends JFrame {
@@ -63,6 +64,18 @@ public class VendorDashboard extends JFrame {
 		JMenuItem revenueItem = new JMenuItem("Revenue Management");
 		revenueItem.addActionListener(e -> openRevenuePage());
 		revenueMenu.add(revenueItem);
+
+		// Notification Menu
+		JMenu notificationMenu = new JMenu("Notification");
+		JMenuItem notificationItem = new JMenuItem("View Notifications");
+		notificationItem.addActionListener(e -> openNotificationPage());
+		notificationMenu.add(notificationItem);
+
+		// Profile Menu
+		JMenu profileMenu = new JMenu("Profile");
+		JMenuItem profileItem = new JMenuItem("Profile Management");
+		profileItem.addActionListener(e -> openProfilePage());
+		profileMenu.add(profileItem);
         
         menuBar.add(homeMenu);
         menuBar.add(orderMenu);
@@ -141,6 +154,14 @@ public class VendorDashboard extends JFrame {
 
 	private void openRevenuePage() {
 		new VendorRevenuePage().setVisible(true);
+	}
+
+	private void openNotificationPage() {
+		new NotificationPage().setVisible(true);
+	}
+
+	private void openProfilePage() {
+		new VendorProfilePage((VendorDTO) SessionControlService.getUser()).setVisible(true);
 	}
 	
 	public static void main(String[] args) {
