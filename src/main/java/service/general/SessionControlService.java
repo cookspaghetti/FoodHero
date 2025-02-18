@@ -11,6 +11,7 @@ import dto.RunnerDTO;
 import dto.UserDTO;
 import dto.VendorDTO;
 import enumeration.Role;
+import enumeration.VendorType;
 
 public class SessionControlService {
 	
@@ -35,10 +36,15 @@ public class SessionControlService {
 	private static List<String> reviews;                  // Runner/Vendor
 	private static String lastDeliveredAddress;           // Runner
 	private static LocalDateTime lastDeliveryDate;        // Runner
+	private static Boolean available;					  // Runner
+	private static String currentTask;					  // Runner
+	
 
 	private static String vendorName;                     // Vendor
 	private static HashMap<String, Integer> items;        // Vendor
 	private static List<String> orderHistory;             // Vendor
+	private static Boolean open;						  // Vendor
+	private static VendorType vendorType;				  // Vendor
 	
 	private static double credit;						  // Customer
     private static List<String> vendorReviews;			  // Customer
@@ -46,6 +52,8 @@ public class SessionControlService {
     private static List<String> complains;				  // Customer
     private static List<String> transactions;			  // Customer
     private static List<String> deliveryAddresses;		  // Customer
+    
+    private static HashMap<String, Integer> cartItems; // item id, amount
 
 	// === Set Session for Admin ===
 	public static void setSession(AdminDTO admin) {
@@ -77,6 +85,8 @@ public class SessionControlService {
 		reviews = runner.getReviews();
 		lastDeliveredAddress = runner.getLastDeliveredAddress();
 		lastDeliveryDate = runner.getLastDeliveryDate();
+		available = runner.isAvailable();
+		currentTask = runner.getCurrentTask();
 	}
 
 	// === Set Session for Vendor ===
@@ -91,9 +101,11 @@ public class SessionControlService {
 		orderHistory = vendor.getOrderHistory();
 		ratings = vendor.getRatings();
 		reviews = vendor.getReviews();
+		open = vendor.getOpen();
+		vendorType = vendor.getVendorType();
 	}
 
-	// === Set Session for Vendor ===
+	// === Set Session for Customer ===
 	public static void setSession(CustomerDTO customer) {
 		clearSession();
 		user = customer;
@@ -152,6 +164,8 @@ public class SessionControlService {
 	public static List<String> getReviews() { return reviews; }
 	public static String getLastDeliveredAddress() { return lastDeliveredAddress; }
 	public static LocalDateTime getLastDeliveryDate() { return lastDeliveryDate; }
+	public static Boolean getAvailable() { return available; }
+	public static String getCurrentTask() { return currentTask; }
 
 	public static String getVendorName() { return vendorName; }
 	public static HashMap<String, Integer> getItems() { return items; }
@@ -162,4 +176,34 @@ public class SessionControlService {
     public static List<String> getComplains() { return complains; };
     public static List<String> getTransactions() { return transactions; };
     public static List<String> getDeliveryAddresses() { return deliveryAddresses; };
+	public static Boolean getOpen() { return open; }
+	public static VendorType getVendorType() { return vendorType; }
+
+	// Cart Service
+	public static void addToCart(String itemId, int amount) {
+		if (cartItems == null) {
+			cartItems = new HashMap<>();
+		}
+		cartItems.put(itemId, amount);
+	}
+
+	public static void removeFromCart(String itemId) {
+		if (cartItems != null) {
+			cartItems.remove(itemId);
+		}
+	}
+
+	public static HashMap<String, Integer> getCartItems() {
+		return cartItems;
+	}
+
+	public static void clearCart() {
+		cartItems = null;
+	}
+
+	public static void updateCart(String itemId, int amount) {
+		if (cartItems != null) {
+			cartItems.put(itemId, amount);
+		}
+	}
 }

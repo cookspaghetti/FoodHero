@@ -35,6 +35,7 @@ import ui.form.VendorItemDetailsForm;
 import ui.form.VendorOrderDetailsForm;
 import ui.form.VendorOrderHistoryForm;
 import ui.review.RunnerReviewPage;
+import ui.vendor.VendorMenuPage;
 
 public class ButtonEditor extends AbstractCellEditor implements TableCellEditor {
 	private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 6));
@@ -43,6 +44,7 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
     private final JButton disableButton = new JButton("Disable");
 	private final JButton updateButton = new JButton("Update");
 	private final JButton viewButton = new JButton("View");
+	private final JButton addToCartButton = new JButton("Add to Cart");
 	private String itemId;
 	private String vendorId; // specifically for itemPage
 	private ServiceType type;
@@ -117,6 +119,12 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 			});
 
 			panel.add(viewButton);
+		} else if (mode == ButtonMode.ADDTOCART) {
+			addToCartButton.addActionListener(e -> {
+				handleAddToCartAction();
+			});
+
+			panel.add(addToCartButton);
 		}
 
 	}
@@ -223,8 +231,10 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 	            new ManagerComplaintDetailsForm(ComplaintService.readComplaint(itemId)).setVisible(true);
 	        }
 	    }
+		case VENDOR -> new VendorMenuPage(itemId).setVisible(true);
+		case TASK -> new RunnerTaskDetailsForm(TaskService.readTask(itemId)).setVisible(true);
 	    default -> JOptionPane.showMessageDialog(null, "Invalid type for viewing.");
-	}
+		}
 	}
 
 	private void handleViewOrderAction() {
@@ -243,6 +253,16 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 		}
 
 		new CustomerOrderHistoryForm(OrderService.readOrder(itemId)).setVisible(true);
+	}
+
+	private void handleAddToCartAction() {
+		if (type == null) {
+			JOptionPane.showMessageDialog(null, "Unknown type. Cannot add to cart.");
+			return;
+		}
+
+		// Add item to cart
+
 	}
 
 	private ServiceType getDataTypeFromId(String id) {

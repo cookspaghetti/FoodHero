@@ -30,6 +30,8 @@ public class TaskService {
 		json.put("runnerId", task.getRunnerId());
 		json.put("status", task.getStatus());
 		json.put("taskDetails", task.getTaskDetails());
+		json.put("deliveryFee", task.getDeliveryFee());
+		json.put("customerAddress", task.getCustomerAddress());
 		json.put("acceptanceTime", task.getAcceptanceTime() != null ? task.getAcceptanceTime().toString() : JSONObject.NULL);
 		json.put("completionTime", task.getCompletionTime() != null ? task.getCompletionTime().toString() : JSONObject.NULL);
 
@@ -45,7 +47,7 @@ public class TaskService {
 	}
 
 	// Method to read a task from the text file
-	public TaskDTO readTask(String id) {
+	public static TaskDTO readTask(String id) {
 		String filePath = SYS_PATH + "task.txt";
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -61,6 +63,8 @@ public class TaskService {
 					task.setRunnerId(json.getString("runnerId"));
 					task.setStatus(TaskStatus.valueOf(json.getString("status")));
 					task.setTaskDetails(json.getString("taskDetails"));
+					task.setDeliveryFee(json.getDouble("deliveryFee"));
+					task.setCustomerAddress(json.getString("customerAddress"));
 
 					// Handling nullable LocalDateTime fields
 					if (!json.isNull("acceptanceTime")) {
@@ -100,6 +104,8 @@ public class TaskService {
 				task.setRunnerId(json.getString("runnerId"));
 				task.setStatus(TaskStatus.valueOf(json.getString("status")));
 				task.setTaskDetails(json.getString("taskDetails"));
+				task.setDeliveryFee(json.getDouble("deliveryFee"));
+				task.setCustomerAddress(json.getString("customerAddress"));
 
 				// Parse optional datetime fields
 				if (json.has("acceptanceTime") && !json.isNull("acceptanceTime")) {
@@ -138,7 +144,8 @@ public class TaskService {
 					json.put("runnerId", updatedTask.getRunnerId());
 					json.put("status", updatedTask.getStatus());
 					json.put("taskDetails", updatedTask.getTaskDetails());
-
+					json.put("deliveryFee", updatedTask.getDeliveryFee());
+					json.put("customerAddress", updatedTask.getCustomerAddress());
 					json.put("acceptanceTime", 
 							updatedTask.getAcceptanceTime() != null ? updatedTask.getAcceptanceTime().toString() : JSONObject.NULL);
 					json.put("completionTime", 

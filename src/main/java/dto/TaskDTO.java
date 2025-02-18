@@ -11,6 +11,8 @@ public class TaskDTO {
     private String runnerId;
     private TaskStatus status;
     private String taskDetails;
+    private String customerAddress;
+    private double deliveryFee;
     private LocalDateTime acceptanceTime;
     private LocalDateTime completionTime;
     
@@ -56,6 +58,18 @@ public class TaskDTO {
 	}
 	public void setCompletionTime(LocalDateTime completionTime) {
 		this.completionTime = completionTime;
+	}
+	public double getDeliveryFee() {
+		return deliveryFee;
+	}
+	public void setDeliveryFee(double deliveryFee) {
+		this.deliveryFee = deliveryFee;
+	}
+	public String getCustomerAddress() {
+		return customerAddress;
+	}
+	public void setCustomerAddress(String customerAddress) {
+		this.customerAddress = customerAddress;
 	}
     
 }

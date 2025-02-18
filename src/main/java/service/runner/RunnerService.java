@@ -42,6 +42,7 @@ public class RunnerService {
 		json.put("reviews", runner.getReviews() != null ? new JSONArray(runner.getReviews()) : new JSONArray());
 		
 		json.put("available", runner.isAvailable());
+		json.put("currentTask", runner.getCurrentTask());
 		json.put("earnings", runner.getEarnings());
 		json.put("ratings", runner.getRatings());     // Added ratings field
 		json.put("lastDeliveredAddress", runner.getLastDeliveredAddress() != null ? runner.getLastDeliveredAddress() : "");
@@ -88,6 +89,7 @@ public class RunnerService {
 					runner.setEarnings(json.optDouble("earnings", 0.0));
 					runner.setRatings(json.optDouble("ratings", 0.0));
 					runner.setAvailable(json.optBoolean("available"));
+					runner.setCurrentTask(json.getString("currentTask"));
 
 					// Convert JSON arrays to List<String>
 					runner.setTasks(JsonUtils.jsonArrayToList(json.getJSONArray("tasks")));
@@ -135,6 +137,7 @@ public class RunnerService {
 				runner.setEarnings(json.optDouble("earnings", 0.0));
 				runner.setRatings(json.optDouble("ratings", 0.0));
 				runner.setAvailable(json.optBoolean("available"));
+				runner.setCurrentTask(json.getString("currentTask"));
 				
 				// Reading tasks and reviews (Lists)
 				runner.setTasks(JsonUtils.jsonArrayToList(json.getJSONArray("tasks")));
@@ -182,6 +185,7 @@ public class RunnerService {
 					json.put("earnings", updatedRunner.getEarnings());
 					json.put("ratings", updatedRunner.getRatings());                    // Added ratings
 					json.put("available", updatedRunner.isAvailable());
+					json.put("currentTask", updatedRunner.getCurrentTask());
 					
 					// Convert Lists to JSON Arrays safely
 					json.put("tasks", updatedRunner.getTasks() != null ? new JSONArray(updatedRunner.getTasks()) : new JSONArray());

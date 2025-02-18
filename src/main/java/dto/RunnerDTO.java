@@ -10,6 +10,7 @@ public class RunnerDTO extends UserDTO {
     private double earnings;
     private double ratings;
     private Boolean available;
+    private String currentTask;
     private List<String> reviews;
     private String lastDeliveredAddress;
     private LocalDateTime lastDeliveryDate;
@@ -62,6 +63,12 @@ public class RunnerDTO extends UserDTO {
 	}
 	public void setAvailable(Boolean available) {
 		this.available = available;
+	}
+	public String getCurrentTask() {
+		return currentTask;
+	}
+	public void setCurrentTask(String currentTask) {
+		this.currentTask = currentTask;
 	}
     
 }

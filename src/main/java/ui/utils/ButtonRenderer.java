@@ -16,6 +16,7 @@ public class ButtonRenderer extends JPanel implements TableCellRenderer {
     private final JButton disableButton = new JButton("Disable");
     private final JButton updateButton = new JButton("Update");
     private final JButton viewButton = new JButton("View");
+    private final JButton addToCartButton = new JButton("Add to Cart");
 
     public ButtonRenderer(ButtonMode mode) {
     	if (mode == ButtonMode.EDIT) {
@@ -44,6 +45,9 @@ public class ButtonRenderer extends JPanel implements TableCellRenderer {
     	} else if (mode == ButtonMode.VIEWORDERHISTORY) {
     		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
             add(viewButton);
+    	} else if (mode == ButtonMode.ADDTOCART) {
+    		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
+            add(addToCartButton);
     	}
     }
 
