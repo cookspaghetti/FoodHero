@@ -3,11 +3,20 @@ package ui.dashboard;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
-import dto.AdminDTO; // Assuming you have AdminDTO for user details
+import dto.AdminDTO;
+import dto.OrderDTO;
+import dto.RunnerDTO;
+import dto.VendorDTO;
+import enumeration.OrderStatus;
 import enumeration.Role;
 import service.general.SessionControlService;
+import service.order.OrderService;
+import service.runner.RunnerService;
+import service.vendor.VendorService;
 import ui.login.LoginInterface;
 import ui.notification.NotificationPage;
 import ui.profile.AdminProfilePage;
@@ -22,6 +31,13 @@ import java.awt.Font;
 
 public class AdminDashboard extends JFrame {
 	private AdminDTO admin;
+
+	private String[] activeVendors;
+	private String[] activeRunners;
+	private String[] activeOrders;
+	private int numActiveVendors = 0;
+	private int numActiveRunners = 0;
+	private int numActiveOrders = 0;
 
 	public AdminDashboard(AdminDTO admin) {
 		this.admin = admin;
@@ -115,20 +131,25 @@ public class AdminDashboard extends JFrame {
 		// ======= Data Panel =======
 		JPanel dataPanel = new JPanel(new GridLayout(3, 2, 15, 10)); // 3 rows, 2 columns with gaps
 
-		JLabel vendorsLabel = new JLabel("Active Vendors (" +  10 + ")");
+		// Get active vendors, runners, and orders
+		activeVendors = getActiveVendors();
+		activeRunners = getActiveRunners();
+		activeOrders = getActiveOrders();
+
+		JLabel vendorsLabel = new JLabel("Active Vendors (" + numActiveVendors + ")");
 		vendorsLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		vendorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		JList<String> vendorsList = new JList<>(new String[]{"Vendor A", "Vendor B"}); // Example data
+		JList<String> vendorsList = new JList<>(activeVendors);
 
-		JLabel runnersLabel = new JLabel("Active Runners:");
+		JLabel runnersLabel = new JLabel("Active Runners (" + numActiveRunners + ")");
 		runnersLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		runnersLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		JList<String> runnersList = new JList<>(new String[]{"Runner X", "Runner Y"});
+		JList<String> runnersList = new JList<>(activeRunners);
 
-		JLabel ordersLabel = new JLabel("Active Orders:");
+		JLabel ordersLabel = new JLabel("Active Orders (" + numActiveOrders + ")");
 		ordersLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		ordersLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		JList<String> ordersList = new JList<>(new String[]{"Order #123", "Order #456"});
+		JList<String> ordersList = new JList<>(activeOrders);
 
 		// Add components to the data panel
 		dataPanel.add(vendorsLabel);
@@ -169,9 +190,9 @@ public class AdminDashboard extends JFrame {
 			JOptionPane.showMessageDialog(this, "Unknown error occured. Please try again. ");
 			break;
 		}
-			
 	}
 
+	// Menu Action Methods
 	private void openTopUpPage() {
 		new AdminTopUpPage().setVisible(true);
 	}
@@ -183,10 +204,45 @@ public class AdminDashboard extends JFrame {
 	private void openProfilePage() {
 		new AdminProfilePage((AdminDTO) SessionControlService.getUser()).setVisible(true);
 	}
-	
-	public static void main(String[] args) {
-		AdminDTO admin = new AdminDTO();
-		admin.setName("Alex"); // Example admin name
-		new AdminDashboard(admin).setVisible(true);
+
+	// Populate the active vendors list
+	private String[] getActiveVendors() {
+		List<VendorDTO> vendors = VendorService.readAllVendor();
+		List<String> activeVendors = new ArrayList<>();
+		for (VendorDTO vendor : vendors) {
+			if (vendor.getOpen()) {
+				activeVendors.add(vendor.getName());
+			}
+		}
+		numActiveVendors = activeVendors.size();
+		return activeVendors.toArray(new String[0]);
 	}
+
+	// Populate the active runners list
+	private String[] getActiveRunners() {
+		List<String> activeRunners = new ArrayList<>();
+		List<RunnerDTO> runners = RunnerService.readAllRunner();
+		for (RunnerDTO runner : runners) {
+			if (runner.isAvailable()) {
+				activeRunners.add(runner.getName());
+			}
+		}
+		numActiveRunners = activeRunners.size();
+		return activeRunners.toArray(new String[0]);
+	}
+
+	// Populate the active orders list
+	private String[] getActiveOrders() {
+		List<String> activeOrders = new ArrayList<>();
+		List<OrderDTO> orders = OrderService.readAllOrder();
+		for (OrderDTO order : orders) {
+			if (order.getStatus().equals(OrderStatus.PENDING) || order.getStatus().equals(OrderStatus.PROCESSING) || order.getStatus().equals(OrderStatus.ON_THE_WAY) || 
+				order.getStatus().equals(OrderStatus.READY_FOR_PICKUP)) {
+				activeOrders.add(order.getId());
+			}
+		}
+		numActiveOrders = activeOrders.size();
+		return activeOrders.toArray(new String[0]);
+	}
+	
 }

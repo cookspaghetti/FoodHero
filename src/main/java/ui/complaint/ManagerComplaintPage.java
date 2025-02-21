@@ -3,9 +3,12 @@ package ui.complaint;
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.table.DefaultTableModel;
+import java.util.List;
 
+import dto.ComplaintDTO;
 import enumeration.ButtonMode;
 import enumeration.ComplaintStatus;
+import service.complaint.ComplaintService;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
 import ui.utils.MultiLineRenderer;
@@ -29,7 +32,19 @@ public class ManagerComplaintPage extends JFrame {
 		JPanel searchPanel = new JPanel();
 		searchField = new JTextField(20);
 		searchButton = new JButton("Search");
+		searchButton.addActionListener(e -> {
+			String keyword = searchField.getText();
+			if (keyword.isEmpty()) {
+				return;
+			}
+			// Search by keyword
+			searchByKeyword(keyword);
+		});
+
 		statusFilter = new JComboBox<>(ComplaintStatus.values());
+		statusFilter.addActionListener(e -> {
+			filterByStatus((ComplaintStatus) statusFilter.getSelectedItem());
+		});
 
 		searchPanel.add(new JLabel("Search Complaint:"));
 		searchPanel.add(searchField);
@@ -66,23 +81,43 @@ public class ManagerComplaintPage extends JFrame {
 		complaintTable.getColumnModel().getColumn(4).setPreferredWidth(100); // Status
 		complaintTable.getColumnModel().getColumn(5).setPreferredWidth(80); // Actions
 
-		Object[][] sampleData = {
-				{"C001", "U123", "O567", "Received a defective product. Requesting a replacement.", "Pending", "View"},
-				{"C002", "U456", "O789", "Delivery was delayed by 5 days, highly dissatisfied.", "Resolved", "View"},
-				{"C003", "U789", "O345", "Wrong item received. Need a refund or exchange.", "In Progress", "View"},
-				{"C004", "U234", "O678", "Customer service was unresponsive to my queries.", "Escalated", "View"},
-				{"C005", "U567", "O901", "Product description was misleading. Want to return.", "Closed", "View"}
-		};
+		Object[][] data = getComplaintData();
 
-		for (Object[] row : sampleData) {
+		for (Object[] row : data) {
 			tableModel.addRow(row);
 		}
 
 		setVisible(true);
 	}
 
-	public static void main(String[] args) {
-		new ManagerComplaintPage();
+	// Method to get complaint data from database
+	private Object[][] getComplaintData() {
+		List<ComplaintDTO> complaints = ComplaintService.readAllComplaint();
+		Object[][] data = new Object[complaints.size()][6];
+		return data;
 	}
+
+	// Method to search complaints by keyword
+	private void searchByKeyword(String keyword) {
+		List<ComplaintDTO> complaints = ComplaintService.readAllComplaint();
+		tableModel.setRowCount(0);
+		for (ComplaintDTO complaint : complaints) {
+			if (complaint.getDescription().toLowerCase().contains(keyword.toLowerCase())) {
+				tableModel.addRow(new Object[] {complaint.getId(), complaint.getCustomerId(), complaint.getOrderId(), complaint.getDescription(), complaint.getStatus(), "View"});
+			}
+		}
+	}
+
+	// Method to filter complaints by status
+	private void filterByStatus(ComplaintStatus status) {
+		List<ComplaintDTO> complaints = ComplaintService.readAllComplaint();
+		tableModel.setRowCount(0);
+		for (ComplaintDTO complaint : complaints) {
+			if (complaint.getStatus() == status) {
+				tableModel.addRow(new Object[] {complaint.getId(), complaint.getCustomerId(), complaint.getOrderId(), complaint.getDescription(), complaint.getStatus(), "View"});
+			}
+		}
+	}
+
 }
 

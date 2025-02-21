@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,8 +18,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
+import dto.ComplaintDTO;
 import dto.ManagerDTO;
+import dto.RunnerDTO;
+import dto.VendorDTO;
+import enumeration.ComplaintStatus;
+import service.complaint.ComplaintService;
 import service.general.SessionControlService;
+import service.runner.RunnerService;
+import service.vendor.VendorService;
 import ui.complaint.ManagerComplaintPage;
 import ui.item.ManagerItemPage;
 import ui.login.LoginInterface;
@@ -29,6 +38,13 @@ import ui.revenue.ManagerRevenuePage;
 public class ManagerDashboard extends JFrame {
 	private ManagerDTO manager;
 
+	private String[] activeVendors;
+	private String[] activeRunners;
+	private String[] newComplaints;
+	private int numActiveVendors = 0;
+	private int numActiveRunners = 0;
+	private int numNewComplaints = 0;
+	
 	public ManagerDashboard(ManagerDTO manager) {
 		this.manager = manager;
 		initComponents();
@@ -115,20 +131,25 @@ public class ManagerDashboard extends JFrame {
 		// ======= Data Panel =======
 		JPanel dataPanel = new JPanel(new GridLayout(3, 2, 15, 10)); // 3 rows, 2 columns with gaps
 
-		JLabel vendorsLabel = new JLabel("Active Vendors (" +  10 + ")");
+		// Get active vendors and runners
+		activeVendors = getActiveVendors();
+		activeRunners = getActiveRunners();
+		newComplaints = getNewComplaints();
+
+		JLabel vendorsLabel = new JLabel("Active Vendors (" + numActiveVendors + ")");
 		vendorsLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		vendorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		JList<String> vendorsList = new JList<>(new String[]{"Vendor A", "Vendor B"}); // Example data
+		JList<String> vendorsList = new JList<>(activeVendors);
 
-		JLabel runnersLabel = new JLabel("Active Runners:");
+		JLabel runnersLabel = new JLabel("Active Runners: (" + numActiveRunners + ")");
 		runnersLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		runnersLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		JList<String> runnersList = new JList<>(new String[]{"Runner X", "Runner Y"});
+		JList<String> runnersList = new JList<>(activeRunners);
 
-		JLabel ordersLabel = new JLabel("New Complaints:");
+		JLabel ordersLabel = new JLabel("New Complaints: (" + numNewComplaints + ")");
 		ordersLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		ordersLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		JList<String> ordersList = new JList<>(new String[]{"Order #123", "Order #456"});
+		JList<String> ordersList = new JList<>(newComplaints);
 
 		// Add components to the data panel
 		dataPanel.add(vendorsLabel);
@@ -171,9 +192,42 @@ public class ManagerDashboard extends JFrame {
 		new ManagerProfilePage((ManagerDTO) SessionControlService.getUser()).setVisible(true);
 	}
 
-	public static void main(String[] args) {
-		ManagerDTO manager =  new ManagerDTO();
-		manager.setName("Alex"); // Example admin name
-		new ManagerDashboard(manager).setVisible(true);
+	// Populate the active vendors list
+	private String[] getActiveVendors() {
+		List<VendorDTO> vendors = VendorService.readAllVendor();
+		List<String> activeVendors = new ArrayList<>();
+		for (VendorDTO vendor : vendors) {
+			if (vendor.getOpen()) {
+				activeVendors.add(vendor.getName());
+			}
+		}
+		numActiveVendors = activeVendors.size();
+		return activeVendors.toArray(new String[0]);
+	}
+
+	// Populate the active runners list
+	private String[] getActiveRunners() {
+		List<String> activeRunners = new ArrayList<>();
+		List<RunnerDTO> runners = RunnerService.readAllRunner();
+		for (RunnerDTO runner : runners) {
+			if (runner.isAvailable()) {
+				activeRunners.add(runner.getName());
+			}
+		}
+		numActiveRunners = activeRunners.size();
+		return activeRunners.toArray(new String[0]);
+	}
+
+	// Populate the new complaints list
+	private String[] getNewComplaints() {
+		List<String> newComplaints = new ArrayList<>();
+		List<ComplaintDTO> complaints = ComplaintService.readAllComplaint();
+		for (ComplaintDTO complaint : complaints) {
+			if (!complaint.getStatus().equals(ComplaintStatus.PENDING)) {
+				newComplaints.add(complaint.getOrderId());
+			}
+		}
+		numNewComplaints = newComplaints.size();
+		return newComplaints.toArray(new String[0]);
 	}
 }

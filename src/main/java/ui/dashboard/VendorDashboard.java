@@ -2,8 +2,11 @@ package ui.dashboard;
 
 import javax.swing.*;
 
+import dto.OrderDTO;
 import dto.VendorDTO;
+import enumeration.OrderStatus;
 import service.general.SessionControlService;
+import service.order.OrderService;
 import ui.item.VendorItemPage;
 import ui.login.LoginInterface;
 import ui.notification.NotificationPage;
@@ -13,9 +16,18 @@ import ui.profile.VendorProfilePage;
 import ui.revenue.VendorRevenuePage;
 import ui.review.VendorReviewPage;
 import java.awt.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class VendorDashboard extends JFrame {
 	private VendorDTO vendor;
+
+	private String[] activeOrders;
+	private String[] topSales;
+	private String[] earningsToday;
+	private int numActiveOrders = 0;
 
 	public VendorDashboard(VendorDTO vendor) {
 		this.vendor = vendor;
@@ -104,20 +116,25 @@ public class VendorDashboard extends JFrame {
 		// ======= Data Panel =======
 		JPanel dataPanel = new JPanel(new GridLayout(3, 2, 15, 10)); // 3 rows, 2 columns with gaps
 
-		JLabel vendorsLabel = new JLabel("Active Orders (" +  10 + ")");
+		// Get data to populate the dashboard
+		activeOrders = getActiveOrders();
+		topSales = getTopSales();
+		earningsToday = getEarningsToday();
+
+		JLabel vendorsLabel = new JLabel("Active Orders (" + numActiveOrders + "):");
 		vendorsLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		vendorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		JList<String> vendorsList = new JList<>(new String[]{"Vendor A", "Vendor B"}); // Example data
+		JList<String> vendorsList = new JList<>(activeOrders);
 
 		JLabel runnersLabel = new JLabel("Top Sales:");
 		runnersLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		runnersLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		JList<String> runnersList = new JList<>(new String[]{"Runner X", "Runner Y"});
+		JList<String> runnersList = new JList<>(topSales);
 
 		JLabel ordersLabel = new JLabel("Earnings Today:");
 		ordersLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		ordersLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		JList<String> ordersList = new JList<>(new String[]{"Order #123", "Order #456"});
+		JList<String> ordersList = new JList<>(earningsToday);
 
 		// Add components to the data panel
 		dataPanel.add(vendorsLabel);
@@ -164,9 +181,61 @@ public class VendorDashboard extends JFrame {
 		new VendorProfilePage((VendorDTO) SessionControlService.getUser()).setVisible(true);
 	}
 	
-	public static void main(String[] args) {
-		VendorDTO vendor = new VendorDTO();
-		vendor.setName("Alex"); // Example admin name
-		new VendorDashboard(vendor).setVisible(true);
+	// ======= Data Methods =======
+	private String[] getActiveOrders() {
+		List<String> activeOrders = new ArrayList<>();
+		List<OrderDTO> orders = OrderService.readVendorOrders(vendor.getId());
+		for (OrderDTO order : orders) {
+			if (order.getStatus().equals(OrderStatus.PENDING) || order.getStatus().equals(OrderStatus.PROCESSING) || order.getStatus().equals(OrderStatus.ON_THE_WAY) || 
+				order.getStatus().equals(OrderStatus.READY_FOR_PICKUP)) {
+				activeOrders.add(order.getId());
+			}
+		}
+		numActiveOrders = activeOrders.size();
+		return activeOrders.toArray(new String[0]);
+	}
+
+	private String[] getTopSales() {
+		List<OrderDTO> orders = OrderService.readVendorOrders(vendor.getId());
+		HashMap<String, Integer> salesByItems = new HashMap<>();
+		List<String> topSales = new ArrayList<>();
+		LocalDate currentDate = LocalDate.now();
+
+		for (OrderDTO order : orders) {
+			LocalDate orderDate = order.getPlacementTime().toLocalDate();
+			if (orderDate.equals(currentDate) && order.getStatus().equals(OrderStatus.DELIVERED)) {
+				HashMap<String, Integer> items = order.getItems();
+				for (String item : items.keySet()) {
+					if (salesByItems.containsKey(item)) {
+						salesByItems.put(item, salesByItems.get(item) + items.get(item));
+					} else {
+						salesByItems.put(item, items.get(item));
+					}
+				}
+			}
+		}
+
+		// Get the top 10 sales
+		salesByItems.entrySet().stream()
+			.sorted((item1, item2) -> item2.getValue().compareTo(item1.getValue()))
+			.limit(10)
+			.forEach(item -> topSales.add(item.getKey() + " - " + item.getValue()));
+		
+		return topSales.toArray(new String[0]);
+	}
+
+	private String[] getEarningsToday() {
+		List<OrderDTO> orders = OrderService.readVendorOrders(vendor.getId());
+		double earnings = 0.0;
+		LocalDate currentDate = LocalDate.now();
+
+		for (OrderDTO order : orders) {
+			LocalDate orderDate = order.getPlacementTime().toLocalDate();
+			if (orderDate.equals(currentDate) && order.getStatus().equals(OrderStatus.DELIVERED)) {
+				earnings += order.getTotalAmount();
+			}
+		}
+		earnings = earnings * 0.9; // 10% commission fee
+		return new String[]{String.format("RM %.2f", earnings)};
 	}
 }

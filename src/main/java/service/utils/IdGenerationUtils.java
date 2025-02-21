@@ -11,7 +11,7 @@ import service.general.SessionControlService;
 
 public class IdGenerationUtils {
 
-	public String getNextId(ServiceType type, String vendorId, String runnerId) {
+	public static String getNextId(ServiceType type, String vendorId, String runnerId) {
 
 		String filePath;
 		String abbreviation = "ERR"; // e.g adm for admin, mgr for manager

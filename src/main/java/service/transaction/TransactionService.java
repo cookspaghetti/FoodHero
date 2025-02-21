@@ -23,7 +23,7 @@ public class TransactionService {
 	private static final String SYS_PATH = "src\\main\\resources\\database\\transaction\\";
 
 	// Method to create an AddTransaction and save to a text file in JSON format
-	public ResponseCode createAddTransaction(AddTransactionDTO transaction) {
+	public static ResponseCode createAddTransaction(AddTransactionDTO transaction) {
 
 		String filePath = SYS_PATH + "add_transaction.txt";
 

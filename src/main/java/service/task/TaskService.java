@@ -88,7 +88,7 @@ public class TaskService {
 	}
 
 	// Method to read all tasks from the text file
-	public List<TaskDTO> readAllTask() {
+	public static  List<TaskDTO> readAllTask() {
 		String filePath = SYS_PATH + "task.txt";
 		List<TaskDTO> tasks = new ArrayList<>();
 

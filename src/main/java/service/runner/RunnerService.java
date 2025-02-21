@@ -115,7 +115,7 @@ public class RunnerService {
 	}
 
 	// Method to read all runners from the text file
-	public List<RunnerDTO> readAllRunner() {
+	public static List<RunnerDTO> readAllRunner() {
 		String filePath = SYS_PATH + "runner.txt";
 		List<RunnerDTO> runners = new ArrayList<>();
 

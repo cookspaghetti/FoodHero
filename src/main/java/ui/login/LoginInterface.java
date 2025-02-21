@@ -3,11 +3,19 @@ package ui.login;
 import javax.swing.*;
 
 import dto.AdminDTO;
+import dto.CustomerDTO;
+import dto.ManagerDTO;
+import dto.RunnerDTO;
+import dto.VendorDTO;
 import enumeration.ResponseCode;
 import enumeration.Role;
 import service.general.LoginService;
 import service.general.SessionControlService;
 import ui.dashboard.AdminDashboard;
+import ui.dashboard.CustomerDashboard;
+import ui.dashboard.ManagerDashboard;
+import ui.dashboard.RunnerDashboard;
+import ui.dashboard.VendorDashboard;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -172,10 +180,10 @@ public class LoginInterface extends JFrame {
 				// Open respective dashboard based on the role
 				switch (selectedRole) {
 				case ADMIN -> new AdminDashboard((AdminDTO) SessionControlService.getUser()).setVisible(true);
-				// case MANAGER -> new ManagerDashboard(user).setVisible(true);
-				// case CUSTOMER -> new CustomerDashboard(user).setVisible(true);
-				// case VENDOR -> new VendorDashboard(user).setVisible(true);
-				// case RUNNER -> new RunnerDashboard(user).setVisible(true);
+				case MANAGER -> new ManagerDashboard((ManagerDTO) SessionControlService.getUser()).setVisible(true);
+				case CUSTOMER -> new CustomerDashboard((CustomerDTO) SessionControlService.getUser()).setVisible(true);
+				case VENDOR -> new VendorDashboard((VendorDTO) SessionControlService.getUser()).setVisible(true);
+				case RUNNER -> new RunnerDashboard((RunnerDTO) SessionControlService.getUser()).setVisible(true);
 				default -> JOptionPane.showMessageDialog(this, "Unknown error occurred. Please try again.");
 				}
 

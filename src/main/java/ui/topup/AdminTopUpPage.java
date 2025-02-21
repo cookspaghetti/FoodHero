@@ -71,7 +71,7 @@ public class AdminTopUpPage extends JFrame {
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
         closeButton.addActionListener(e -> dispose());
-        topUpButton.addActionListener(e -> new TopUpPaymentDialog(this, nameLabel.getText(), phoneLabel.getText()));
+        topUpButton.addActionListener(e -> new TopUpPaymentDialog(this, nameLabel.getText(), phoneLabel.getText(), idLabel.getText()));
 
         setVisible(true);
     }

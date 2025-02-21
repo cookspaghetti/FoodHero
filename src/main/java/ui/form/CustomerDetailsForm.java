@@ -61,8 +61,4 @@ public class CustomerDetailsForm extends JFrame {
         setVisible(true);
     }
 
-    public static void main(String[] args) {
-        CustomerDTO customer = new CustomerDTO(); // Replace with actual Customer object
-        new CustomerDetailsForm(customer);
-    }
 }

@@ -111,7 +111,7 @@ public class AdminService {
 	}
 
 	// Method to update admin
-	public ResponseCode updateAdmin(AdminDTO updatedAdmin) {
+	public static ResponseCode updateAdmin(AdminDTO updatedAdmin) {
 
 		String filePath = SYS_PATH + "admin.txt";
 

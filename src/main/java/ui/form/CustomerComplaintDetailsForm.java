@@ -3,7 +3,6 @@ package ui.form;
 import javax.swing.*;
 
 import dto.ComplaintDTO;
-import enumeration.ComplaintStatus;
 
 import java.awt.*;
 
@@ -41,7 +40,7 @@ public class CustomerComplaintDetailsForm extends JFrame {
         getContentPane().add(new JScrollPane(solutionArea));
 
         JButton closeButton = new JButton("Close");
-        getContentPane().add(new JLabel()); // Placeholder
+        getContentPane().add(new JLabel());
         getContentPane().add(closeButton);
 
         closeButton.addActionListener(e -> dispose());
@@ -50,14 +49,4 @@ public class CustomerComplaintDetailsForm extends JFrame {
         setVisible(true);
     }
     
-    public static void main(String[] args) {
-        ComplaintDTO sampleComplaint = new ComplaintDTO();
-        sampleComplaint.setId("C123");
-        sampleComplaint.setCustomerId("U456");
-        sampleComplaint.setOrderId("O789");
-        sampleComplaint.setDescription("Item was damaged. Item was damaged. Item was damaged. Item was damaged. Item was damaged.");
-        sampleComplaint.setStatus(ComplaintStatus.IN_REVIEW);
-        sampleComplaint.setSolution("Replacement is being processed.");
-        new CustomerComplaintDetailsForm(sampleComplaint);
-    }
 }

@@ -139,7 +139,7 @@ public class CustomerService {
 	}
 
 	// Method to update customer
-	public ResponseCode updateCustomer(CustomerDTO updatedCustomer) {
+	public static ResponseCode updateCustomer(CustomerDTO updatedCustomer) {
 
 		String filePath = SYS_PATH + "customer.txt";
 

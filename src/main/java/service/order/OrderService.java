@@ -106,6 +106,104 @@ public class OrderService {
 		return null;
 	}
 
+	// Method to read customer orders from the text file
+	public static List<OrderDTO> readCustomerOrders(String customerId) {
+		String filePath = SYS_PATH + "order.txt";
+		List<OrderDTO> orders = new ArrayList<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("customerId").equals(customerId)) {
+					OrderDTO order = new OrderDTO();
+					order.setId(json.getString("id"));
+					order.setCustomerId(json.getString("customerId"));
+					order.setVendorId(json.getString("vendorId"));
+					order.setRunnerId(json.getString("runnerId"));
+					order.setStatus(OrderStatus.valueOf(json.getString("status")));
+					order.setTotalAmount(json.getDouble("totalAmount"));
+					order.setDeliveryFee(json.getDouble("deliveryFee"));
+					order.setNotes(json.getString("notes"));
+					order.setDeliveryAddress(json.getString("deliveryAddress"));
+
+					// Parse placementTime and completionTime
+					order.setPlacementTime(LocalDateTime.parse(json.getString("placementTime")));
+					if (json.has("completionTime") && !json.getString("completionTime").isEmpty()) {
+						order.setCompletionTime(LocalDateTime.parse(json.getString("completionTime")));
+					}
+
+					// Parse items (HashMap<String, Integer>)
+					JSONObject itemsJson = json.getJSONObject("items");
+					HashMap<String, Integer> items = new HashMap<>();
+					for (String key : itemsJson.keySet()) {
+						items.put(key, itemsJson.getInt(key));
+					}
+					order.setItems(items);
+
+					orders.add(order);  // Add to the list
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading orders from file: " + e.getMessage());
+		} catch (JSONException e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
+
+		return orders;  // Return the list of orders
+	}
+
+	// Method to read vendor orders from the text file
+	public static List<OrderDTO> readVendorOrders(String vendorId) {
+		String filePath = SYS_PATH + "order.txt";
+		List<OrderDTO> orders = new ArrayList<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("vendorId").equals(vendorId)) {
+					OrderDTO order = new OrderDTO();
+					order.setId(json.getString("id"));
+					order.setCustomerId(json.getString("customerId"));
+					order.setVendorId(json.getString("vendorId"));
+					order.setRunnerId(json.getString("runnerId"));
+					order.setStatus(OrderStatus.valueOf(json.getString("status")));
+					order.setTotalAmount(json.getDouble("totalAmount"));
+					order.setDeliveryFee(json.getDouble("deliveryFee"));
+					order.setNotes(json.getString("notes"));
+					order.setDeliveryAddress(json.getString("deliveryAddress"));
+
+					// Parse placementTime and completionTime
+					order.setPlacementTime(LocalDateTime.parse(json.getString("placementTime")));
+					if (json.has("completionTime") && !json.getString("completionTime").isEmpty()) {
+						order.setCompletionTime(LocalDateTime.parse(json.getString("completionTime")));
+					}
+
+					// Parse items (HashMap<String, Integer>)
+					JSONObject itemsJson = json.getJSONObject("items");
+					HashMap<String, Integer> items = new HashMap<>();
+					for (String key : itemsJson.keySet()) {
+						items.put(key, itemsJson.getInt(key));
+					}
+					order.setItems(items);
+
+					orders.add(order);  // Add to the list
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading orders from file: " + e.getMessage());
+		} catch (JSONException e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
+
+		return orders;  // Return the list of orders
+	}
+
 	// Method to read runner orders from the text file
 	public static List<OrderDTO> readRunnerOrders(String runnerId) {
 		String filePath = SYS_PATH + "order.txt";
@@ -156,7 +254,7 @@ public class OrderService {
 	}
 
 	// Method to read all orders from the text file
-	public List<OrderDTO> readAllOrder() {
+	public static List<OrderDTO> readAllOrder() {
 		String filePath = SYS_PATH + "order.txt";
 		List<OrderDTO> orders = new ArrayList<>();
 
@@ -205,7 +303,7 @@ public class OrderService {
 	}
 
 	// Method to update an existing order
-	public ResponseCode updateOrder(String id, OrderDTO updatedOrder) {
+	public static ResponseCode updateOrder(String id, OrderDTO updatedOrder) {
 
 		String filePath = SYS_PATH + "order.txt";
 

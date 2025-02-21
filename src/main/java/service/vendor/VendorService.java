@@ -175,7 +175,7 @@ public class VendorService {
 	}
 
 	// Method to read all vendors from the text file
-	public List<VendorDTO> readAllVendor() {
+	public static List<VendorDTO> readAllVendor() {
 		
 		String filePath = SYS_PATH + "vendor.txt";
 		

@@ -1,4 +1,4 @@
-package service.complain;
+package service.complaint;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,7 +20,7 @@ public class ComplaintService {
 	private static final String SYS_PATH = "src\\main\\resources\\database\\complain\\";
 
 	// Method to create a complain and save it to a text file in JSON format
-	public void createComplaint(ComplaintDTO complain) {
+	public static ResponseCode createComplaint(ComplaintDTO complain) {
 		String filePath = SYS_PATH + "complain.txt";
 
 		// Construct JSON Object
@@ -35,9 +35,10 @@ public class ComplaintService {
 		// Write JSON to text file
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
-			System.out.println("Complain created successfully!");
+			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing complain to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		}
 	}
 
@@ -73,8 +74,40 @@ public class ComplaintService {
 		return null; // If no matching complain is found
 	}
 
+	// Method to read all complaints of a customer from the text file
+	public static List<ComplaintDTO> readCustomerComplaints(String customerId) {
+		String filePath = SYS_PATH + "complain.txt";
+		List<ComplaintDTO> complaints = new ArrayList<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("customerId").equals(customerId)) {
+					ComplaintDTO complain = new ComplaintDTO();
+					complain.setId(json.getString("id"));
+					complain.setCustomerId(json.getString("customerId"));
+					complain.setOrderId(json.getString("orderId"));
+					complain.setDescription(json.getString("description"));
+					complain.setStatus(ComplaintStatus.valueOf(json.getString("status")));
+					complain.setSolution(json.getString("solution"));
+
+					complaints.add(complain); // Add to the list
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading complaints from file: " + e.getMessage());
+		} catch (JSONException e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
+
+		return complaints; // Return the list of complaints
+	}
+
 	// Method to read all complaints from the text file
-	public List<ComplaintDTO> readAllComplaint() {
+	public static List<ComplaintDTO> readAllComplaint() {
 		String filePath = SYS_PATH + "complain.txt";
 		List<ComplaintDTO> complaints = new ArrayList<>();
 
@@ -156,7 +189,7 @@ public class ComplaintService {
 	}
 
 	// Method to delete a complain from the text file
-	public void deleteComplaint(String id) {
+	public ResponseCode deleteComplaint(String id) {
 		String filePath = SYS_PATH + "complain.txt";
 		List<String> updatedData = new ArrayList<>();
 		boolean found = false;
@@ -176,8 +209,10 @@ public class ComplaintService {
 			}
 		} catch (IOException e) {
 			System.err.println("Error reading complain from file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
 		} catch (JSONException e) {
 			System.err.println("Error parsing JSON: " + e.getMessage());
+			return ResponseCode.JSON_EXCEPTION;
 		}
 
 		if (found) {
@@ -186,11 +221,14 @@ public class ComplaintService {
 					writer.write(updatedLine);
 					writer.newLine();
 				}
+				return ResponseCode.SUCCESS;
 			} catch (IOException e) {
 				System.err.println("Error writing updated complain data to file: " + e.getMessage());
+				return ResponseCode.IO_EXCEPTION;
 			}
 		} else {
 			System.out.println("Complain with ID " + id + " not found.");
+			return ResponseCode.RECORD_NOT_FOUND;
 		}
 	}
 }

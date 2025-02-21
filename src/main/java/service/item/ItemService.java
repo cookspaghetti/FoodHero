@@ -95,6 +95,21 @@ public class ItemService {
 		return null; // Return null if the item is not found
 	}
 
+	// Method to read items in an order 
+	public static List<ItemDTO> readItemsInOrder(String vendorId, List<String> itemList) {
+
+		List<ItemDTO> items = new ArrayList<>();
+
+		for (String itemId : itemList) {
+			ItemDTO item = readItem(vendorId, itemId);
+			if (item != null) {
+				items.add(item);
+			}
+		}
+
+		return items;
+	}
+
 	// Method to read all items from the text file
 	public List<ItemDTO> readAllItem(String vendorId) {
 

@@ -4,12 +4,18 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import dto.CustomerDTO;
+import dto.OrderDTO;
 import enumeration.ButtonMode;
 import enumeration.OrderStatus;
-import enumeration.VendorType;
 import service.general.SessionControlService;
+import service.order.OrderService;
+import service.processor.ItemProcessor;
+import service.vendor.VendorService;
 import ui.complaint.CustomerComplaintPage;
 import ui.login.LoginInterface;
 import ui.notification.NotificationPage;
@@ -22,133 +28,145 @@ import ui.vendor.CustomerVendorPage;
 
 public class CustomerDashboard extends JFrame {
 	private CustomerDTO customer;
+    
+    // UI Components
+    private JMenuBar menuBar;
+    private JMenu homeMenu, vendorMenu, orderMenu, transactionMenu, complaintMenu, notificationMenu, profileMenu;
+    private JMenuItem dashboardItem, viewVendorsItem, orderManagementItem, transactionManagementItem, 
+                      complaintManagementItem, notificationItem, editProfileItem;
+    private JPanel headerPanel, activeOrdersPanel;
+    private JLabel balanceLabel, welcomeLabel, activeOrdersLabel;
+    private JButton logoutButton;
+    private JTable activeOrdersTable;
+    private DefaultTableModel tableModel;
+    private JScrollPane tableScrollPane;
 
-	public CustomerDashboard(CustomerDTO customer) {
-		this.customer = customer;
-		initComponents();
-	}
+    public CustomerDashboard(CustomerDTO customer) {
+        this.customer = customer;
+        initComponents();
+    }
 
-	private void initComponents() {
-		setTitle("Customer Dashboard");
-		setSize(800, 600);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLocationRelativeTo(null);
-		getContentPane().setLayout(new BorderLayout());
+    private void initComponents() {
+        setTitle("Customer Dashboard");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        getContentPane().setLayout(new BorderLayout());
 
-		// ======= Menu Bar =======
-		JMenuBar menuBar = new JMenuBar();
+        // ======= Menu Bar =======
+        menuBar = new JMenuBar();
 
-		// Home Menu
-		JMenu homeMenu = new JMenu("Home");
-		JMenuItem dashboardItem = new JMenuItem("Dashboard");
-		dashboardItem.addActionListener(e -> showDashboard());
-		homeMenu.add(dashboardItem);
-		menuBar.add(homeMenu);
+        // Home Menu
+        homeMenu = new JMenu("Home");
+        dashboardItem = new JMenuItem("Dashboard");
+        dashboardItem.addActionListener(e -> showDashboard());
+        homeMenu.add(dashboardItem);
+        menuBar.add(homeMenu);
 
-		// Vendor Menu
-		JMenu vendorMenu = new JMenu("Vendor");
-		JMenuItem viewVendorsItem = new JMenuItem("View Vendors");
-		viewVendorsItem.addActionListener(e -> openVendorPage());
-		vendorMenu.add(viewVendorsItem);
-		menuBar.add(vendorMenu);
+        // Vendor Menu
+        vendorMenu = new JMenu("Vendor");
+        viewVendorsItem = new JMenuItem("View Vendors");
+        viewVendorsItem.addActionListener(e -> openVendorPage());
+        vendorMenu.add(viewVendorsItem);
+        menuBar.add(vendorMenu);
 
-		// Order Menu
-		JMenu orderMenu = new JMenu("Order");
-		JMenuItem orderManagementItem = new JMenuItem("Order Management");
-		orderManagementItem.addActionListener(e -> openOrderPage());
-		orderMenu.add(orderManagementItem);
-		menuBar.add(orderMenu);
+        // Order Menu
+        orderMenu = new JMenu("Order");
+        orderManagementItem = new JMenuItem("Order Management");
+        orderManagementItem.addActionListener(e -> openOrderPage());
+        orderMenu.add(orderManagementItem);
+        menuBar.add(orderMenu);
 
-		// Transaction Menu
-		JMenu transactionMenu = new JMenu("Transaction");
-		JMenuItem transactionManagementItem = new JMenuItem("Transaction Management");
-		transactionManagementItem.addActionListener(e -> openTransactionPage());
-		transactionMenu.add(transactionManagementItem);
-		menuBar.add(transactionMenu);
+        // Transaction Menu
+        transactionMenu = new JMenu("Transaction");
+        transactionManagementItem = new JMenuItem("Transaction Management");
+        transactionManagementItem.addActionListener(e -> openTransactionPage());
+        transactionMenu.add(transactionManagementItem);
+        menuBar.add(transactionMenu);
 
-		// Complaint Menu
-		JMenu complaintMenu = new JMenu("Complaint");
-		JMenuItem complaintManagementItem = new JMenuItem("Complaint Management");
-		complaintManagementItem.addActionListener(e -> openComplaintPage());
-		complaintMenu.add(complaintManagementItem);
-		menuBar.add(complaintMenu);
+        // Complaint Menu
+        complaintMenu = new JMenu("Complaint");
+        complaintManagementItem = new JMenuItem("Complaint Management");
+        complaintManagementItem.addActionListener(e -> openComplaintPage());
+        complaintMenu.add(complaintManagementItem);
+        menuBar.add(complaintMenu);
 
-		// Notification Menu
-		JMenu notificationMenu = new JMenu("Notification");
-		JMenuItem notificationItem = new JMenuItem("View Notifications");
-		notificationItem.addActionListener(e -> openNotificationPage());
-		notificationMenu.add(notificationItem);
+        // Notification Menu
+        notificationMenu = new JMenu("Notification");
+        notificationItem = new JMenuItem("View Notifications");
+        notificationItem.addActionListener(e -> openNotificationPage());
+        notificationMenu.add(notificationItem);
+        menuBar.add(notificationMenu);
 
-		// Profile Menu
-		JMenu profileMenu = new JMenu("Profile");
-		JMenuItem editProfileItem = new JMenuItem("Profile Management");
-		editProfileItem.addActionListener(e -> openProfilePage());
-		profileMenu.add(editProfileItem);
+        // Profile Menu
+        profileMenu = new JMenu("Profile");
+        editProfileItem = new JMenuItem("Profile Management");
+        editProfileItem.addActionListener(e -> openProfilePage());
+        profileMenu.add(editProfileItem);
+        menuBar.add(profileMenu);
 
-		setJMenuBar(menuBar);
+        setJMenuBar(menuBar);
 
-		// ======= Header Panel (Welcome & Logout) =======
-		JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		JLabel balanceLabel = new JLabel("Account Balance: " + customer.getCredit());
-		JLabel welcomeLabel = new JLabel("Welcome, " + customer.getName());
-		JButton logoutButton = new JButton("Logout");
-		logoutButton.setFocusable(false);
+        // ======= Header Panel (Welcome & Logout) =======
+        headerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        balanceLabel = new JLabel("Account Balance: " + customer.getCredit());
+        welcomeLabel = new JLabel("Welcome, " + customer.getName());
+        logoutButton = new JButton("Logout");
+        logoutButton.setFocusable(false);
 
-		logoutButton.addActionListener(e -> {
-			new LoginInterface().setVisible(true);
-			this.dispose();
-		});
-		
-		headerPanel.add(balanceLabel);
-		headerPanel.add(welcomeLabel);
-		headerPanel.add(logoutButton);
-		getContentPane().add(headerPanel, BorderLayout.NORTH);
+        logoutButton.addActionListener(e -> {
+            new LoginInterface().setVisible(true);
+            this.dispose();
+        });
 
-		// ======= Active Orders Table =======
-		JPanel activeOrdersPanel = new JPanel(new BorderLayout());
-		JLabel activeOrdersLabel = new JLabel("Active Orders");
+        headerPanel.add(balanceLabel);
+        headerPanel.add(welcomeLabel);
+        headerPanel.add(logoutButton);
+        getContentPane().add(headerPanel, BorderLayout.NORTH);
 
-		String[] columnNames = {"Order ID", "Vendor Name", "Vendor Type", "Item", "Progress", "Status", "Actions"};
-		DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
-			@Override
-		    public boolean isCellEditable(int row, int column) {
-		        return column == 6; // Make only the "Action" column editable
-		    }
-		};
-		JTable activeOrdersTable = new JTable(tableModel);
-		activeOrdersTable.setRowHeight(40);
-		
-		activeOrdersTable.getColumn("Order ID").setPreferredWidth(50);
-		activeOrdersTable.getColumn("Vendor Name").setPreferredWidth(200);
-		
-        // Adding sample data
-        Object[][] sampleData = {
-            {"ORD00001", "Vendor A", VendorType.CHINESE, "Burger", 50, OrderStatus.ON_THE_WAY, "Cancel"},
-            {"ORD00002", "Vendor B", VendorType.MALAY, "Pizza", 75, OrderStatus.ON_THE_WAY, "Cancel"},
-            {"ORD00003", "Vendor C", VendorType.INDIAN, "Pasta", 30, OrderStatus.ON_THE_WAY, "Cancel"}
+        // ======= Active Orders Table =======
+        activeOrdersPanel = new JPanel(new BorderLayout());
+        activeOrdersLabel = new JLabel("Active Orders");
+
+        String[] columnNames = { "Order ID", "Vendor Name", "Vendor Type", "Item", "Progress", "Status", "Actions" };
+        tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 6; // Make only the "Action" column editable
+            }
         };
-        for (Object[] row : sampleData) {
+        activeOrdersTable = new JTable(tableModel);
+        activeOrdersTable.setRowHeight(40);
+
+        activeOrdersTable.getColumn("Order ID").setPreferredWidth(50);
+        activeOrdersTable.getColumn("Vendor Name").setPreferredWidth(200);
+
+        // Adding sample data
+        Object[][] data = getActiveOrders();
+
+        for (Object[] row : data) {
             tableModel.addRow(row);
         }
-        
-		// Adding a progress bar to the table
-		activeOrdersTable.getColumn("Progress").setCellRenderer((table, value, isSelected, hasFocus, row, column) -> {
-			JProgressBar progressBar = new JProgressBar(0, 100);
-			progressBar.setValue((int) value);
-			progressBar.setStringPainted(true);
-			return progressBar;
-		});
-		
-		// Rendering buttons on Actions column
-		activeOrdersTable.getColumn("Actions").setCellRenderer(new ButtonRenderer(ButtonMode.VIEW));
-		activeOrdersTable.getColumn("Actions").setCellEditor(new ButtonEditor(activeOrdersTable, ButtonMode.VIEW));
 
-		JScrollPane tableScrollPane = new JScrollPane(activeOrdersTable);
-		activeOrdersPanel.add(activeOrdersLabel, BorderLayout.NORTH);
-		activeOrdersPanel.add(tableScrollPane, BorderLayout.CENTER);
-		getContentPane().add(activeOrdersPanel, BorderLayout.CENTER);
+        // Adding a progress bar to the table
+        activeOrdersTable.getColumn("Progress").setCellRenderer((table, value, isSelected, hasFocus, row, column) -> {
+            JProgressBar progressBar = new JProgressBar(0, 100);
+            progressBar.setValue((int) value);
+            progressBar.setStringPainted(true);
+            return progressBar;
+        });
+
+        // Rendering buttons on Actions column
+        activeOrdersTable.getColumn("Actions").setCellRenderer(new ButtonRenderer(ButtonMode.VIEW));
+        activeOrdersTable.getColumn("Actions").setCellEditor(new ButtonEditor(activeOrdersTable, ButtonMode.VIEW));
+
+        tableScrollPane = new JScrollPane(activeOrdersTable);
+        activeOrdersPanel.add(activeOrdersLabel, BorderLayout.NORTH);
+        activeOrdersPanel.add(tableScrollPane, BorderLayout.CENTER);
+        getContentPane().add(activeOrdersPanel, BorderLayout.CENTER);
 	}
 
+	// Menu actions
 	private void showDashboard() {
 		this.dispose();
 		new CustomerDashboard((CustomerDTO) SessionControlService.getUser()).setVisible(true);
@@ -178,10 +196,51 @@ public class CustomerDashboard extends JFrame {
 		new CustomerProfilePage((CustomerDTO) SessionControlService.getUser()).setVisible(true);
 	}
 
-	public static void main(String[] args) {
-		CustomerDTO customer =  new CustomerDTO();
-		customer.setName("Alex"); // Example customer name
-		customer.setCredit(1000);
-		new CustomerDashboard(customer).setVisible(true);
+	// Populating the table
+	private Object[][] getActiveOrders() {
+		List<OrderDTO> orders = OrderService.readCustomerOrders(customer.getId());
+		Object[][] data = new Object[orders.size()][7];
+		for (int i = 0; i < orders.size(); i++) {
+			OrderDTO order = orders.get(i);
+			data[i][0] = order.getId(); // Order ID
+			data[i][1] = VendorService.readVendor(order.getVendorId()).getVendorName(); // Vendor Name
+			data[i][2] = VendorService.readVendor(order.getVendorId()).getVendorType(); // Vendor Type
+			data[i][3] = processItemList(order.getVendorId(), order.getItems()); // Item
+			data[i][4] = getProgress(order.getStatus()); // Progress
+			data[i][5] = order.getStatus(); // Status
+			data[i][6] = "View"; // Actions
+		}
+		activeOrdersLabel.setText("Active Orders (" + orders.size() + ")");
+		return data;
 	}
+
+	// Process item list to display in the table
+	private String processItemList(String vendorId, HashMap<String, Integer> items) {
+		try{
+			CompletableFuture<String> itemFuture = ItemProcessor.processItemListAsync(vendorId, items);
+			return itemFuture.join();
+		} catch (Exception e) {
+			System.err.println("Error processing item list: " + e.getMessage());
+			return "Error";
+		}
+	}
+
+	// Get progress based on order status
+	private int getProgress(OrderStatus status) {
+		switch (status) {
+			case PENDING:
+				return 0;
+			case PROCESSING:
+				return 25;
+			case READY_FOR_PICKUP:
+				return 50;
+			case ON_THE_WAY:
+				return 75;
+			case DELIVERED:
+				return 100;
+			default:
+				return 0;
+		}
+	}
+
 }
