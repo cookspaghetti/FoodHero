@@ -115,13 +115,14 @@ public class CustomerCreateUserForm extends JFrame {
             // New address object
             AddressDTO newAddress = new AddressDTO();
             newAddress.setId(IdGenerationUtils.getNextId(ServiceType.ADDRESS, null, null));
+            newAddress.setUserId(IdGenerationUtils.getNextId(ServiceType.CUSTOMER, null, null));
             newAddress.setStreet(streetField.getText());
             newAddress.setCity(cityField.getText());
             newAddress.setState(stateField.getText());
             newAddress.setPostalCode(postalCodeField.getText());
             newAddress.setCountry(countryField.getText());
 
-            ResponseCode response = AddressService.updateAddress(newAddress);
+            ResponseCode response = AddressService.createAddress(newAddress);
             if (response == ResponseCode.SUCCESS) {
                 newAddressId = newAddress.getId();
                 JOptionPane.showMessageDialog(this, "Address updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);

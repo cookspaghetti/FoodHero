@@ -21,48 +21,63 @@ public class IdGenerationUtils {
 		case ADMIN: 
 			filePath = "src\\main\\resources\\database\\user\\admin.txt";
 			abbreviation = "ADM";
+			break;
 		case MANAGER: 
 			filePath = "src\\main\\resources\\database\\user\\manager.txt";
 			abbreviation = "MGR";
+			break;
 		case CUSTOMER: 
 			filePath = "src\\main\\resources\\database\\user\\customer.txt";
 			abbreviation = "CUS";
+			break;
 		case VENDOR: 
 			filePath = "src\\main\\resources\\database\\user\\vendor.txt";
 			abbreviation = "VDR";
+			break;
 		case RUNNER: 
 			filePath = "src\\main\\resources\\database\\user\\vendor.txt";
 			abbreviation = "RUN";
+			break;
 		case ITEM: 
 			filePath = "src\\main\\resources\\database\\item\\item_" + SessionControlService.getId() + ".txt";
 			abbreviation = "ITM";
+			break;
 		case ORDER:
 			filePath = "src\\main\\resources\\database\\order\\order.txt";
 			abbreviation = "ORD";
+			break;
 		case VENDOR_REVIEW:
 			filePath = "src\\main\\resources\\database\\review\\vendor_" + vendorId + ".txt";
 			abbreviation = "VRE";
+			break;
 		case RUNNER_REVIEW:
 			filePath = "src\\main\\resources\\database\\review\\runner_" + runnerId + ".txt";
 			abbreviation = "RRE";
+			break;
 		case ADD_TRANSACTION:
 			filePath = "src\\main\\resources\\database\\transaction\\add_transaction.txt";
 			abbreviation = "ADD";
+			break;
 		case DEDUCT_TRANSACTION:
 			filePath = "src\\main\\resources\\database\\transaction\\deduct_transaction.txt";
 			abbreviation = "DED";
+			break;
 		case TASK:
 			filePath = "src\\main\\resources\\database\\task\\task.txt";
 			abbreviation = "TAK";
+			break;
 		case COMPLAIN:
 			filePath = "src\\main\\resources\\database\\complain\\complain.txt";
 			abbreviation = "COM";
+			break;
 		case NOTIFICATION:
 			filePath = "src\\main\\resources\\database\\notification\\notification.txt";
 			abbreviation = "NOT";
+			break;
 		case ADDRESS:
 			filePath = "src\\main\\resources\\database\\address\\address.txt";
 			abbreviation = "ADR";
+			break;
 		default:
 			filePath = "ERR";
 		}
