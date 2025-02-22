@@ -133,7 +133,7 @@ public class LoginService {
 			vendor.setName(json.getString("name"));
 			vendor.setPhoneNumber(json.getString("phoneNumber"));
 			vendor.setAddressId(json.getString("addressId"));
-			vendor.setEmailAddress(json.getString("email"));
+			vendor.setEmailAddress(json.getString("emailAddress"));
 			vendor.setStatus(json.getBoolean("status"));
 			vendor.setVendorName(json.getString("vendorName"));
 			vendor.setRatings(json.getDouble("ratings"));
