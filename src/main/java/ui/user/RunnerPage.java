@@ -3,8 +3,7 @@ package ui.user;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.util.Vector;
-
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -14,10 +13,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
+import dto.RunnerDTO;
 import enumeration.ButtonMode;
+import service.runner.RunnerService;
+import ui.form.RunnerCreateUserForm;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
 
@@ -77,9 +78,7 @@ public class RunnerPage extends JFrame {
 		runnerTable.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer(ButtonMode.EDITDELETE));
 		runnerTable.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(runnerTable, ButtonMode.EDITDELETE));
 
-		// Example data (replace with actual data)
-		addRunnerRow("RUN00001", "Alex Tho", "alex@example.com", "Active");
-		addRunnerRow("RUN00001", "Jane Doe", "jane@example.com", "Inactive");
+		loadRunners();
 
 		add(new JScrollPane(runnerTable), BorderLayout.CENTER);
 	}
@@ -87,45 +86,66 @@ public class RunnerPage extends JFrame {
 	// ======= Action Methods =======
 	private void searchRunners(ActionEvent e) {
 		String searchTerm = searchField.getText().trim().toLowerCase();
-		filterTable(searchTerm, (String) filterComboBox.getSelectedItem());
+		
+		// Validate search term
+		if (searchTerm.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Please enter a search term", "Search Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		// Clear table
+		tableModel.setRowCount(0);
+
+		// Get list of runners
+		List<RunnerDTO> runners = RunnerService.readAllRunner();
+
+		// Search for runner
+		for (RunnerDTO runner : runners) {
+			if (runner.getName().toLowerCase().contains(searchTerm)) {
+				addRow(runner.getId(), runner.getName(), runner.getEmailAddress(), runner.getStatus());
+			}
+			if (runner.getId().toLowerCase().contains(searchTerm)) {
+				addRow(runner.getId(), runner.getName(), runner.getEmailAddress(), runner.getStatus());
+			}
+		}
 	}
 
 	private void filterRunners(ActionEvent e) {
 		String filter = (String) filterComboBox.getSelectedItem();
-		filterTable(searchField.getText().trim().toLowerCase(), filter);
+		filterTable(filter);
 	}
 	
 	private void createRunner(ActionEvent e) {
-		JOptionPane.showMessageDialog(this, "Add Manager button clicked.");
+		new RunnerCreateUserForm().setVisible(true);
+		loadRunners();
 	}
 
 	// ======= Filtering Logic =======
-	private void filterTable(String searchTerm, String filter) {
+	private void filterTable(String filter) {
 		for (int i = 0; i < runnerTable.getRowCount(); i++) {
-			String name = runnerTable.getValueAt(i, 1).toString().toLowerCase();
-			String email = runnerTable.getValueAt(i, 2).toString().toLowerCase();
-			String status = runnerTable.getValueAt(i, 3).toString();
-
-			boolean matchesSearch = name.contains(searchTerm) || email.contains(searchTerm);
-			boolean matchesFilter = filter.equals("All") || status.equals(filter);
-
-			runnerTable.setRowHeight(i, (matchesSearch && matchesFilter) ? 20 : 0); // Hide unmatched rows
+			String status = (String) runnerTable.getValueAt(i, 3);
+			if (filter.equals("All") || status.equalsIgnoreCase(filter)) {
+				runnerTable.setRowHeight(i, 40);
+				runnerTable.setValueAt(true, i, 4);
+			} else {
+				runnerTable.setRowHeight(i, 0);
+				runnerTable.setValueAt(false, i, 4);
+			}
 		}
 	}
 
 	// ======= Utility Method =======
-	private void addRunnerRow(String id, String name, String email, String status) {
-		Vector<String> row = new Vector<>();
-		row.add(id);
-		row.add(name);
-		row.add(email);
-		row.add(status);
-		row.add("Actions");
-		tableModel.addRow(row);
+	private void addRow(String id, String name, String email, boolean status) {
+		tableModel.addRow(new Object[]{id, name, email, status ? "Active" : "Inactive", "Edit"});
 	}
 
-	// ======= Main Method for Testing =======
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(() -> new RunnerPage().setVisible(true));
+	private void loadRunners() {
+		tableModel.setRowCount(0);
+
+		List<RunnerDTO> runners = RunnerService.readAllRunner();
+		for (RunnerDTO runner : runners) {
+			addRow(runner.getId(), runner.getName(), runner.getEmailAddress(), runner.getStatus());
+		}
 	}
+
 }

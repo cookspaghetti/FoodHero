@@ -15,6 +15,8 @@ import org.json.JSONObject;
 import dto.RunnerReviewDTO;
 import dto.VendorReviewDTO;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
+import service.utils.IdGenerationUtils;
 
 public class ReviewService {
 
@@ -26,7 +28,7 @@ public class ReviewService {
         String filePath = SYS_PATH + "vendor_" + review.getVendorId() + "_review.txt";
         
         JSONObject json = new JSONObject();
-        json.put("id", review.getId());
+        json.put("id", IdGenerationUtils.getNextId(ServiceType.VENDOR_REVIEW, review.getVendorId(), null));
         json.put("orderId", review.getOrderId());
         json.put("customerId", review.getCustomerId());
         json.put("rating", review.getRating());
@@ -42,7 +44,7 @@ public class ReviewService {
     }
 
 	// Method to read a VendorReview from the text file
-	public VendorReviewDTO readVendorReview(String vendorId, String id) {
+	public static VendorReviewDTO readVendorReview(String vendorId, String id) {
 		
 		String filePath = SYS_PATH + "vendor_" + vendorId + "_review.txt";
 		
@@ -75,7 +77,7 @@ public class ReviewService {
 	}
 
 	// Method to read all VendorReviews for a specific vendor
-	public List<VendorReviewDTO> readAllVendorReview(String vendorId) {
+	public static List<VendorReviewDTO> readAllVendorReview(String vendorId) {
 		
 		String filePath = SYS_PATH + "vendor_" + vendorId + "_review.txt";
 		
@@ -211,7 +213,7 @@ public class ReviewService {
 	    String filePath = SYS_PATH + "runner_" + review.getRunnerId() + "_review.txt";
 
 	    JSONObject json = new JSONObject();
-	    json.put("id", review.getId());
+	    json.put("id", IdGenerationUtils.getNextId(ServiceType.RUNNER_REVIEW, null, review.getRunnerId()));
 	    json.put("orderId", review.getOrderId());
 	    json.put("customerId", review.getCustomerId());
 	    json.put("rating", review.getRating());

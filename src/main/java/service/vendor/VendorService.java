@@ -15,9 +15,11 @@ import org.json.JSONException;
 
 import dto.VendorDTO;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
 import enumeration.VendorType;
 import service.item.ItemService;
 import service.review.ReviewService;
+import service.utils.IdGenerationUtils;
 import service.utils.JsonUtils;
 
 public class VendorService {
@@ -25,13 +27,13 @@ public class VendorService {
 	private static final String SYS_PATH = "src\\main\\resources\\database\\user\\";
 
 	// Method to create a vendor and save to a text file in JSON format
-	public ResponseCode createVendor(VendorDTO vendor) {
+	public static ResponseCode createVendor(VendorDTO vendor) {
 
 		String filePath = SYS_PATH + "vendor.txt";
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
-		json.put("id", vendor.getId());
+		json.put("id", IdGenerationUtils.getNextId(ServiceType.VENDOR, null, null));
 	    json.put("name", vendor.getName());
 	    json.put("phoneNumber", vendor.getPhoneNumber());
 	    json.put("addressId", vendor.getAddressId());                    
@@ -174,6 +176,57 @@ public class VendorService {
 		return null; // Return null if not found
 	}
 
+	// Method to read vendor by name
+	public static VendorDTO readVendorByName(String vendorName) {
+		
+		String filePath = SYS_PATH + "vendor.txt";
+
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			// Read each line (JSON object) in the file
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				// Check if the ID matches
+				if (json.getString("vendorName").equals(vendorName)) {
+					// Construct Vendor object
+					VendorDTO vendor = new VendorDTO();
+					vendor.setId(json.getString("id"));
+					vendor.setName(json.getString("name"));
+					vendor.setPhoneNumber(json.getString("phoneNumber"));
+					vendor.setAddressId(json.getString("addressId"));
+					vendor.setEmailAddress(json.getString("email"));
+					vendor.setStatus(json.getBoolean("status"));
+					vendor.setVendorName(json.getString("vendorName"));
+					vendor.setVendorType(VendorType.valueOf(json.getString("vendorType")));
+					vendor.setRatings(json.getDouble("ratings"));
+					vendor.setPassword(json.getString("password"));
+					vendor.setOpen(json.getBoolean("open"));
+
+					// Convert JSON Object (items) to HashMap<String, Integer>
+					HashMap<String, Integer> itemsMap = new HashMap<>();
+					JSONObject itemsJson = json.getJSONObject("items");
+					for (String key : itemsJson.keySet()) {
+						itemsMap.put(key, itemsJson.getInt(key));
+					}
+					vendor.setItems(itemsMap);
+
+					// Convert JSON arrays to List<String>
+					vendor.setOrderHistory(JsonUtils.jsonArrayToList(json.getJSONArray("orderHistory")));
+					vendor.setReviews(JsonUtils.jsonArrayToList(json.getJSONArray("reviews")));
+
+					return vendor; // Return the found vendor
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading vendor file: " + e.getMessage());
+		}
+
+		System.out.println("Vendor with name " + vendorName + " not found.");
+		return null; // Return null if not found
+	}
+
 	// Method to read all vendors from the text file
 	public static List<VendorDTO> readAllVendor() {
 		
@@ -224,7 +277,7 @@ public class VendorService {
 	}
 
 	// Method to update vendor
-	public ResponseCode updateVendor(VendorDTO updatedVendor) {
+	public static ResponseCode updateVendor(VendorDTO updatedVendor) {
 
 		String filePath = SYS_PATH + "vendor.txt";
 

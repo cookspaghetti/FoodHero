@@ -14,6 +14,8 @@ import org.json.JSONArray;
 
 import dto.CustomerDTO;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
+import service.utils.IdGenerationUtils;
 import service.utils.JsonUtils;
 
 public class CustomerService {
@@ -21,13 +23,13 @@ public class CustomerService {
 	private static final String SYS_PATH = "src\\main\\resources\\database\\user\\";
 
 	// Method to create an customer and save to a text file in JSON format
-	public ResponseCode createCustomer(CustomerDTO customer) {
+	public static ResponseCode createCustomer(CustomerDTO customer) {
 
 		String filePath = SYS_PATH + "customer.txt";
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
-		json.put("id", customer.getId());
+		json.put("id", IdGenerationUtils.getNextId(ServiceType.CUSTOMER, null, null));
 		json.put("name", customer.getName());
 		json.put("phoneNumber", customer.getPhoneNumber());
 		json.put("addressId", customer.getAddressId());                // Fixed field name
@@ -99,8 +101,52 @@ public class CustomerService {
 		return null; // Return null if not found
 	}
 
+	// Method to read customer info by phone number
+	public static CustomerDTO readCustomerByPhoneNumber(String phoneNumber) {
+
+		String filePath = SYS_PATH + "customer.txt";
+
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			// Read each line (JSON object) in the file
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				// Check if the phone number matches
+				if (json.getString("phoneNumber").equals(phoneNumber)) {
+					// Construct Customer object
+					CustomerDTO customer = new CustomerDTO();
+					customer.setId(json.getString("id"));
+					customer.setName(json.getString("name"));
+					customer.setPhoneNumber(json.getString("phoneNumber"));
+					customer.setAddressId(json.optString("addressId", ""));            // Fixed field name
+					customer.setEmailAddress(json.optString("emailAddress", ""));      // Fixed field name
+					customer.setPassword(json.optString("password", ""));              // Added password
+					customer.setStatus(json.optBoolean("status", true));               // Added status with default true
+					customer.setCredit(json.optDouble("credit", 0.0));
+
+					// Convert JSON arrays to List<String> with null safety
+					customer.setOrderHistory(JsonUtils.jsonArrayToList(json.optJSONArray("orderHistory")));
+					customer.setVendorReviews(JsonUtils.jsonArrayToList(json.optJSONArray("vendorReviews")));
+					customer.setRunnerReviews(JsonUtils.jsonArrayToList(json.optJSONArray("runnerReviews")));
+					customer.setComplains(JsonUtils.jsonArrayToList(json.optJSONArray("complains")));
+					customer.setTransactions(JsonUtils.jsonArrayToList(json.optJSONArray("transactions")));
+					customer.setDeliveryAddresses(JsonUtils.jsonArrayToList(json.optJSONArray("deliveryAddresses")));
+
+					return customer; // Return the found customer
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading customer file: " + e.getMessage());
+		}
+
+		System.out.println("Customer with phone number " + phoneNumber + " not found.");
+		return null; // Return null if not found
+	}
+
 	// Method to read all customers from the text file
-	public List<CustomerDTO> readAllCustomer() {
+	public static List<CustomerDTO> readAllCustomer() {
 		String filePath = SYS_PATH + "customer.txt";
 		List<CustomerDTO> customers = new ArrayList<>();
 

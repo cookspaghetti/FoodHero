@@ -14,22 +14,30 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import dto.NotificationDTO;
 import dto.OrderDTO;
+import dto.TaskDTO;
 import enumeration.OrderStatus;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
+import enumeration.TaskStatus;
+import service.notification.NotificationService;
+import service.runner.RunnerService;
+import service.task.TaskService;
+import service.utils.IdGenerationUtils;
 
 public class OrderService {
 
 	private static final String SYS_PATH = "src\\main\\resources\\database\\order\\";
 
 	// Method to create an order and save to a text file in JSON format
-	public ResponseCode createOrder(OrderDTO order) {
+	public static ResponseCode createOrder(OrderDTO order) {
 
 		String filePath = SYS_PATH + "order.txt";
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
-		json.put("id", order.getId());
+		json.put("id", IdGenerationUtils.getNextId(ServiceType.ORDER, null, null));
 		json.put("customerId", order.getCustomerId());
 		json.put("vendorId", order.getVendorId());
 		json.put("runnerId", order.getRunnerId());
@@ -49,6 +57,33 @@ public class OrderService {
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
 			System.out.println("Order created successfully!");
+
+			// Send notification to the vendor
+			NotificationDTO notification = new NotificationDTO();
+			notification.setUserId(order.getVendorId());
+			notification.setMessage("New order received: " + order.getId());
+			notification.setTimestamp(LocalDateTime.now());
+			ResponseCode response = NotificationService.createNotification(notification);
+			if (response != ResponseCode.SUCCESS) {
+				System.err.println("Failed to send notification to vendor");
+			}
+
+			// Create task for runner
+			TaskDTO task = new TaskDTO();
+			task.setOrderId(order.getId());
+			task.setRunnerId(RunnerService.assignRunner(order.getDeliveryAddress()));
+			task.setStatus(TaskStatus.PENDING);
+			task.setTaskDetails("Deliver order " + order.getId() + " to " + order.getDeliveryAddress());
+			task.setCustomerAddress(order.getDeliveryAddress());
+			task.setDeliveryFee(order.getDeliveryFee());
+			if (task.getRunnerId() == null) {
+				return ResponseCode.RUNNER_NOT_FOUND;
+			}
+			response = TaskService.createTask(task);
+			if (response != ResponseCode.SUCCESS) {
+				return response;
+			}
+
 			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing order to file: " + e.getMessage());
@@ -303,71 +338,73 @@ public class OrderService {
 	}
 
 	// Method to update an existing order
-	public static ResponseCode updateOrder(String id, OrderDTO updatedOrder) {
-
+	public static ResponseCode updateOrder(OrderDTO updatedOrder) {
 		String filePath = SYS_PATH + "order.txt";
-
 		List<String> updatedLines = new ArrayList<>();
 		boolean isUpdated = false;
-
+	
+		// Input validation
+		if (updatedOrder == null || updatedOrder.getId() == null) {
+			System.err.println("Invalid order data provided");
+			return ResponseCode.INVALID_INPUT;
+		}
+	
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 			String line;
-
+	
 			while ((line = reader.readLine()) != null) {
 				JSONObject json = new JSONObject(line);
-
-				if (json.getString("id").equals(id)) {
+	
+				if (json.getString("id").equals(updatedOrder.getId())) {
 					// Update the fields with values from updatedOrder
 					json.put("customerId", updatedOrder.getCustomerId());
 					json.put("vendorId", updatedOrder.getVendorId());
 					json.put("runnerId", updatedOrder.getRunnerId());
-					json.put("status", updatedOrder.getStatus());
+					json.put("status", updatedOrder.getStatus().toString());
 					json.put("totalAmount", updatedOrder.getTotalAmount());
 					json.put("deliveryFee", updatedOrder.getDeliveryFee());
 					json.put("placementTime", updatedOrder.getPlacementTime().toString());
-					json.put("completionTime", updatedOrder.getCompletionTime() != null 
-							? updatedOrder.getCompletionTime().toString() 
-									: "");
-					json.put("notes", updatedOrder.getNotes());
+					json.put("completionTime", 
+						updatedOrder.getCompletionTime() != null ? 
+						updatedOrder.getCompletionTime().toString() : 
+						JSONObject.NULL);
+					json.put("notes", updatedOrder.getNotes() != null ? updatedOrder.getNotes() : "");
 					json.put("deliveryAddress", updatedOrder.getDeliveryAddress());
-
+	
 					// Convert items HashMap to JSONObject
 					JSONObject itemsJson = new JSONObject();
-					for (Map.Entry<String, Integer> entry : updatedOrder.getItems().entrySet()) {
-						itemsJson.put(entry.getKey(), entry.getValue());
+					if (updatedOrder.getItems() != null) {
+						for (Map.Entry<String, Integer> entry : updatedOrder.getItems().entrySet()) {
+							itemsJson.put(entry.getKey(), entry.getValue());
+						}
 					}
 					json.put("items", itemsJson);
-
+	
 					isUpdated = true;
 				}
-
-				updatedLines.add(json.toString()); // Add the (updated or original) order to the list
+				updatedLines.add(json.toString());
 			}
-		} catch (IOException e) {
-			System.err.println("Error reading orders from file: " + e.getMessage());
-			return ResponseCode.IO_EXCEPTION;
-		} catch (JSONException e) {
-			System.err.println("Error parsing JSON: " + e.getMessage());
-			return ResponseCode.JSON_EXCEPTION;
-		}
-
-		// Write the updated data back to the file
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-			for (String updatedLine : updatedLines) {
-				writer.write(updatedLine);
-				writer.newLine();
-			}
-
+	
+			// Write the updated data back to the file if there were changes
 			if (isUpdated) {
-				System.out.println("Order with ID " + id + " updated successfully.");
-				return ResponseCode.SUCCESS;
+				try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, false))) {
+					for (String updatedLine : updatedLines) {
+						writer.write(updatedLine);
+						writer.newLine();
+					}
+					System.out.println("Order with ID " + updatedOrder.getId() + " updated successfully.");
+					return ResponseCode.SUCCESS;
+				}
 			} else {
-				System.out.println("Order with ID " + id + " not found.");
+				System.out.println("Order with ID " + updatedOrder.getId() + " not found.");
 				return ResponseCode.RECORD_NOT_FOUND;
 			}
 		} catch (IOException e) {
-			System.err.println("Error writing orders to file: " + e.getMessage());
+			System.err.println("Error updating order: " + e.getMessage());
 			return ResponseCode.IO_EXCEPTION;
+		} catch (JSONException e) {
+			System.err.println("Error processing JSON data: " + e.getMessage());
+			return ResponseCode.JSON_EXCEPTION;
 		}
 	}
 

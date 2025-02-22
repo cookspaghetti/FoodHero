@@ -2,6 +2,7 @@ package ui.review;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -12,6 +13,8 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
 import dto.VendorDTO;
+import dto.VendorReviewDTO;
+import service.review.ReviewService;
 import ui.utils.MultiLineRenderer;
 
 public class VendorReviewPage extends JFrame {
@@ -51,6 +54,8 @@ public class VendorReviewPage extends JFrame {
         reviewTable.getColumnModel().getColumn(3).setPreferredWidth(80);  // Rating
         reviewTable.getColumnModel().getColumn(4).setPreferredWidth(400); // Comments (maximize)
 
+        loadReviews(vendor);
+
         setVisible(true);
     }
 
@@ -58,12 +63,12 @@ public class VendorReviewPage extends JFrame {
         tableModel.addRow(rowData);
     }
 
-    public static void main(String[] args) {
-    	VendorDTO vendor = new VendorDTO();
-    	vendor.setName("Alex");
-    	vendor.setId("VEN00001");
-        VendorReviewPage page = new VendorReviewPage(vendor);
-        page.addReview(new Object[]{"1", "O123", "C456", 5, "Great service!"});
-        page.addReview(new Object[]{"2", "O124", "C789", 4, "On-time delivery. On-time delivery. On-time delivery. On-time delivery. On-time delivery. On-time delivery."});
-    }
+    public void loadReviews(VendorDTO vendor) {
+        List<VendorReviewDTO> reviews = ReviewService.readAllVendorReview(vendor.getId());
+        for (VendorReviewDTO review : reviews) {
+            Object[] rowData = {review.getId(), review.getOrderId(), review.getCustomerId(), review.getRating(), review.getComments()};
+            addReview(rowData);
+        }
+    }   
+
 }

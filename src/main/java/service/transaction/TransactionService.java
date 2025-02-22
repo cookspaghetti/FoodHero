@@ -17,6 +17,8 @@ import dto.DeductTransactionDTO;
 import dto.TransactionDTO;
 import enumeration.PaymentMethod;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
+import service.utils.IdGenerationUtils;
 
 public class TransactionService {
 
@@ -29,7 +31,7 @@ public class TransactionService {
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
-		json.put("id", transaction.getId());
+		json.put("id", IdGenerationUtils.getNextId(ServiceType.ADD_TRANSACTION, null, null));
 		json.put("customerId", transaction.getCustomerId());
 		json.put("amount", transaction.getAmount());
 		json.put("date", transaction.getDate().toString());
@@ -49,7 +51,7 @@ public class TransactionService {
 	}
 
 	// Method to read an AddTransaction from the text file
-	public AddTransactionDTO readAddTransaction(String id) {
+	public static AddTransactionDTO readAddTransaction(String id) {
 
 		String filePath = SYS_PATH + "add_transaction.txt";
 
@@ -83,7 +85,7 @@ public class TransactionService {
 	}
 
 	// Method to read all AddTransaction from the text file
-	public List<AddTransactionDTO> readAllAddTransaction(String customerId) {
+	public static List<AddTransactionDTO> readAllAddTransaction(String customerId) {
 
 		String filePath = SYS_PATH + "add_transaction.txt";
 
@@ -164,13 +166,13 @@ public class TransactionService {
 	}
 
 	// Method to create a DeductTransaction and save it to a text file in JSON format
-	public ResponseCode createDeductTransaction(DeductTransactionDTO transaction) {
+	public static ResponseCode createDeductTransaction(DeductTransactionDTO transaction) {
 
 		String filePath = SYS_PATH + "deduct_transaction.txt";
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
-		json.put("id", transaction.getId());
+		json.put("id", IdGenerationUtils.getNextId(ServiceType.DEDUCT_TRANSACTION, null, null));
 		json.put("customerId", transaction.getCustomerId());
 		json.put("amount", transaction.getAmount());
 		json.put("date", transaction.getDate().toString());
@@ -189,7 +191,7 @@ public class TransactionService {
 	}
 
 	// Method to read a DeductTransaction from the text file
-	public DeductTransactionDTO readDeductTransaction(String id) {
+	public static DeductTransactionDTO readDeductTransaction(String id) {
 
 		String filePath = SYS_PATH + "deduct_transaction.txt";
 
@@ -222,7 +224,7 @@ public class TransactionService {
 	}
 
 	// Method to read all DeductTransaction from the text file
-	public List<DeductTransactionDTO> readAllDeductTransaction(String customerId) {
+	public static List<DeductTransactionDTO> readAllDeductTransaction(String customerId) {
 
 		String filePath = SYS_PATH + "deduct_transaction.txt";
 

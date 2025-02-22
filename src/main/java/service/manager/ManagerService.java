@@ -13,19 +13,21 @@ import org.json.JSONObject;
 
 import dto.ManagerDTO;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
+import service.utils.IdGenerationUtils;
 
 public class ManagerService {
 
 	private static final String SYS_PATH = "src\\main\\resources\\database\\user\\";
 
 	// Method to create a manager and save to a text file in JSON format
-	public ResponseCode createManager(ManagerDTO manager) {
+	public static ResponseCode createManager(ManagerDTO manager) {
 
 		String filePath = SYS_PATH + "manager.txt";
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
-		json.put("id", manager.getId());
+		json.put("id", IdGenerationUtils.getNextId(ServiceType.MANAGER, null, null));
 		json.put("name", manager.getName());
 		json.put("phoneNumber", manager.getPhoneNumber());
 		json.put("addressId", manager.getAddressId());
@@ -80,7 +82,7 @@ public class ManagerService {
 	}
 
 	// Method to read all managers from the text file
-	public List<ManagerDTO> readAllManager() {
+	public static List<ManagerDTO> readAllManager() {
 		String filePath = SYS_PATH + "manager.txt";
 		List<ManagerDTO> managers = new ArrayList<>();
 
@@ -111,7 +113,7 @@ public class ManagerService {
 	}
 
 	// Method to update manager
-	public ResponseCode updateManager(ManagerDTO updatedManager) {
+	public static ResponseCode updateManager(ManagerDTO updatedManager) {
 		String filePath = SYS_PATH + "manager.txt";
 		List<String> updatedLines = new ArrayList<>();
 		boolean found = false;

@@ -4,6 +4,8 @@ import org.json.JSONObject;
 
 import dto.AddressDTO;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
+import service.utils.IdGenerationUtils;
 
 import java.io.*;
 import java.util.*;
@@ -14,10 +16,10 @@ public class AddressService {
     private static final String FILE_PATH = SYS_PATH + "address.txt";
 
     // ======= CREATE =======
-    public static ResponseCode saveAddress(AddressDTO address) {
+    public static ResponseCode createAddress(AddressDTO address) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
             JSONObject json = new JSONObject();
-            json.put("id", address.getId());
+            json.put("id", IdGenerationUtils.getNextId(ServiceType.ADDRESS, null, null));
             json.put("userId", address.getUserId());
             json.put("street", address.getStreet());
             json.put("city", address.getCity());
@@ -50,12 +52,15 @@ public class AddressService {
         return null;
     }
 
-    public static List<AddressDTO> getAllAddresses() {
+    public static List<AddressDTO> getAllAddresses(String userId) {
         List<AddressDTO> addresses = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                addresses.add(createAddressFromJson(new JSONObject(line)));
+                JSONObject json = new JSONObject(line);
+                if (json.getString("userId").equals(userId)) {
+                    addresses.add(createAddressFromJson(json));
+                }
             }
         } catch (IOException e) {
             System.err.println("Error reading addresses: " + e.getMessage());
@@ -65,43 +70,77 @@ public class AddressService {
 
     // ======= UPDATE =======
     public static ResponseCode updateAddress(AddressDTO updatedAddress) {
-        List<AddressDTO> addresses = getAllAddresses();
+        if (updatedAddress == null || updatedAddress.getId() == null) {
+            return ResponseCode.INVALID_INPUT;
+        }
+    
+        List<String> updatedLines = new ArrayList<>();
         boolean found = false;
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
-            for (AddressDTO address : addresses) {
-                if (address.getId().equals(updatedAddress.getId())) {
-                    writer.write(convertToJson(updatedAddress).toString());
+    
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                JSONObject json = new JSONObject(line);
+                if (json.getString("id").equals(updatedAddress.getId())) {
+                    updatedLines.add(convertToJson(updatedAddress).toString());
                     found = true;
                 } else {
-                    writer.write(convertToJson(address).toString());
+                    updatedLines.add(line);
                 }
-                writer.newLine();
+            }
+    
+            if (found) {
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
+                    for (String updatedLine : updatedLines) {
+                        writer.write(updatedLine);
+                        writer.newLine();
+                    }
+                    return ResponseCode.SUCCESS;
+                }
             }
         } catch (IOException e) {
             System.err.println("Error updating address: " + e.getMessage());
             return ResponseCode.IO_EXCEPTION;
         }
-        return found ? ResponseCode.SUCCESS : ResponseCode.RECORD_NOT_FOUND;
+    
+        return ResponseCode.RECORD_NOT_FOUND;
     }
 
     // ======= DELETE =======
     public static ResponseCode deleteAddress(String id) {
-        List<AddressDTO> addresses = getAllAddresses();
-        boolean found = addresses.removeIf(address -> address.getId().equals(id));
-
-        if (found) {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
-                for (AddressDTO address : addresses) {
-                    writer.write(convertToJson(address).toString());
-                    writer.newLine();
-                }
-            } catch (IOException e) {
-                System.err.println("Error deleting address: " + e.getMessage());
-                return ResponseCode.IO_EXCEPTION;
-            }
+        if (id == null || id.trim().isEmpty()) {
+            return ResponseCode.INVALID_INPUT;
         }
-        return found ? ResponseCode.SUCCESS : ResponseCode.RECORD_NOT_FOUND;
+    
+        List<String> remainingLines = new ArrayList<>();
+        boolean found = false;
+    
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                JSONObject json = new JSONObject(line);
+                if (!json.getString("id").equals(id)) {
+                    remainingLines.add(line);
+                } else {
+                    found = true;
+                }
+            }
+    
+            if (found) {
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
+                    for (String remainingLine : remainingLines) {
+                        writer.write(remainingLine);
+                        writer.newLine();
+                    }
+                    return ResponseCode.SUCCESS;
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error deleting address: " + e.getMessage());
+            return ResponseCode.IO_EXCEPTION;
+        }
+    
+        return ResponseCode.RECORD_NOT_FOUND;
     }
 
     // ======= Helper Methods =======

@@ -13,6 +13,9 @@ import org.json.JSONObject;
 
 import dto.AdminDTO;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
+import service.general.SessionControlService;
+import service.utils.IdGenerationUtils;
 
 public class AdminService {
 
@@ -25,7 +28,7 @@ public class AdminService {
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
-		json.put("id", admin.getId());
+		json.put("id", IdGenerationUtils.getNextId(ServiceType.ADMIN, null, null));
 	    json.put("name", admin.getName());
 	    json.put("phoneNumber", admin.getPhoneNumber());
 	    json.put("addressId", admin.getAddressId());
@@ -80,7 +83,7 @@ public class AdminService {
 	}
 
 	// Method to read all admins from the text file
-	public List<AdminDTO> readAllAdmin() {
+	public static List<AdminDTO> readAllAdmin() {
 		String filePath = SYS_PATH + "admin.txt";
 		List<AdminDTO> admins = new ArrayList<>();
 
@@ -166,6 +169,11 @@ public class AdminService {
 
 	// Method to delete an admin
 	public static ResponseCode deleteAdmin(String id) {
+
+		if (id == SessionControlService.getId()) {
+			System.out.println("Cannot delete currently logged in admin.");
+			return ResponseCode.ACCESS_DENIED;
+		}
 
 		String filePath = SYS_PATH + "admin.txt";
 

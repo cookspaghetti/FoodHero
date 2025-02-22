@@ -3,6 +3,7 @@ package ui.item;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.Vector;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -15,14 +16,18 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import dto.ItemDTO;
 import enumeration.ButtonMode;
+import service.general.SessionControlService;
+import service.item.ItemService;
+import ui.form.VendorCreateItemForm;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
 
 public class VendorItemPage extends JFrame {
 	private JTextField searchField;
 	private JButton searchButton;
-	private JButton filterButton;
+	private JButton createButton;
 	private JComboBox<String> filterComboBox;
 	private JTable itemTable;
 	private DefaultTableModel tableModel;
@@ -38,9 +43,11 @@ public class VendorItemPage extends JFrame {
 		JPanel searchPanel = new JPanel();
 		searchField = new JTextField(20);
 		searchButton = new JButton("Search");
-		filterButton = new JButton("Filter");
+		searchButton.addActionListener(this::searchItems);
 		filterComboBox = new JComboBox<>(new String[]{"All", "Active", "Inactive"});
 		filterComboBox.addActionListener(this::filterItems);
+		createButton = new JButton("Create Item");
+		createButton.addActionListener(e -> new VendorCreateItemForm());
 
 		searchPanel.add(new JLabel("Search Item:"));
 		searchPanel.add(searchField);
@@ -67,25 +74,25 @@ public class VendorItemPage extends JFrame {
 
 		// Set column widths
 		TableColumn idColumn = itemTable.getColumn("Item ID");
-		idColumn.setPreferredWidth(80); // Fit XXX00000
+		idColumn.setPreferredWidth(80);
 
 		TableColumn nameColumn = itemTable.getColumn("Item Name");
-		nameColumn.setPreferredWidth(250); // Fit as much as possible
+		nameColumn.setPreferredWidth(250);
 
 		TableColumn priceColumn = itemTable.getColumn("Price");
-		priceColumn.setPreferredWidth(100); // Fit RMXXX.XX
+		priceColumn.setPreferredWidth(100);
 
 		TableColumn descColumn = itemTable.getColumn("Vendor ID");
-		descColumn.setPreferredWidth(80); // Fit as much as possible
+		descColumn.setPreferredWidth(80);
 
 		TableColumn availColumn = itemTable.getColumn("Availability");
-		availColumn.setPreferredWidth(80); // Active/Inactive
+		availColumn.setPreferredWidth(80);
 
 		TableColumn actionColumn = itemTable.getColumn("Actions");
-		actionColumn.setPreferredWidth(180); // For one delete button
+		actionColumn.setPreferredWidth(180);
 
-		addItemRow("ITM00001", "Triple G", "RM88.88", "VDR00001", "Active");
-		addItemRow("ITM00001", "Triple G", "RM88.88", "VDR00001", "Active");
+		// Load the items
+		loadItems();
 
 		add(new JScrollPane(itemTable), BorderLayout.CENTER);
 
@@ -95,26 +102,32 @@ public class VendorItemPage extends JFrame {
 	// ======= Action Methods =======
 	private void searchItems(ActionEvent e) {
 		String searchTerm = searchField.getText().trim().toLowerCase();
-		filterTable(searchTerm, (String) filterComboBox.getSelectedItem());
+		
+		// Clear table
+		tableModel.setRowCount(0);
+
+		List<ItemDTO> items = ItemService.readAllItem(SessionControlService.getUser().getId());
+		for (ItemDTO item : items) {
+			if (item.getName().toLowerCase().contains(searchTerm)){
+				addItemRow(item.getId(), item.getName(), String.valueOf(item.getPrice()), item.getVendorId(), item.isAvailability() ? "Active" : "Inactive");
+			}
+		}
 	}
 
 	private void filterItems(ActionEvent e) {
 		String filter = (String) filterComboBox.getSelectedItem();
-		filterTable(searchField.getText().trim().toLowerCase(), filter);
+        if (filter != null) {
+            filterTable(filter);
+        }
 	}
 
 	// ======= Filtering Logic =======
-	private void filterTable(String searchTerm, String filter) {
+	private void filterTable(String filter) {
 		for (int i = 0; i < itemTable.getRowCount(); i++) {
-			String name = itemTable.getValueAt(i, 1).toString().toLowerCase();
-			String email = itemTable.getValueAt(i, 2).toString().toLowerCase();
-			String status = itemTable.getValueAt(i, 3).toString();
-
-			boolean matchesSearch = name.contains(searchTerm) || email.contains(searchTerm);
-			boolean matchesFilter = filter.equals("All") || status.equals(filter);
-
-			itemTable.setRowHeight(i, (matchesSearch && matchesFilter) ? 20 : 0); // Hide unmatched rows
-		}
+            String status = itemTable.getValueAt(i, 4).toString(); // Column index for Availability
+            boolean matchesFilter = filter.equals("All") || status.equals(filter);
+            itemTable.setRowHeight(i, matchesFilter ? 40 : 0);
+        }
 	}
 
 	// ======= Utility Method =======
@@ -129,7 +142,16 @@ public class VendorItemPage extends JFrame {
 		tableModel.addRow(row);
 	}
 
-	public static void main(String[] args) {
-		new VendorItemPage();
+	// Method to load the items
+	private void loadItems() {
+		// Clear table
+		tableModel.setRowCount(0);
+
+		// Update table
+		List<ItemDTO> items = ItemService.readAllItem(SessionControlService.getUser().getId());
+		for (ItemDTO item : items) {
+			addItemRow(item.getId(), item.getName(), String.valueOf(item.getPrice()), item.getVendorId(), item.isAvailability() ? "Active" : "Inactive");
+		}
 	}
+
 }

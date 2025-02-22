@@ -3,21 +3,26 @@ package ui.form;
 import javax.swing.*;
 
 import dto.AddressDTO;
-import dto.AdminDTO;
+import dto.VendorDTO;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
 import service.address.AddressService;
-import service.admin.AdminService;
+import service.utils.IdGenerationUtils;
+import service.vendor.VendorService;
 
 import java.awt.*;
 
-public class AdminDetailsForm extends JFrame {
+public class VendorCreateUserForm extends JFrame {
+
     private JTextField idField, nameField, phoneField, emailField, passwordField;
     private JCheckBox statusCheckBox;
     private JButton saveButton, closeButton, editAddressButton;
 
-    public AdminDetailsForm(AdminDTO admin) {
-        setTitle("Admin Information");
-        setSize(400, 360);
+    private String newAddressId;
+
+    public VendorCreateUserForm() {
+        setTitle("Create Vendor");
+        setSize(400,405);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         getContentPane().setLayout(new GridLayout(8, 2, 5, 5));
@@ -25,20 +30,20 @@ public class AdminDetailsForm extends JFrame {
         JLabel label = new JLabel("ID:");
         label.setHorizontalAlignment(SwingConstants.CENTER);
         getContentPane().add(label);
-        idField = new JTextField(admin.getId());
+        idField = new JTextField(IdGenerationUtils.getNextId(ServiceType.VENDOR, null, null));
         idField.setEditable(false);
         getContentPane().add(idField);
 
         JLabel label_1 = new JLabel("Name:");
         label_1.setHorizontalAlignment(SwingConstants.CENTER);
         getContentPane().add(label_1);
-        nameField = new JTextField(admin.getName());
+        nameField = new JTextField();
         getContentPane().add(nameField);
 
         JLabel label_2 = new JLabel("Phone Number:");
         label_2.setHorizontalAlignment(SwingConstants.CENTER);
         getContentPane().add(label_2);
-        phoneField = new JTextField(admin.getPhoneNumber());
+        phoneField = new JTextField();
         getContentPane().add(phoneField);
 
         JLabel label_3 = new JLabel("Address:");
@@ -50,19 +55,19 @@ public class AdminDetailsForm extends JFrame {
         JLabel label_4 = new JLabel("Email Address:");
         label_4.setHorizontalAlignment(SwingConstants.CENTER);
         getContentPane().add(label_4);
-        emailField = new JTextField(admin.getEmailAddress());
+        emailField = new JTextField();
         getContentPane().add(emailField);
 
         JLabel label_5 = new JLabel("Password:");
         label_5.setHorizontalAlignment(SwingConstants.CENTER);
         getContentPane().add(label_5);
-        passwordField = new JPasswordField(admin.getPassword());
+        passwordField = new JPasswordField();
         getContentPane().add(passwordField);
 
         JLabel label_6 = new JLabel("Status:");
         label_6.setHorizontalAlignment(SwingConstants.CENTER);
         getContentPane().add(label_6);
-        statusCheckBox = new JCheckBox("Active", admin.getStatus());
+        statusCheckBox = new JCheckBox("Active", true);
         getContentPane().add(statusCheckBox);
 
         saveButton = new JButton("Save");
@@ -70,18 +75,15 @@ public class AdminDetailsForm extends JFrame {
         getContentPane().add(saveButton);
         getContentPane().add(closeButton);
 
-        saveButton.addActionListener(e -> updateAdmin(admin));
+        saveButton.addActionListener(e -> createCustomer());
         closeButton.addActionListener(e -> dispose());
-        editAddressButton.addActionListener(e -> openAddressDialog(admin));
+        editAddressButton.addActionListener(e -> openAddressDialog());
 
         setVisible(true);
     }
 
     // Open dialog to edit address
-    private void openAddressDialog(AdminDTO admin) {
-        // Get address object from admin object
-        AddressDTO address = AddressService.getAddressById(admin.getAddressId());
-        
+    private void openAddressDialog() {  
         JDialog dialog = new JDialog(this, "Edit Address", true);
         dialog.setSize(300, 300);
         dialog.setLayout(new GridLayout(6, 2, 5, 5));
@@ -91,12 +93,6 @@ public class AdminDetailsForm extends JFrame {
         JTextField stateField = new JTextField();
         JTextField postalCodeField = new JTextField();
         JTextField countryField = new JTextField();
-
-        streetField.setText(address.getStreet());
-        cityField.setText(address.getCity());
-        stateField.setText(address.getState());
-        postalCodeField.setText(address.getPostalCode());
-        countryField.setText(address.getCountry());
 
         dialog.add(new JLabel("Street:"));
         dialog.add(streetField);
@@ -115,17 +111,18 @@ public class AdminDetailsForm extends JFrame {
         dialog.add(closeButton);
 
         saveButton.addActionListener(e -> {
-            // Update address object
-            AddressDTO updatedAddress = new AddressDTO();
-            updatedAddress.setId(address.getId());
-            updatedAddress.setStreet(streetField.getText());
-            updatedAddress.setCity(cityField.getText());
-            updatedAddress.setState(stateField.getText());
-            updatedAddress.setPostalCode(postalCodeField.getText());
-            updatedAddress.setCountry(countryField.getText());
+            // New address object
+            AddressDTO newAddress = new AddressDTO();
+            newAddress.setId(IdGenerationUtils.getNextId(ServiceType.ADDRESS, null, null));
+            newAddress.setStreet(streetField.getText());
+            newAddress.setCity(cityField.getText());
+            newAddress.setState(stateField.getText());
+            newAddress.setPostalCode(postalCodeField.getText());
+            newAddress.setCountry(countryField.getText());
 
-            ResponseCode response = AddressService.updateAddress(updatedAddress);
+            ResponseCode response = AddressService.updateAddress(newAddress);
             if (response == ResponseCode.SUCCESS) {
+                newAddressId = newAddress.getId();
                 JOptionPane.showMessageDialog(this, "Address updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to update address", "Error", JOptionPane.ERROR_MESSAGE);
@@ -140,35 +137,25 @@ public class AdminDetailsForm extends JFrame {
         dialog.setVisible(true);
     }
 
-    // Update admin object with new values
-    private void updateAdmin(AdminDTO admin) {
-        // Check if the fields are empty
-        if (idField.getText().isEmpty() || nameField.getText().isEmpty() || phoneField.getText().isEmpty() || emailField.getText().isEmpty() || passwordField.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+    private void createCustomer() {
+        if (newAddressId == null) {
+            JOptionPane.showMessageDialog(this, "Please create an address", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        VendorDTO vendor = new VendorDTO();
+        vendor.setId(IdGenerationUtils.getNextId(ServiceType.VENDOR, null, null));
+        vendor.setName(nameField.getText());
+        vendor.setPhoneNumber(phoneField.getText());
+        vendor.setEmailAddress(emailField.getText());
+        vendor.setPassword(passwordField.getText());
+        vendor.setStatus(statusCheckBox.isSelected());
+        vendor.setAddressId(newAddressId);
 
-        // Check if any fields is modified
-        if (idField.getText().equals(admin.getId()) && nameField.getText().equals(admin.getName()) && phoneField.getText().equals(admin.getPhoneNumber()) && emailField.getText().equals(admin.getEmailAddress()) && passwordField.getText().equals(admin.getPassword()) && statusCheckBox.isSelected() == admin.getStatus()) {
-            JOptionPane.showMessageDialog(this, "No changes made", "Info", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        AdminDTO updatedAdmin = new AdminDTO();
-        updatedAdmin.setId(admin.getId());
-        updatedAdmin.setName(nameField.getText());
-        updatedAdmin.setPhoneNumber(phoneField.getText());
-        updatedAdmin.setAddressId(admin.getAddressId());
-        updatedAdmin.setEmailAddress(emailField.getText());
-        updatedAdmin.setPassword(passwordField.getText());
-        updatedAdmin.setStatus(statusCheckBox.isSelected());
-
-        // Update admin object
-        ResponseCode response = AdminService.updateAdmin(updatedAdmin);
+        ResponseCode response = VendorService.createVendor(vendor);
         if (response == ResponseCode.SUCCESS) {
-            JOptionPane.showMessageDialog(this, "Admin updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vendor created successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(this, "Failed to update admin", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Failed to create vendor", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

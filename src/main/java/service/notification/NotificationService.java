@@ -14,19 +14,21 @@ import org.json.JSONObject;
 
 import dto.NotificationDTO;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
+import service.utils.IdGenerationUtils;
 
 public class NotificationService {
 
 	private static final String SYS_PATH = "src\\main\\resources\\database\\notification\\";
 
 	// Method to create a notification and save it to a text file in JSON format
-	public ResponseCode createNotification(NotificationDTO notification) {
+	public static ResponseCode createNotification(NotificationDTO notification) {
 
 		String filePath = SYS_PATH + "notification.txt";
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
-		json.put("id", notification.getId());
+		json.put("id", IdGenerationUtils.getNextId(ServiceType.NOTIFICATION, null, null));
 		json.put("recipientId", notification.getUserId());
 		json.put("title", notification.getTitle());
 		json.put("message", notification.getMessage());
@@ -77,7 +79,7 @@ public class NotificationService {
 	}
 
 	// Method to read all notification from the text file
-	public List<NotificationDTO> readAllNotification(String userId) {
+	public static List<NotificationDTO> readAllNotification(String userId) {
 		String filePath = SYS_PATH + "notification.txt";
 		
 		List<NotificationDTO> notifications = new ArrayList<>();

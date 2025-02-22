@@ -12,6 +12,12 @@ public enum ResponseCode {
     // Access Errors
     ACCESS_DENIED(444, "Access denied for current role. "),
 
+    // Validation Errors
+    INVALID_INPUT(400, "Invalid input. "),
+
+    // Runner Errors
+    RUNNER_NOT_FOUND(666, "Runner not found. "),
+
     // Exception Errors
     IO_EXCEPTION(501, "Input/Output Exception Occurred. "),
     JSON_EXCEPTION(502, "JSON Processing Exception. "),

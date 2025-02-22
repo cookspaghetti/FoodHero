@@ -53,7 +53,7 @@ public class SessionControlService {
     private static List<String> transactions;			  // Customer
     private static List<String> deliveryAddresses;		  // Customer
     
-    private static HashMap<String, Integer> cartItems; // item id, amount
+    private static HashMap<String, Integer> cartItems;    // item id, amount
 
 	// === Set Session for Admin ===
 	public static void setSession(AdminDTO admin) {

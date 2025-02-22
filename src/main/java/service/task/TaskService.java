@@ -13,19 +13,21 @@ import org.json.JSONObject;
 
 import dto.TaskDTO;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
 import enumeration.TaskStatus;
+import service.utils.IdGenerationUtils;
 
 public class TaskService {
 
 	private static final String SYS_PATH = "src\\main\\resources\\database\\";
 
 	// Method to create a task and save to a text file in JSON format
-	public ResponseCode createTask(TaskDTO task) {
+	public static ResponseCode createTask(TaskDTO task) {
 		String filePath = SYS_PATH + "task.txt";
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
-		json.put("id", task.getId());
+		json.put("id", IdGenerationUtils.getNextId(ServiceType.TASK, null, null));
 		json.put("orderId", task.getOrderId());
 		json.put("runnerId", task.getRunnerId());
 		json.put("status", task.getStatus());
@@ -87,6 +89,47 @@ public class TaskService {
 		return null;
 	}
 
+	// Method to read tasks by runner ID from the text file
+	public static List<TaskDTO> readTaskByRunnerId(String runnerId) {
+		String filePath = SYS_PATH + "task.txt";
+		List<TaskDTO> tasks = new ArrayList<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("runnerId").equals(runnerId)) {
+					TaskDTO task = new TaskDTO();
+					task.setId(json.getString("id"));
+					task.setOrderId(json.getString("orderId"));
+					task.setRunnerId(json.getString("runnerId"));
+					task.setStatus(TaskStatus.valueOf(json.getString("status")));
+					task.setTaskDetails(json.getString("taskDetails"));
+					task.setDeliveryFee(json.getDouble("deliveryFee"));
+					task.setCustomerAddress(json.getString("customerAddress"));
+
+					// Handling nullable LocalDateTime fields
+					if (!json.isNull("acceptanceTime")) {
+						task.setAcceptanceTime(LocalDateTime.parse(json.getString("acceptanceTime")));
+					}
+					if (!json.isNull("completionTime")) {
+						task.setCompletionTime(LocalDateTime.parse(json.getString("completionTime")));
+					}
+
+					tasks.add(task); // Add to the list
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading tasks from file: " + e.getMessage());
+		} catch (JSONException e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
+
+		return tasks; // Return the list of tasks
+	}
+
 	// Method to read all tasks from the text file
 	public static  List<TaskDTO> readAllTask() {
 		String filePath = SYS_PATH + "task.txt";
@@ -127,18 +170,18 @@ public class TaskService {
 	}
 
 	// Method to update a task in the text file
-	public ResponseCode updateTask(String id, TaskDTO updatedTask) {
+	public static ResponseCode updateTask(TaskDTO updatedTask) {
 		String filePath = SYS_PATH + "task.txt";
 		List<String> updatedLines = new ArrayList<>();
-
+	
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 			String line;
 			boolean isUpdated = false;
-
+	
 			while ((line = reader.readLine()) != null) {
 				JSONObject json = new JSONObject(line);
-
-				if (json.getString("id").equals(id)) {
+	
+				if (json.getString("id").equals(updatedTask.getId())) {
 					// Updating task details
 					json.put("orderId", updatedTask.getOrderId());
 					json.put("runnerId", updatedTask.getRunnerId());
@@ -150,13 +193,13 @@ public class TaskService {
 							updatedTask.getAcceptanceTime() != null ? updatedTask.getAcceptanceTime().toString() : JSONObject.NULL);
 					json.put("completionTime", 
 							updatedTask.getCompletionTime() != null ? updatedTask.getCompletionTime().toString() : JSONObject.NULL);
-
+	
 					isUpdated = true; // Mark as updated
 				}
-
+	
 				updatedLines.add(json.toString());
 			}
-
+	
 			if (isUpdated) {
 				// Write the updated content back to the file
 				try (FileWriter writer = new FileWriter(filePath, false)) {
@@ -164,10 +207,10 @@ public class TaskService {
 						writer.write(updatedLine + System.lineSeparator());
 					}
 				}
-				System.out.println("Task with ID " + id + " updated successfully!");
+				System.out.println("Task with ID " + updatedTask.getId() + " updated successfully!");
 				return ResponseCode.SUCCESS;
 			} else {
-				System.out.println("Task with ID " + id + " not found.");
+				System.out.println("Task with ID " + updatedTask.getId() + " not found.");
 				return ResponseCode.RECORD_NOT_FOUND;
 			}
 		} catch (IOException e) {
@@ -180,7 +223,7 @@ public class TaskService {
 	}
 
 	// Method to delete a task from the text file
-	public ResponseCode deleteTask(String id) {
+	public static ResponseCode deleteTask(String id) {
 		String filePath = SYS_PATH + "task.txt";
 		List<String> remainingTasks = new ArrayList<>();
 		boolean isDeleted = false;
@@ -191,7 +234,7 @@ public class TaskService {
 			while ((line = reader.readLine()) != null) {
 				JSONObject json = new JSONObject(line);
 
-				if (json.getString("id").equals(id)) {
+				if (json.getString("orderId").equals(id)) {
 					isDeleted = true; // Task found and will be deleted
 					continue;         // Skip adding this task to the remaining list
 				}

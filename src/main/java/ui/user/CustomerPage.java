@@ -3,8 +3,7 @@ package ui.user;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.util.Vector;
-
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -14,10 +13,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
+import dto.CustomerDTO;
 import enumeration.ButtonMode;
+import service.customer.CustomerService;
+import ui.form.CustomerCreateUserForm;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
 
@@ -77,9 +78,7 @@ public class CustomerPage extends JFrame {
 		customerTable.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer(ButtonMode.EDITDELETE));
 		customerTable.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(customerTable, ButtonMode.EDITDELETE));
 
-		// Example data (replace with actual data)
-		addCustomerRow("CUS00001", "Alex Tho", "alex@example.com", "Active");
-		addCustomerRow("CUS00001", "Jane Doe", "jane@example.com", "Inactive");
+		loadCustomers();
 
 		add(new JScrollPane(customerTable), BorderLayout.CENTER);
 	}
@@ -87,45 +86,70 @@ public class CustomerPage extends JFrame {
 	// ======= Action Methods =======
 	private void searchCustomers(ActionEvent e) {
 		String searchTerm = searchField.getText().trim().toLowerCase();
-		filterTable(searchTerm, (String) filterComboBox.getSelectedItem());
+		
+		// Validate search term
+		if (searchTerm.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Please enter a search term", "Search Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		// Clear table
+		tableModel.setRowCount(0);
+
+		// Get list of customers
+		List<CustomerDTO> customers = CustomerService.readAllCustomer();
+
+		// Search for customers
+		for (CustomerDTO customer : customers) {
+			if (customer.getName().toLowerCase().contains(searchTerm)) {
+				addRow(customer.getId(), customer.getName(), customer.getEmailAddress(), customer.getStatus());
+			}
+			if (customer.getId().toLowerCase().contains(searchTerm)) {
+				addRow(customer.getId(), customer.getName(), customer.getEmailAddress(), customer.getStatus());
+			}
+		}
 	}
 
 	private void filterCustomers(ActionEvent e) {
 		String filter = (String) filterComboBox.getSelectedItem();
-		filterTable(searchField.getText().trim().toLowerCase(), filter);
+		filterTable(filter);
 	}
 	
 	private void createCustomer(ActionEvent e) {
-		JOptionPane.showMessageDialog(this, "Add Manager button clicked.");
+		new CustomerCreateUserForm().setVisible(true);
+		loadCustomers();
 	}
 
 	// ======= Filtering Logic =======
-	private void filterTable(String searchTerm, String filter) {
+	private void filterTable(String filter) {
 		for (int i = 0; i < customerTable.getRowCount(); i++) {
-			String name = customerTable.getValueAt(i, 1).toString().toLowerCase();
-			String email = customerTable.getValueAt(i, 2).toString().toLowerCase();
-			String status = customerTable.getValueAt(i, 3).toString();
-
-			boolean matchesSearch = name.contains(searchTerm) || email.contains(searchTerm);
-			boolean matchesFilter = filter.equals("All") || status.equals(filter);
-
-			customerTable.setRowHeight(i, (matchesSearch && matchesFilter) ? 20 : 0); // Hide unmatched rows
+			String status = (String) customerTable.getValueAt(i, 3);
+			boolean show = false;
+			if (filter.equals("All")) {
+				show = true;
+			} else if (filter.equals("Active") && status.equals("Active")) {
+				show = true;
+			} else if (filter.equals("Inactive") && status.equals("Inactive")) {
+				show = true;
+			}
+			customerTable.setRowHeight(i, show ? 40 : 0);
 		}
 	}
 
-	// ======= Utility Method =======
-	private void addCustomerRow(String id, String name, String email, String status) {
-		Vector<String> row = new Vector<>();
-		row.add(id);
-		row.add(name);
-		row.add(email);
-		row.add(status);
-		row.add("Actions");
-		tableModel.addRow(row);
+	private void addRow(String id, String name, String email, boolean status) {
+		tableModel.addRow(new Object[]{id, name, email, status ? "Active" : "Inactive", "Edit"});
 	}
 
-	// ======= Main Method for Testing =======
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(() -> new CustomerPage().setVisible(true));
+	private void loadCustomers() {
+		// Clear table
+		tableModel.setRowCount(0);
+
+		// Get list of customers
+		List<CustomerDTO> customers = CustomerService.readAllCustomer();
+
+		// Add customers to the table
+		for (CustomerDTO customer : customers) {
+			addRow(customer.getId(), customer.getName(), customer.getEmailAddress(), customer.getStatus());
+		}
 	}
 }

@@ -14,6 +14,8 @@ import org.json.JSONObject;
 import dto.ComplaintDTO;
 import enumeration.ComplaintStatus;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
+import service.utils.IdGenerationUtils;
 
 public class ComplaintService {
 
@@ -25,7 +27,7 @@ public class ComplaintService {
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
-		json.put("id", complain.getId());
+		json.put("id", IdGenerationUtils.getNextId(ServiceType.COMPLAIN, null, null));
 		json.put("customerId", complain.getCustomerId());
 		json.put("orderId", complain.getOrderId());
 		json.put("description", complain.getDescription());
@@ -137,7 +139,7 @@ public class ComplaintService {
 	}
 
 	// Method to update complain
-	public ResponseCode updateComplaint(ComplaintDTO updatedComplain) {
+	public static ResponseCode updateComplaint(ComplaintDTO updatedComplain) {
 		String filePath = SYS_PATH + "complain.txt";
 		List<String> updatedLines = new ArrayList<>();
 		boolean found = false;

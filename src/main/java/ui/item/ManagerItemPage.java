@@ -4,18 +4,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Vector;
+import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import dto.ItemDTO;
+import dto.VendorDTO;
 import enumeration.ButtonMode;
+import service.item.ItemService;
+import service.vendor.VendorService;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
 
 public class ManagerItemPage extends JFrame {
 	private JTextField searchField;
 	private JButton searchButton;
-	private JButton filterButton;
 	private JComboBox<String> filterComboBox;
 	private JTable itemTable;
 	private DefaultTableModel tableModel;
@@ -31,9 +35,9 @@ public class ManagerItemPage extends JFrame {
 		JPanel searchPanel = new JPanel();
 		searchField = new JTextField(20);
 		searchButton = new JButton("Search");
-		filterButton = new JButton("Filter");
 		filterComboBox = new JComboBox<>(new String[]{"All", "Active", "Inactive"});
 		filterComboBox.addActionListener(this::filterItems);
+		searchButton.addActionListener(this::searchVendors);
 
 		searchPanel.add(new JLabel("Search Vendor:"));
 		searchPanel.add(searchField);
@@ -60,25 +64,22 @@ public class ManagerItemPage extends JFrame {
 
 		// Set column widths
 		TableColumn idColumn = itemTable.getColumn("Item ID");
-		idColumn.setPreferredWidth(80); // Fit XXX00000
+		idColumn.setPreferredWidth(80);
 
 		TableColumn nameColumn = itemTable.getColumn("Item Name");
-		nameColumn.setPreferredWidth(250); // Fit as much as possible
+		nameColumn.setPreferredWidth(250);
 
 		TableColumn priceColumn = itemTable.getColumn("Price");
-		priceColumn.setPreferredWidth(100); // Fit RMXXX.XX
+		priceColumn.setPreferredWidth(100);
 
 		TableColumn descColumn = itemTable.getColumn("Vendor ID");
-		descColumn.setPreferredWidth(80); // Fit as much as possible
+		descColumn.setPreferredWidth(80);
 
 		TableColumn availColumn = itemTable.getColumn("Availability");
-		availColumn.setPreferredWidth(80); // Active/Inactive
+		availColumn.setPreferredWidth(80);
 
 		TableColumn actionColumn = itemTable.getColumn("Actions");
-		actionColumn.setPreferredWidth(180); // For one delete button
-
-		addItemRow("ITM00001", "Triple G", "RM88.88", "VDR00001", "Active");
-		addItemRow("ITM00001", "Triple G", "RM88.88", "VDR00001", "Active");
+		actionColumn.setPreferredWidth(180);
 
 		add(new JScrollPane(itemTable), BorderLayout.CENTER);
 
@@ -86,29 +87,51 @@ public class ManagerItemPage extends JFrame {
 	}
 
 	// ======= Action Methods =======
-	private void searchItems(ActionEvent e) {
+	private void searchVendors(ActionEvent e) {
 		String searchTerm = searchField.getText().trim().toLowerCase();
-		filterTable(searchTerm, (String) filterComboBox.getSelectedItem());
+
+		// Validate search term
+		if (searchTerm.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Please enter a search term", "Search Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		// Get vendor info
+		VendorDTO vendor = new VendorDTO();
+		if (VendorService.readVendor(searchTerm) != null) {
+			vendor = VendorService.readVendor(searchTerm);
+		} else if (VendorService.readVendorByName(searchTerm) != null) {
+			vendor = VendorService.readVendorByEmail(searchTerm);
+		} else {
+			JOptionPane.showMessageDialog(this, "Vendor not found", "Search Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		// Clear table
+		tableModel.setRowCount(0);
+
+		// Update table
+		List<ItemDTO> items = ItemService.readAllItem(vendor.getId());
+		for (ItemDTO item : items) {
+			addItemRow(item.getId(), item.getName(), String.valueOf(item.getPrice()), item.getDescription(), item.isAvailability() ? "Active" : "Inactive");
+		}
 	}
 
 	private void filterItems(ActionEvent e) {
-		String filter = (String) filterComboBox.getSelectedItem();
-		filterTable(searchField.getText().trim().toLowerCase(), filter);
-	}
+        String filter = (String) filterComboBox.getSelectedItem();
+        if (filter != null) {
+            filterTable(filter);
+        }
+    }
 
 	// ======= Filtering Logic =======
-	private void filterTable(String searchTerm, String filter) {
-		for (int i = 0; i < itemTable.getRowCount(); i++) {
-			String name = itemTable.getValueAt(i, 1).toString().toLowerCase();
-			String email = itemTable.getValueAt(i, 2).toString().toLowerCase();
-			String status = itemTable.getValueAt(i, 3).toString();
-
-			boolean matchesSearch = name.contains(searchTerm) || email.contains(searchTerm);
-			boolean matchesFilter = filter.equals("All") || status.equals(filter);
-
-			itemTable.setRowHeight(i, (matchesSearch && matchesFilter) ? 20 : 0); // Hide unmatched rows
-		}
-	}
+	private void filterTable(String filter) {
+        for (int i = 0; i < itemTable.getRowCount(); i++) {
+            String status = itemTable.getValueAt(i, 4).toString(); // Column index for Availability
+            boolean matchesFilter = filter.equals("All") || status.equals(filter);
+            itemTable.setRowHeight(i, matchesFilter ? 40 : 0);
+        }
+    }
 
 	// ======= Utility Method =======
 	private void addItemRow(String itemId, String itemName, String price, String desc, String avail) {
@@ -122,9 +145,6 @@ public class ManagerItemPage extends JFrame {
 		tableModel.addRow(row);
 	}
 
-	public static void main(String[] args) {
-		new ManagerItemPage();
-	}
 }
 
 

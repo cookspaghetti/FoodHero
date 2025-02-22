@@ -2,6 +2,8 @@ package ui.topup;
 
 import javax.swing.*;
 
+import dto.CustomerDTO;
+import service.customer.CustomerService;
 import ui.dialog.TopUpPaymentDialog;
 
 import java.awt.*;
@@ -27,6 +29,8 @@ public class AdminTopUpPage extends JFrame {
         searchPanel.add(searchField);
         searchPanel.add(searchButton);
         getContentPane().add(searchPanel, BorderLayout.NORTH);
+
+        searchButton.addActionListener(e -> searchCustomer());
 
         // Customer Details Panel
         JPanel detailsPanel = new JPanel(new GridLayout(6, 2, 5, 5));
@@ -71,13 +75,31 @@ public class AdminTopUpPage extends JFrame {
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
         closeButton.addActionListener(e -> dispose());
-        topUpButton.addActionListener(e -> new TopUpPaymentDialog(this, nameLabel.getText(), phoneLabel.getText(), idLabel.getText()));
+        topUpButton.addActionListener(
+                e -> new TopUpPaymentDialog(this, nameLabel.getText(), phoneLabel.getText(), idLabel.getText()));
 
         setVisible(true);
     }
 
-    public static void main(String[] args) {
-        new AdminTopUpPage();
-    }
-}
+    private void searchCustomer() {
+        String searchTerm = searchField.getText().trim().toLowerCase();
+        // Search for customer phone number
+        CustomerDTO customer = new CustomerDTO();
 
+        if (CustomerService.readCustomerByPhoneNumber(searchTerm) != null) {
+            customer = CustomerService.readCustomerByPhoneNumber(searchTerm);
+        }
+
+        if (customer != null) {
+            idLabel.setText(customer.getId());
+            nameLabel.setText(customer.getName());
+            phoneLabel.setText(customer.getPhoneNumber());
+            addressLabel.setText(customer.getAddressId());
+            emailLabel.setText(customer.getEmailAddress());
+            statusLabel.setText(customer.getStatus() ? "Active" : "Inactive");
+        } else {
+            JOptionPane.showMessageDialog(this, "Customer not found!");
+        }
+    }
+    
+}

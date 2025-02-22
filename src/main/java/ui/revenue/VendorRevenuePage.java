@@ -2,6 +2,7 @@ package ui.revenue;
 
 import java.awt.BorderLayout;
 import java.time.Year;
+import java.util.List;
 
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -11,11 +12,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import dto.OrderDTO;
+import dto.VendorDTO;
+import enumeration.OrderStatus;
+import service.general.SessionControlService;
+import service.order.OrderService;
+
 public class VendorRevenuePage extends JFrame {
     private JComboBox<String> yearFilterComboBox;
     private JTable revenueTable;
     private JScrollPane tableScrollPane;
     private DefaultTableModel tableModel;
+
+    private VendorDTO vendor = (VendorDTO) SessionControlService.getUser();
 
     public VendorRevenuePage() {
         setTitle("Vendor Revenue Review");
@@ -27,6 +36,7 @@ public class VendorRevenuePage extends JFrame {
         // Search Panel
         JPanel searchPanel = new JPanel();
         yearFilterComboBox = new JComboBox<>();
+        yearFilterComboBox.addActionListener(e -> filterYear(yearFilterComboBox.getSelectedItem().toString()));
         
         // Populate year combo box (starting from 2015)
         for (int year = 2015; year <= Year.now().getValue(); year++) {
@@ -53,13 +63,40 @@ public class VendorRevenuePage extends JFrame {
         setVisible(true);
     }
     
-    // Method to calculate the earnings
-    
-    // Method to update the combo box for filtering
-    
-    // Method to read the vendor details
+    // Method to update the table
+    private void updateTable(String year) {
+        // Get list of orders
+        List<OrderDTO> orders = OrderService.readVendorOrders(vendor.getId());
+        for (OrderDTO order : orders) {
+            // Filter orders that are not delivered
+            if (order.getStatus() != OrderStatus.DELIVERED) {
+                continue;
+            }
+            // Filter orders that are not in the selected year
+            if (!String.valueOf(order.getCompletionTime().getYear()).equals(year)) {
+                continue;
+            }
 
-    public static void main(String[] args) {
-        new VendorRevenuePage();
+            int month = order.getCompletionTime().getMonthValue();
+            int orderCount = Integer.parseInt(tableModel.getValueAt(month - 1, 1).toString());
+            double earnings = Double.parseDouble(tableModel.getValueAt(month - 1, 2).toString());
+
+            tableModel.setValueAt(orderCount + 1, month - 1, 1);
+            tableModel.setValueAt(earnings + order.getTotalAmount(), month - 1, 2);
+        }
     }
+    
+    // Method to filter the year
+    private void filterYear(String year) {
+        // Reset table
+        tableModel.setRowCount(0);
+        String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+        for (String month : months) {
+            tableModel.addRow(new Object[]{month, "N/A", "N/A"});
+        }
+
+        // Update table
+        updateTable(year);
+    }
+
 }

@@ -3,11 +3,14 @@ package ui.vendor;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import dto.ItemDTO;
 import enumeration.ButtonMode;
+import service.item.ItemService;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
 
 import java.awt.*;
+import java.util.List;
 
 public class VendorMenuPage extends JFrame {
 
@@ -47,16 +50,7 @@ public class VendorMenuPage extends JFrame {
 		menuTable.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer(ButtonMode.ADDTOCART));
 		menuTable.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(menuTable, ButtonMode.ADDTOCART));
 		
-		// Sample Data (Replace with real vendor data)
-		Object[][] sampleData = {
-				{"I001", "Burger", "$5.00", "Delicious beef burger", "Add to Cart"},
-				{"I002", "Pizza", "$8.00", "Cheesy pepperoni pizza", "Add to Cart"},
-				{"I003", "Pasta", "$7.00", "Creamy Alfredo pasta", "Add to Cart"}
-		};
-
-		for (Object[] row : sampleData) {
-			tableModel.addRow(row);
-		}
+		loadVendorMenu(vendorId);
 
 		JScrollPane scrollPane = new JScrollPane(menuTable);
 		add(scrollPane, BorderLayout.CENTER);
@@ -65,8 +59,16 @@ public class VendorMenuPage extends JFrame {
 		setVisible(true);
 	}
 
-	public static void main(String[] args) {
-		new VendorMenuPage("VEN00001");
+	private void loadVendorMenu(String vendorId) {
+		List<ItemDTO> items = ItemService.readAllItem(vendorId);
+		for (ItemDTO item : items) {
+			if (item.isAvailability() == false) {
+				continue;
+			}
+			Object[] data = {item.getId(), item.getName(), item.getPrice(), item.getDescription(), "Add to Cart"};
+			tableModel.addRow(data);
+		}
 	}
+
 }
 

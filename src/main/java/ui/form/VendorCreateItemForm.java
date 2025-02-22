@@ -4,49 +4,51 @@ import javax.swing.*;
 
 import dto.ItemDTO;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
 import service.item.ItemService;
+import service.utils.IdGenerationUtils;
 
 import java.awt.*;
 
-public class VendorItemDetailsForm extends JFrame {
+public class VendorCreateItemForm extends JFrame {
     private JTextField idField, nameField, priceField, defaultAmountField, descriptionField;
     private JComboBox<String> availabilityComboBox;
     private JButton saveButton, closeButton;
 
-    public VendorItemDetailsForm(ItemDTO item) {
-        setTitle("Item Details");
+    public VendorCreateItemForm() {
+        setTitle("Create Item");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new GridLayout(7, 2, 5, 5));
 
         getContentPane().add(new JLabel("Item ID:"));
-        idField = new JTextField(item.getId());
+        idField = new JTextField(IdGenerationUtils.getNextId(ServiceType.ITEM, null, null));
         idField.setEditable(false);
         getContentPane().add(idField);
 
         getContentPane().add(new JLabel("Name:"));
-        nameField = new JTextField(item.getName());
+        nameField = new JTextField();
         getContentPane().add(nameField);
 
         getContentPane().add(new JLabel("Price:"));
-        priceField = new JTextField(String.valueOf(item.getPrice()));
+        priceField = new JTextField();
         getContentPane().add(priceField);
 
         getContentPane().add(new JLabel("Default Amount:"));
-        defaultAmountField = new JTextField(String.valueOf(item.getDefaultAmount()));
+        defaultAmountField = new JTextField(String.valueOf(1));
         getContentPane().add(defaultAmountField);
 
         getContentPane().add(new JLabel("Description:"));
-        descriptionField = new JTextField(item.getDescription());
+        descriptionField = new JTextField();
         getContentPane().add(descriptionField);
 
         getContentPane().add(new JLabel("Availability:"));
         availabilityComboBox = new JComboBox<>(new String[]{"Active", "Inactive"});
-        availabilityComboBox.setSelectedItem(item.isAvailability() ? "Active" : "Inactive");
+        availabilityComboBox.setSelectedItem("Active");
         getContentPane().add(availabilityComboBox);
 
         saveButton = new JButton("Save");
-        saveButton.addActionListener(e -> updateItem());
+        saveButton.addActionListener(e -> createItem());
         closeButton = new JButton("Close");
         closeButton.addActionListener(e -> dispose());
         
@@ -58,7 +60,7 @@ public class VendorItemDetailsForm extends JFrame {
     }
 
     // Method to update item details
-    private void updateItem() {
+    private void createItem() {
         // Get the values from the form
         String name = nameField.getText();
         double price = Double.parseDouble(priceField.getText());
@@ -72,23 +74,25 @@ public class VendorItemDetailsForm extends JFrame {
             return;
         }
 
-        // Update the item details
-        ItemDTO updatedItem = new ItemDTO();
-        updatedItem.setId(idField.getText());
-        updatedItem.setName(name);
-        updatedItem.setPrice(price);
-        updatedItem.setDefaultAmount(defaultAmount);
-        updatedItem.setDescription(description);
-        updatedItem.setAvailability(availability);
+        // Create the item object
+        ItemDTO newItem = new ItemDTO();
+        newItem.setId(idField.getText());
+        newItem.setName(name);
+        newItem.setPrice(price);
+        newItem.setDefaultAmount(defaultAmount);
+        newItem.setDescription(description);
+        newItem.setAvailability(availability);
 
         // Call the service to update the item details
-        ResponseCode response = ItemService.updateItem(updatedItem);
-        if (response != ResponseCode.SUCCESS) {
-            JOptionPane.showMessageDialog(this, "Failed to update item details.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+        ResponseCode response = ItemService.createItem(newItem);
+        if (response == ResponseCode.SUCCESS) {
+            JOptionPane.showMessageDialog(this, "Item created successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to create item", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        
-        // Display a success/failure message
-        JOptionPane.showMessageDialog(this, "Item details updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static void main(String[] args) {
+        new VendorCreateItemForm();
     }
 }

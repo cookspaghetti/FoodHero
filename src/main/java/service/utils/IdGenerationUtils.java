@@ -60,6 +60,9 @@ public class IdGenerationUtils {
 		case NOTIFICATION:
 			filePath = "src\\main\\resources\\database\\notification\\notification.txt";
 			abbreviation = "NOT";
+		case ADDRESS:
+			filePath = "src\\main\\resources\\database\\address\\address.txt";
+			abbreviation = "ADR";
 		default:
 			filePath = "ERR";
 		}

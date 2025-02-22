@@ -15,7 +15,9 @@ import dto.ItemDTO;
 import dto.VendorDTO;
 import enumeration.ResponseCode;
 import enumeration.Role;
+import enumeration.ServiceType;
 import service.general.SessionControlService;
+import service.utils.IdGenerationUtils;
 import service.vendor.VendorService;
 
 public class ItemService {
@@ -23,7 +25,7 @@ public class ItemService {
 	private static final String SYS_PATH = "src\\main\\resources\\database\\item\\";
 
 	// Method to create an item and save it to a text file in JSON format
-	public ResponseCode createItem(ItemDTO item) {
+	public static ResponseCode createItem(ItemDTO item) {
 
 		// Get current user info
 		Role role = SessionControlService.getRole();
@@ -42,7 +44,7 @@ public class ItemService {
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
-		json.put("id", item.getId());
+		json.put("id", IdGenerationUtils.getNextId(ServiceType.ITEM, null, null));
 		json.put("name", item.getName());
 		json.put("price", item.getPrice());
 		json.put("defaultAmount", item.getDefaultAmount());
@@ -111,7 +113,7 @@ public class ItemService {
 	}
 
 	// Method to read all items from the text file
-	public List<ItemDTO> readAllItem(String vendorId) {
+	public static List<ItemDTO> readAllItem(String vendorId) {
 
 		// Construct the file name
 		String filePath = SYS_PATH + "item_" + vendorId + ".txt";
@@ -145,7 +147,7 @@ public class ItemService {
 	}
 
 	// Method to update an item in the text file
-	public ResponseCode updateItem(ItemDTO updatedItem) {
+	public static ResponseCode updateItem(ItemDTO updatedItem) {
 
 		// Get current user info
 		Role role = SessionControlService.getRole();
