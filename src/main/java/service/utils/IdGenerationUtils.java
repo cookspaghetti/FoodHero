@@ -35,11 +35,11 @@ public class IdGenerationUtils {
 			abbreviation = "VDR";
 			break;
 		case RUNNER: 
-			filePath = "src\\main\\resources\\database\\user\\vendor.txt";
+			filePath = "src\\main\\resources\\database\\user\\runner.txt";
 			abbreviation = "RUN";
 			break;
 		case ITEM: 
-			filePath = "src\\main\\resources\\database\\item\\item_" + SessionControlService.getId() + ".txt";
+			filePath = "src\\main\\resources\\database\\item\\vendor_" + SessionControlService.getId() + "_items.txt";
 			abbreviation = "ITM";
 			break;
 		case ORDER:

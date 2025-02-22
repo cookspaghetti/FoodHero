@@ -40,7 +40,7 @@ public class ItemService {
 		}
 
 		// Construct the file name
-		String filePath = SYS_PATH + "item_" + vendorId + ".txt";
+		String filePath = SYS_PATH + "vendor_" + vendorId + "_items.txt";
 
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
@@ -67,7 +67,7 @@ public class ItemService {
 	public static ItemDTO readItem(String vendorId, String id) {
 
 		// Construct the file name
-		String filePath = SYS_PATH + "item_" + vendorId + ".txt";
+		String filePath = SYS_PATH + "vendor_" + vendorId + "_items.txt";
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 			String line;
@@ -116,7 +116,7 @@ public class ItemService {
 	public static List<ItemDTO> readAllItem(String vendorId) {
 
 		// Construct the file name
-		String filePath = SYS_PATH + "item_" + vendorId + ".txt";
+		String filePath = SYS_PATH + "vendor_" + vendorId + "_items.txt";
 
 		List<ItemDTO> items = new ArrayList<>();
 
@@ -162,7 +162,7 @@ public class ItemService {
 		}
 
 		// Construct the file name
-		String filePath = SYS_PATH + "item_" + vendorId + ".txt";
+		String filePath = SYS_PATH + "vendor_" + vendorId + "_items.txt";
 
 		List<String> fileContent = new ArrayList<>();
 
@@ -209,7 +209,7 @@ public class ItemService {
 	public static ResponseCode deleteItem(String vendorId, String itemId) {
 
 		// Construct the file name
-		String filePath = SYS_PATH + "item_" + vendorId + ".txt";
+		String filePath = SYS_PATH + "vendor_" + vendorId + "_items.txt";
 
 		List<String> fileContent = new ArrayList<>();
 		boolean itemFound = false;

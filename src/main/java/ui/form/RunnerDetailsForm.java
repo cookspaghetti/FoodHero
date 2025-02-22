@@ -183,16 +183,4 @@ public class RunnerDetailsForm extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        RunnerDTO runner = new RunnerDTO(); // Replace with actual Runner object
-        runner.setId("1");
-        runner.setName("John Doe");
-        runner.setPhoneNumber("12345678");
-        runner.setEmailAddress("");
-        runner.setPassword("password");
-        runner.setStatus(true);
-        runner.setAddressId("1");
-        
-        new RunnerDetailsForm(runner);
-    }
 }

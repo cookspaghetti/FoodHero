@@ -177,17 +177,5 @@ public class CustomerDetailsForm extends JFrame {
             JOptionPane.showMessageDialog(this, "Failed to update customer", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
-    public static void main(String[] args) {
-        CustomerDTO customer = new CustomerDTO();
-        customer.setId("1");
-        customer.setName("John Doe");
-        customer.setPhoneNumber("12345678");
-        customer.setEmailAddress("");
-        customer.setPassword("password");
-        customer.setStatus(true);
-        customer.setAddressId("1");
-
-        new CustomerDetailsForm(customer);
-    }
+    
 }

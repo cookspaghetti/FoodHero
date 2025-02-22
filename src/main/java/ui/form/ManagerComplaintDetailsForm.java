@@ -94,14 +94,4 @@ public class ManagerComplaintDetailsForm extends JFrame {
         setVisible(true);
     }
 
-    public static void main(String[] args) {
-        ComplaintDTO sampleComplaint = new ComplaintDTO();
-        sampleComplaint.setId("C123");
-        sampleComplaint.setCustomerId("U456");
-        sampleComplaint.setOrderId("O789");
-        sampleComplaint.setDescription("Item was damaged. Item was damaged. Item was damaged. Item was damaged. Item was damaged.");
-        sampleComplaint.setStatus(ComplaintStatus.IN_REVIEW);
-        sampleComplaint.setSolution("Replacement is being processed.");
-        new ManagerComplaintDetailsForm(sampleComplaint);
-    }
 }

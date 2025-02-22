@@ -168,16 +168,5 @@ public class ManagerDetailsForm extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        ManagerDTO manager = new ManagerDTO(); // Replace with actual manager object
-        manager.setId("1");
-        manager.setName("John Doe");
-        manager.setPhoneNumber("12345678");
-        manager.setEmailAddress("");
-        manager.setPassword("password");
-        manager.setStatus(true);
-        manager.setAddressId("1");
-        new ManagerDetailsForm(manager);
-    }
 }
 

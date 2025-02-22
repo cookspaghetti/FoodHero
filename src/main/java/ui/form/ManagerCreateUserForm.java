@@ -156,6 +156,7 @@ public class ManagerCreateUserForm extends JFrame {
         ResponseCode response = ManagerService.createManager(manager);
         if (response == ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(this, "Manager created successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to create manager", "Error", JOptionPane.ERROR_MESSAGE);
         }

@@ -115,6 +115,10 @@ public class ManagerItemPage extends JFrame {
 		for (ItemDTO item : items) {
 			addItemRow(item.getId(), item.getName(), String.valueOf(item.getPrice()), item.getDescription(), item.isAvailability() ? "Active" : "Inactive");
 		}
+
+		if (items.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "No items found", "Search Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private void filterItems(ActionEvent e) {

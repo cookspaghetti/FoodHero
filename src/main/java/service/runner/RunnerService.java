@@ -21,6 +21,7 @@ import enumeration.ResponseCode;
 import enumeration.ServiceType;
 import service.address.AddressService;
 import service.notification.NotificationService;
+import service.review.ReviewService;
 import service.utils.IdGenerationUtils;
 import service.utils.JsonUtils;
 
@@ -62,11 +63,17 @@ public class RunnerService {
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
 			System.out.println("Runner created successfully!");
-			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing runner to file: " + e.getMessage());
 			return ResponseCode.IO_EXCEPTION;
 		}
+		
+		ResponseCode response = ReviewService.createRunnerReviewDataStorage(runner.getId());
+		if (response != ResponseCode.SUCCESS) {
+			return response;
+		}
+		
+		return ResponseCode.SUCCESS;
 	}
 
 	// Method to read runner info
@@ -104,9 +111,22 @@ public class RunnerService {
 					runner.setLastDeliveredAddress(json.getString("lastDeliveredAddress"));
 
 					// Parse lastDeliveryDate as LocalDateTime
-					String dateStr = json.optString("lastDeliveryDate", null);
-					if (dateStr != null && !dateStr.isEmpty()) {
-						runner.setLastDeliveryDate(LocalDateTime.parse(dateStr));
+					if (json.has("lastDeliveryDate") && !json.isNull("lastDeliveryDate")) {
+						String dateStr = json.getString("lastDeliveryDate").trim();
+						if (!dateStr.isEmpty()) {
+							try {
+								DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+								runner.setLastDeliveryDate(LocalDateTime.parse(dateStr, formatter));
+							} catch (Exception e) {
+								System.err.println("Error parsing date: " + e.getMessage());
+								// Set to null if parsing fails
+								runner.setLastDeliveryDate(null);
+							}
+						} else {
+							runner.setLastDeliveryDate(null);
+						}
+					} else {
+						runner.setLastDeliveryDate(null);
 					}
 
 					return runner; // Return the found runner
@@ -155,9 +175,22 @@ public class RunnerService {
 					runner.setLastDeliveredAddress(json.getString("lastDeliveredAddress"));
 
 					// Parse lastDeliveryDate as LocalDateTime
-					String dateStr = json.optString("lastDeliveryDate", null);
-					if (dateStr != null && !dateStr.isEmpty()) {
-						runner.setLastDeliveryDate(LocalDateTime.parse(dateStr));
+					if (json.has("lastDeliveryDate") && !json.isNull("lastDeliveryDate")) {
+						String dateStr = json.getString("lastDeliveryDate").trim();
+						if (!dateStr.isEmpty()) {
+							try {
+								DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+								runner.setLastDeliveryDate(LocalDateTime.parse(dateStr, formatter));
+							} catch (Exception e) {
+								System.err.println("Error parsing date: " + e.getMessage());
+								// Set to null if parsing fails
+								runner.setLastDeliveryDate(null);
+							}
+						} else {
+							runner.setLastDeliveryDate(null);
+						}
+					} else {
+						runner.setLastDeliveryDate(null);
 					}
 
 					return runner; // Return the found runner
@@ -201,9 +234,22 @@ public class RunnerService {
 				runner.setReviews(JsonUtils.jsonArrayToList(json.getJSONArray("reviews")));
 
 				// Reading lastDeliveryDate (Optional)
-				if (!json.isNull("lastDeliveryDate")) {
-					DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-					runner.setLastDeliveryDate(LocalDateTime.parse(json.getString("lastDeliveryDate"), formatter));
+				if (json.has("lastDeliveryDate") && !json.isNull("lastDeliveryDate")) {
+					String dateStr = json.getString("lastDeliveryDate").trim();
+					if (!dateStr.isEmpty()) {
+						try {
+							DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+							runner.setLastDeliveryDate(LocalDateTime.parse(dateStr, formatter));
+						} catch (Exception e) {
+							System.err.println("Error parsing date: " + e.getMessage());
+							// Set to null if parsing fails
+							runner.setLastDeliveryDate(null);
+						}
+					} else {
+						runner.setLastDeliveryDate(null);
+					}
+				} else {
+					runner.setLastDeliveryDate(null);
 				}
 
 				runners.add(runner); // Add to the list

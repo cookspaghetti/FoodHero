@@ -87,14 +87,14 @@ public class VendorService {
 				JSONObject json = new JSONObject(line);
 
 				// Check if the ID matches
-				if (json.getString("id").equals(id)) {
+				if (json.getString("id").toLowerCase().equals(id.toLowerCase())) {
 					// Construct Vendor object
 					VendorDTO vendor = new VendorDTO();
 					vendor.setId(json.getString("id"));
 					vendor.setName(json.getString("name"));
 					vendor.setPhoneNumber(json.getString("phoneNumber"));
 					vendor.setAddressId(json.getString("addressId"));
-					vendor.setEmailAddress(json.getString("email"));
+					vendor.setEmailAddress(json.getString("emailAddress"));
 					vendor.setStatus(json.getBoolean("status"));
 					vendor.setVendorName(json.getString("vendorName"));
 					vendor.setVendorType(VendorType.valueOf(json.getString("vendorType")));
@@ -145,7 +145,7 @@ public class VendorService {
 					vendor.setName(json.getString("name"));
 					vendor.setPhoneNumber(json.getString("phoneNumber"));
 					vendor.setAddressId(json.getString("addressId"));
-					vendor.setEmailAddress(json.getString("email"));
+					vendor.setEmailAddress(json.getString("emailAddress"));
 					vendor.setStatus(json.getBoolean("status"));
 					vendor.setVendorName(json.getString("vendorName"));
 					vendor.setVendorType(VendorType.valueOf(json.getString("vendorType")));
@@ -189,14 +189,14 @@ public class VendorService {
 				JSONObject json = new JSONObject(line);
 
 				// Check if the ID matches
-				if (json.getString("vendorName").equals(vendorName)) {
+				if (json.getString("vendorName").toLowerCase().equals(vendorName.toLowerCase())) {
 					// Construct Vendor object
 					VendorDTO vendor = new VendorDTO();
 					vendor.setId(json.getString("id"));
 					vendor.setName(json.getString("name"));
 					vendor.setPhoneNumber(json.getString("phoneNumber"));
 					vendor.setAddressId(json.getString("addressId"));
-					vendor.setEmailAddress(json.getString("email"));
+					vendor.setEmailAddress(json.getString("emailAddress"));
 					vendor.setStatus(json.getBoolean("status"));
 					vendor.setVendorName(json.getString("vendorName"));
 					vendor.setVendorType(VendorType.valueOf(json.getString("vendorType")));
@@ -245,7 +245,7 @@ public class VendorService {
 				vendor.setName(json.getString("name"));
 				vendor.setPhoneNumber(json.getString("phoneNumber"));
 				vendor.setAddressId(json.getString("addressId"));
-				vendor.setEmailAddress(json.getString("email"));
+				vendor.setEmailAddress(json.getString("emailAddress"));
 				vendor.setStatus(json.getBoolean("status"));
 				vendor.setVendorName(json.getString("vendorName"));
 				vendor.setVendorType(VendorType.valueOf(json.getString("vendorType")));

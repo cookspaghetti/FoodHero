@@ -6,6 +6,7 @@ import dto.AddressDTO;
 import dto.VendorDTO;
 import enumeration.ResponseCode;
 import enumeration.ServiceType;
+import enumeration.VendorType;
 import service.address.AddressService;
 import service.utils.IdGenerationUtils;
 import service.vendor.VendorService;
@@ -152,9 +153,19 @@ public class VendorCreateUserForm extends JFrame {
         vendor.setStatus(statusCheckBox.isSelected());
         vendor.setAddressId(newAddressId);
 
+        // Default values
+        vendor.setVendorName("Vendor");
+        vendor.setVendorType(VendorType.OTHERS);
+        vendor.setOpen(false);
+        vendor.setItems(null);
+        vendor.setOrderHistory(null);
+        vendor.setRatings(0.0);
+        vendor.setReviews(null);
+
         ResponseCode response = VendorService.createVendor(vendor);
         if (response == ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(this, "Vendor created successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to create vendor", "Error", JOptionPane.ERROR_MESSAGE);
         }

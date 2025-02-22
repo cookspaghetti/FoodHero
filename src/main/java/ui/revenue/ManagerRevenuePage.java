@@ -35,9 +35,6 @@ public class ManagerRevenuePage extends JFrame {
         searchField = new JTextField(20);
         searchButton = new JButton("Search");
         yearFilterComboBox = new JComboBox<>();
-
-        searchButton.addActionListener(e -> searchVendor());
-        yearFilterComboBox.addActionListener(e -> filterYear(yearFilterComboBox.getSelectedItem().toString()));
         
         // Populate year combo box (starting from 2015)
         for (int year = 2015; year <= Year.now().getValue(); year++) {
@@ -59,6 +56,9 @@ public class ManagerRevenuePage extends JFrame {
         revenueTable = new JTable(tableModel);
         tableScrollPane = new JScrollPane(revenueTable);
         add(tableScrollPane, BorderLayout.CENTER);
+        
+        searchButton.addActionListener(e -> searchVendor());
+        yearFilterComboBox.addActionListener(e -> filterYear(yearFilterComboBox.getSelectedItem().toString()));
 
         // Populate fixed months
         String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
@@ -139,8 +139,5 @@ public class ManagerRevenuePage extends JFrame {
         updateTable(String.valueOf(Year.now().getValue()));
     }
 
-    public static void main(String[] args) {
-        new ManagerRevenuePage();
-    }
 }
 

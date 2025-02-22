@@ -149,13 +149,25 @@ public class CustomerCreateUserForm extends JFrame {
         customer.setName(nameField.getText());
         customer.setPhoneNumber(phoneField.getText());
         customer.setEmailAddress(emailField.getText());
+        customer.setAddressId(newAddressId);
         customer.setPassword(passwordField.getText());
         customer.setStatus(statusCheckBox.isSelected());
         customer.setAddressId(newAddressId);
 
+        // Default values
+        customer.setCredit(0.0);
+        customer.setOrderHistory(null);
+        customer.setVendorReviews(null);
+        customer.setRunnerReviews(null);
+        customer.setComplains(null);
+        customer.setTransactions(null);
+        customer.setDeliveryAddresses(null);
+
+
         ResponseCode response = CustomerService.createCustomer(customer);
         if (response == ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(this, "Customer created successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to create customer", "Error", JOptionPane.ERROR_MESSAGE);
         }

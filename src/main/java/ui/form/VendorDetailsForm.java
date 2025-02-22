@@ -14,7 +14,6 @@ import javax.swing.JDialog;
 
 import dto.VendorDTO;
 import dto.AddressDTO;
-import enumeration.VendorType;
 import enumeration.ResponseCode;
 import service.address.AddressService;
 import service.vendor.VendorService;
@@ -191,10 +190,4 @@ public class VendorDetailsForm extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        VendorDTO vendor = new VendorDTO(); // Replace with actual Vendor object
-        vendor.setStatus(true);
-        vendor.setVendorType(VendorType.CHINESE);
-        new VendorDetailsForm(vendor);
-    }
 }

@@ -1,0 +1,1 @@
+{"vendorType":"OTHERS","orderHistory":[],"vendorName":"Vendor","addressId":"ADR00004","emailAddress":"owen@gmail.com","password":"1","phoneNumber":"0123456789","reviews":[],"ratings":0,"name":"Owen","id":"VDR00001","items":{},"open":false,"status":true}

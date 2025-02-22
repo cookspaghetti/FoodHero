@@ -135,7 +135,4 @@ public class RunnerTaskHistoryPage extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        new RunnerTaskHistoryPage();
-    }
 }

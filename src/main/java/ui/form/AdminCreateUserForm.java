@@ -156,6 +156,7 @@ public class AdminCreateUserForm extends JFrame {
         ResponseCode response = AdminService.createAdmin(admin);
         if (response == ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(this, "Admin created successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to create admin", "Error", JOptionPane.ERROR_MESSAGE);
         }

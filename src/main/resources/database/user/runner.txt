@@ -1,0 +1,1 @@
+{"available":false,"currentTask":"","plateNumber":"","lastDeliveredAddress":"","addressId":"ADR00005","lastDeliveryDate":"","emailAddress":"owen@gmail.com","password":"1","earnings":0,"phoneNumber":"0123456789","reviews":[],"ratings":0,"name":"Owen","id":"RUN00001","tasks":[],"status":true}

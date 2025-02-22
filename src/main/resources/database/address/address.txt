@@ -1,0 +1,5 @@
+{"country":"Malaysia","city":"Bukit Jalil","street":"Street 1, Building 1","postalCode":"57000","id":"ADR00001","state":"Kuala Lumpur","userId":"ADM00002"}
+{"country":"Malaysia","city":"Bukit Jalil","street":"Street 1, Building 1","postalCode":"57000","id":"ADR00002","state":"Kuala Lumpur","userId":"MGR00001"}
+{"country":"Malaysia","city":"Bukit Jalil","street":"Taman Sri Endah","postalCode":"57000","id":"ADR00003","state":"Kuala Lumpur","userId":"CUS00001"}
+{"country":"Malaysia","city":"Sri Petaling","street":"Taman Naga Emas","postalCode":"57000","id":"ADR00004","state":"Kuala Lumpur","userId":"VDR00001"}
+{"country":"Malaysia","city":"Bukit Jalil","street":"TPM Resource Center","postalCode":"57000","id":"ADR00005","state":"Kuala Lumpur","userId":"RUN00001"}

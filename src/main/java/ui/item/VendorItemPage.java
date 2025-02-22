@@ -54,6 +54,7 @@ public class VendorItemPage extends JFrame {
 		searchPanel.add(searchButton);
 		searchPanel.add(new JLabel("Filter:"));
 		searchPanel.add(filterComboBox);
+		searchPanel.add(createButton);
 
 		add(searchPanel, BorderLayout.NORTH);
 

@@ -153,9 +153,21 @@ public class RunnerCreateUserForm extends JFrame {
         runner.setStatus(statusCheckBox.isSelected());
         runner.setAddressId(newAddressId);
 
+        // Default values
+        runner.setPlateNumber("");
+        runner.setTasks(null);
+        runner.setEarnings(0.0);
+        runner.setRatings(0.0);
+        runner.setAvailable(false);
+        runner.setCurrentTask(""); 
+        runner.setReviews(null);
+        runner.setLastDeliveredAddress("");
+        runner.setLastDeliveryDate(null);; 
+
         ResponseCode response = RunnerService.createRunner(runner);
         if (response == ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(this, "Runner created successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to create runner", "Error", JOptionPane.ERROR_MESSAGE);
         }
