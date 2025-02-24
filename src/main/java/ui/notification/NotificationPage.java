@@ -4,12 +4,13 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import service.general.SessionControlService;
 import service.notification.NotificationService;
 import dto.NotificationDTO;
+import enumeration.Role;
 
 public class NotificationPage extends JFrame {
     private JComboBox<String> filterComboBox;
@@ -55,21 +56,35 @@ public class NotificationPage extends JFrame {
         String filter = (String) filterComboBox.getSelectedItem();
         // Get all notifications
         List<NotificationDTO> notifications = NotificationService.readAllNotification(SessionControlService.getUser().getId());
+        notifications.sort((n1, n2) -> n2.getTimestamp().compareTo(n1.getTimestamp()));
         // Clear the table
         tableModel.setRowCount(0);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         // Add notifications based on the filter
         for (NotificationDTO notification : notifications) {
             if (filter.equals("All") || (filter.equals("Read") && notification.isRead()) || (filter.equals("Unread") && !notification.isRead())) {
-                tableModel.addRow(new Object[]{notification.getTimestamp(), notification.getTitle(), notification.getMessage()});
+                tableModel.addRow(new Object[]{notification.getTimestamp().format(formatter), notification.getTitle(), notification.getMessage()});
             }
         }
     }
 
     // Load all notifications into the table
     private void loadNotifications() {
+        if (SessionControlService.getRole() == Role.MANAGER) {
+            List<NotificationDTO> notifications = NotificationService.readManagerNotification();
+            notifications.sort((n1, n2) -> n2.getTimestamp().compareTo(n1.getTimestamp()));
+            for (NotificationDTO notification : notifications) {
+                tableModel.addRow(new Object[]{notification.getTimestamp(), notification.getTitle(), notification.getMessage()});
+            }
+            return;
+        }
+        
         List<NotificationDTO> notifications = NotificationService.readAllNotification(SessionControlService.getUser().getId());
+        notifications.sort((n1, n2) -> n2.getTimestamp().compareTo(n1.getTimestamp()));
         for (NotificationDTO notification : notifications) {
             tableModel.addRow(new Object[]{notification.getTimestamp(), notification.getTitle(), notification.getMessage()});
+            notification.setRead(true);
+            NotificationService.updateNotification(notification);
         }
     }
 }

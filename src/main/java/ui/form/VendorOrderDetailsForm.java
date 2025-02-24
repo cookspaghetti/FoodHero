@@ -19,6 +19,7 @@ import service.utils.IdGenerationUtils;
 
 import java.awt.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -60,7 +61,8 @@ public class VendorOrderDetailsForm extends JFrame {
         getContentPane().add(totalAmountField);
 
         getContentPane().add(new JLabel("Placement Time:"));
-        placementTimeField = new JTextField(order.getPlacementTime().toString());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        placementTimeField = new JTextField(order.getPlacementTime().format(formatter));
         placementTimeField.setEditable(false);
         getContentPane().add(placementTimeField);
 
@@ -147,6 +149,11 @@ public class VendorOrderDetailsForm extends JFrame {
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to change the order status?", "Confirm Status Change", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             latestOrder.setStatus((OrderStatus) statusComboBox.getSelectedItem());
+            if (latestOrder.getStatus() == OrderStatus.DELIVERED || latestOrder.getStatus() == OrderStatus.DINE_IN) {
+                latestOrder.setCompletionTime(LocalDateTime.now());
+            } else if (latestOrder.getStatus() == OrderStatus.FAILED || latestOrder.getStatus() == OrderStatus.CANCELLED) {
+                latestOrder.setCompletionTime(null);
+            }
             // Call the service to update the order status
             ResponseCode response = OrderService.updateOrder(latestOrder);
             if (response == ResponseCode.SUCCESS) {

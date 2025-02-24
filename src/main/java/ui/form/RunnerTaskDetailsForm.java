@@ -18,6 +18,7 @@ import service.task.TaskService;
 import service.vendor.VendorService;
 
 import java.awt.*;
+import java.time.LocalDateTime;
 
 public class RunnerTaskDetailsForm extends JFrame {
     private JLabel orderIdLabel, vendorNameLabel, deliveryFeeLabel, taskDetailsLabel;
@@ -109,7 +110,7 @@ public class RunnerTaskDetailsForm extends JFrame {
         RunnerDTO runner = RunnerService.readRunner(SessionControlService.getUser().getId());
 
         // Check if runner is already assigned to a task
-        if (runner.getCurrentTask() != null) {
+        if (runner.getCurrentTask() != null && !runner.getCurrentTask().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Runner is already assigned to a task", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -127,6 +128,7 @@ public class RunnerTaskDetailsForm extends JFrame {
 
         // Update task status
         task.setStatus(TaskStatus.ACCEPTED);
+        task.setAcceptanceTime(LocalDateTime.now());
         ResponseCode response = TaskService.updateTask(task);
         if (response != ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(null, "Failed to accept task", "Error", JOptionPane.ERROR_MESSAGE);
@@ -136,6 +138,7 @@ public class RunnerTaskDetailsForm extends JFrame {
         // Update runner's current task
         runner.setCurrentTask(taskId);
         response = RunnerService.updateRunner(runner);
+        SessionControlService.setSession(runner);
         if (response != ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(null, "Failed to accept task", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -144,6 +147,7 @@ public class RunnerTaskDetailsForm extends JFrame {
         // Update order status
         OrderDTO order = OrderService.readOrder(task.getOrderId());
         order.setStatus(OrderStatus.RUNNER_ASSIGNED);
+        order.setRunnerId(runner.getId());
         response = OrderService.updateOrder(order);
         if (response != ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(null, "Failed to accept task", "Error", JOptionPane.ERROR_MESSAGE);

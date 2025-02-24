@@ -5,6 +5,7 @@ import javax.swing.*;
 import dto.ItemDTO;
 import enumeration.ResponseCode;
 import enumeration.ServiceType;
+import service.general.SessionControlService;
 import service.item.ItemService;
 import service.utils.IdGenerationUtils;
 
@@ -82,11 +83,13 @@ public class VendorCreateItemForm extends JFrame {
         newItem.setDefaultAmount(defaultAmount);
         newItem.setDescription(description);
         newItem.setAvailability(availability);
+        newItem.setVendorId(SessionControlService.getId());
 
         // Call the service to update the item details
         ResponseCode response = ItemService.createItem(newItem);
         if (response == ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(this, "Item created successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to create item", "Error", JOptionPane.ERROR_MESSAGE);
         }

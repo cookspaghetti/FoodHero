@@ -1,0 +1,1 @@
+{"customerAddress":"ADR00007","completionTime":"2025-02-25T00:08:11.864085400","deliveryFee":0.91,"orderId":"ORD00001","acceptanceTime":"2025-02-24T16:15:39.636455200","runnerId":"RUN00001","id":"TAK00001","status":"COMPLETED","taskDetails":"Deliver order ORD00001 to customer"}

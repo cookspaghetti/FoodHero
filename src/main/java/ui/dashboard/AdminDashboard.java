@@ -32,6 +32,10 @@ import java.awt.Font;
 public class AdminDashboard extends JFrame {
 	private AdminDTO admin;
 
+	private JPanel headerPanel;
+	private JLabel welcomeLabel;
+	private JButton logoutButton;
+
 	private String[] activeVendors;
 	private String[] activeRunners;
 	private String[] activeOrders;
@@ -95,7 +99,7 @@ public class AdminDashboard extends JFrame {
 		JMenuItem notificationItem = new JMenuItem("View Notifications");
 		notificationItem.addActionListener(e -> openNotificationPage());
 		notificationMenu.add(notificationItem);
-		
+
 		// Profile Menu
 		JMenu profileMenu = new JMenu("Profile");
 		JMenuItem profileItem = new JMenuItem("Profile Management");
@@ -112,20 +116,37 @@ public class AdminDashboard extends JFrame {
 		setJMenuBar(menuBar);
 
 		// ======= Header Panel (Welcome & Logout) =======
-		JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		JLabel welcomeLabel = new JLabel("Welcome, " + admin.getName());
-		JButton logoutButton = new JButton("Logout");
+		headerPanel = new JPanel(new BorderLayout());
+		JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+		// Style components
+		welcomeLabel = new JLabel("Welcome, " + admin.getName());
+		welcomeLabel.setFont(new Font("Arial", Font.BOLD, 12));
+		logoutButton = new JButton("Logout");
 		logoutButton.setFocusable(false);
 
-		// Logout Button Action
+		// Set fonts and colors
+		Font labelFont = new Font("Arial", Font.PLAIN, 12);
+		welcomeLabel.setFont(labelFont);
+		logoutButton.setFont(labelFont);
+
+		// Add logout action
 		logoutButton.addActionListener(e -> {
+			SessionControlService.clearSession();
 			new LoginInterface().setVisible(true);
 			this.dispose();
 		});
 
-		headerPanel.add(welcomeLabel);
-		headerPanel.add(logoutButton);
+		// Add components to panels
+		leftPanel.add(welcomeLabel);
+		rightPanel.add(logoutButton);
 
+		// Add panels to header
+		headerPanel.add(leftPanel, BorderLayout.WEST);
+		headerPanel.add(rightPanel, BorderLayout.EAST);
+
+		// Add header to frame
 		getContentPane().add(headerPanel, BorderLayout.NORTH);
 
 		// ======= Data Panel =======
@@ -169,26 +190,26 @@ public class AdminDashboard extends JFrame {
 	}
 
 	private void openUserPage(Role role) {
-		
+
 		switch (role) {
-		case ADMIN:
-			new AdminPage().setVisible(true);
-			break;
-		case MANAGER:
-			new ManagerPage().setVisible(true);
-			break;
-		case CUSTOMER:
-			new CustomerPage().setVisible(true);
-			break;
-		case VENDOR:
-			new VendorPage().setVisible(true);
-			break;
-		case RUNNER:
-			new RunnerPage().setVisible(true);
-			break;
-		default:
-			JOptionPane.showMessageDialog(this, "Unknown error occured. Please try again. ");
-			break;
+			case ADMIN:
+				new AdminPage().setVisible(true);
+				break;
+			case MANAGER:
+				new ManagerPage().setVisible(true);
+				break;
+			case CUSTOMER:
+				new CustomerPage().setVisible(true);
+				break;
+			case VENDOR:
+				new VendorPage().setVisible(true);
+				break;
+			case RUNNER:
+				new RunnerPage().setVisible(true);
+				break;
+			default:
+				JOptionPane.showMessageDialog(this, "Unknown error occured. Please try again. ");
+				break;
 		}
 	}
 
@@ -211,7 +232,7 @@ public class AdminDashboard extends JFrame {
 		List<String> activeVendors = new ArrayList<>();
 		for (VendorDTO vendor : vendors) {
 			if (vendor.getOpen()) {
-				activeVendors.add(vendor.getName());
+				activeVendors.add(vendor.getVendorName());
 			}
 		}
 		numActiveVendors = activeVendors.size();
@@ -236,13 +257,15 @@ public class AdminDashboard extends JFrame {
 		List<String> activeOrders = new ArrayList<>();
 		List<OrderDTO> orders = OrderService.readAllOrder();
 		for (OrderDTO order : orders) {
-			if (order.getStatus().equals(OrderStatus.PENDING) || order.getStatus().equals(OrderStatus.PROCESSING) || order.getStatus().equals(OrderStatus.ON_THE_WAY) || 
-				order.getStatus().equals(OrderStatus.READY_FOR_PICKUP)) {
+			if (order.getStatus().equals(OrderStatus.PENDING) || order.getStatus().equals(OrderStatus.PROCESSING)
+					|| order.getStatus().equals(OrderStatus.ON_THE_WAY) 
+					|| order.getStatus().equals(OrderStatus.READY_FOR_PICKUP) 
+					|| order.getStatus().equals(OrderStatus.RUNNER_ASSIGNED)) {
 				activeOrders.add(order.getId());
 			}
 		}
 		numActiveOrders = activeOrders.size();
 		return activeOrders.toArray(new String[0]);
 	}
-	
+
 }

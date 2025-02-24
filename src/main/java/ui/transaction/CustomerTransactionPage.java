@@ -15,6 +15,7 @@ import service.transaction.TransactionService;
 
 import java.awt.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,11 +121,11 @@ public class CustomerTransactionPage extends JFrame {
         transactions.addAll(deductTransactions);
 
         transactions.sort((t1, t2) -> t2.getDate().compareTo(t1.getDate()));
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         for (TransactionDTO transaction : transactions) {
             tableModel.addRow(new Object[] {
                     transaction.getId(),
-                    transaction.getDate(),
+                    transaction.getDate().format(formatter),
                     transaction.getAmount(),
                     transaction.getDescription(),
                     getPaymentMethod(transaction.getId())

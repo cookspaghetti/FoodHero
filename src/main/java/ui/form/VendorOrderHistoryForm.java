@@ -1,6 +1,7 @@
 package ui.form;
 
 import java.awt.GridLayout;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -35,11 +36,12 @@ public class VendorOrderHistoryForm extends JFrame {
         getContentPane().add(new JLabel("Total Amount:"));
         getContentPane().add(new JLabel(String.valueOf(order.getTotalAmount())));
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         getContentPane().add(new JLabel("Placement Time:"));
-        getContentPane().add(new JLabel(order.getPlacementTime().toString()));
+        getContentPane().add(new JLabel(order.getPlacementTime().format(formatter)));
 
         getContentPane().add(new JLabel("Completion Time:"));
-        getContentPane().add(new JLabel(order.getCompletionTime().toString()));
+        getContentPane().add(new JLabel(order.getCompletionTime() == null ? "Not completed" : order.getCompletionTime().format(formatter)));
         
         getContentPane().add(new JLabel("Notes:"));
         getContentPane().add(new JLabel(order.getNotes()));

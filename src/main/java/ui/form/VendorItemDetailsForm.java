@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import dto.ItemDTO;
 import enumeration.ResponseCode;
+import service.general.SessionControlService;
 import service.item.ItemService;
 
 import java.awt.*;
@@ -41,7 +42,7 @@ public class VendorItemDetailsForm extends JFrame {
         getContentPane().add(descriptionField);
 
         getContentPane().add(new JLabel("Availability:"));
-        availabilityComboBox = new JComboBox<>(new String[]{"Active", "Inactive"});
+        availabilityComboBox = new JComboBox<>(new String[] { "Active", "Inactive" });
         availabilityComboBox.setSelectedItem(item.isAvailability() ? "Active" : "Inactive");
         getContentPane().add(availabilityComboBox);
 
@@ -49,7 +50,7 @@ public class VendorItemDetailsForm extends JFrame {
         saveButton.addActionListener(e -> updateItem());
         closeButton = new JButton("Close");
         closeButton.addActionListener(e -> dispose());
-        
+
         getContentPane().add(saveButton);
         getContentPane().add(closeButton);
 
@@ -59,36 +60,59 @@ public class VendorItemDetailsForm extends JFrame {
 
     // Method to update item details
     private void updateItem() {
-        // Get the values from the form
+        // Get values from form
         String name = nameField.getText();
-        double price = Double.parseDouble(priceField.getText());
-        int defaultAmount = Integer.parseInt(defaultAmountField.getText());
         String description = descriptionField.getText();
-        boolean availability = availabilityComboBox.getSelectedItem().equals("Active");
+        String itemId = idField.getText();
 
-        // Validate the values
-        if (name.isEmpty() || price <= 0 || defaultAmount <= 0 || description.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill in all fields with valid values.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (itemId.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Item ID cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Update the item details
-        ItemDTO updatedItem = new ItemDTO();
-        updatedItem.setId(idField.getText());
-        updatedItem.setName(name);
-        updatedItem.setPrice(price);
-        updatedItem.setDefaultAmount(defaultAmount);
-        updatedItem.setDescription(description);
-        updatedItem.setAvailability(availability);
+        double price;
+        int defaultAmount;
+        try {
+            price = Double.parseDouble(priceField.getText());
+            defaultAmount = Integer.parseInt(defaultAmountField.getText());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter valid numeric values for price and default amount.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        // Call the service to update the item details
-        ResponseCode response = ItemService.updateItem(updatedItem);
+        if (name.isEmpty() || description.isEmpty() || price <= 0 || defaultAmount <= 0) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields with valid values.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        boolean availability = "Active".equals(availabilityComboBox.getSelectedItem());
+
+        // Fetch existing item
+        ItemDTO item = ItemService.readItem(SessionControlService.getId(), itemId);
+        if (item == null) {
+            JOptionPane.showMessageDialog(this, "Item not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Update item details
+        item.setName(name);
+        item.setPrice(price);
+        item.setDefaultAmount(defaultAmount);
+        item.setDescription(description);
+        item.setAvailability(availability);
+
+        // Call service to update item
+        ResponseCode response = ItemService.updateItem(item);
         if (response != ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(this, "Failed to update item details.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        // Display a success/failure message
-        JOptionPane.showMessageDialog(this, "Item details updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+        JOptionPane.showMessageDialog(this, "Item details updated successfully.", "Success",
+                JOptionPane.INFORMATION_MESSAGE);
+        dispose();
     }
+
 }

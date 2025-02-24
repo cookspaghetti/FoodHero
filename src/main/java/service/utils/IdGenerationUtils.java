@@ -47,11 +47,11 @@ public class IdGenerationUtils {
 			abbreviation = "ORD";
 			break;
 		case VENDOR_REVIEW:
-			filePath = "src\\main\\resources\\database\\review\\vendor_" + vendorId + ".txt";
+			filePath = "src\\main\\resources\\database\\review\\vendor_" + vendorId + "_review.txt";
 			abbreviation = "VRE";
 			break;
 		case RUNNER_REVIEW:
-			filePath = "src\\main\\resources\\database\\review\\runner_" + runnerId + ".txt";
+			filePath = "src\\main\\resources\\database\\review\\runner_" + runnerId + "_review.txt";
 			abbreviation = "RRE";
 			break;
 		case ADD_TRANSACTION:

@@ -68,12 +68,16 @@ public class OrderService {
 				System.err.println("Failed to send notification to vendor");
 			}
 
+			if (order.getDeliveryAddress() == null) {
+				return ResponseCode.SUCCESS;
+			}
+
 			// Create task for runner
 			TaskDTO task = new TaskDTO();
-			task.setOrderId(order.getId());
+			task.setOrderId(json.getString("id"));
 			task.setRunnerId(RunnerService.assignRunner(order.getDeliveryAddress()));
 			task.setStatus(TaskStatus.PENDING);
-			task.setTaskDetails("Deliver order " + order.getId() + " to " + order.getDeliveryAddress());
+			task.setTaskDetails("Deliver order " + json.getString("id") + " to customer");
 			task.setCustomerAddress(order.getDeliveryAddress());
 			task.setDeliveryFee(order.getDeliveryFee());
 			if (task.getRunnerId() == null) {
@@ -107,16 +111,16 @@ public class OrderService {
 					order.setId(json.getString("id"));
 					order.setCustomerId(json.getString("customerId"));
 					order.setVendorId(json.getString("vendorId"));
-					order.setRunnerId(json.getString("runnerId"));
+					order.setRunnerId(json.optString("runnerId", null));
 					order.setStatus(OrderStatus.valueOf(json.getString("status")));
 					order.setTotalAmount(json.getDouble("totalAmount"));
 					order.setDeliveryFee(json.getDouble("deliveryFee"));
 					order.setNotes(json.getString("notes"));
-					order.setDeliveryAddress(json.getString("deliveryAddress"));
+					order.setDeliveryAddress(json.optString("deliveryAddress", null));
 
 					// Parse placementTime and completionTime
 					order.setPlacementTime(LocalDateTime.parse(json.getString("placementTime")));
-					if (json.has("completionTime") && !json.getString("completionTime").isEmpty()) {
+					if (json.has("completionTime") && !json.isNull("completionTime") && !json.getString("completionTime").isEmpty()) {
 						order.setCompletionTime(LocalDateTime.parse(json.getString("completionTime")));
 					}
 
@@ -157,16 +161,16 @@ public class OrderService {
 					order.setId(json.getString("id"));
 					order.setCustomerId(json.getString("customerId"));
 					order.setVendorId(json.getString("vendorId"));
-					order.setRunnerId(json.getString("runnerId"));
+					order.setRunnerId(json.optString("runnerId", null));
 					order.setStatus(OrderStatus.valueOf(json.getString("status")));
 					order.setTotalAmount(json.getDouble("totalAmount"));
 					order.setDeliveryFee(json.getDouble("deliveryFee"));
 					order.setNotes(json.getString("notes"));
-					order.setDeliveryAddress(json.getString("deliveryAddress"));
+					order.setDeliveryAddress(json.optString("deliveryAddress", null));
 
 					// Parse placementTime and completionTime
 					order.setPlacementTime(LocalDateTime.parse(json.getString("placementTime")));
-					if (json.has("completionTime") && !json.getString("completionTime").isEmpty()) {
+					if (json.has("completionTime") && !json.isNull("completionTime") && !json.getString("completionTime").isEmpty()) {
 						order.setCompletionTime(LocalDateTime.parse(json.getString("completionTime")));
 					}
 
@@ -206,16 +210,16 @@ public class OrderService {
 					order.setId(json.getString("id"));
 					order.setCustomerId(json.getString("customerId"));
 					order.setVendorId(json.getString("vendorId"));
-					order.setRunnerId(json.getString("runnerId"));
+					order.setRunnerId(json.optString("runnerId", null));
 					order.setStatus(OrderStatus.valueOf(json.getString("status")));
 					order.setTotalAmount(json.getDouble("totalAmount"));
 					order.setDeliveryFee(json.getDouble("deliveryFee"));
 					order.setNotes(json.getString("notes"));
-					order.setDeliveryAddress(json.getString("deliveryAddress"));
+					order.setDeliveryAddress(json.optString("deliveryAddress", null));
 
 					// Parse placementTime and completionTime
 					order.setPlacementTime(LocalDateTime.parse(json.getString("placementTime")));
-					if (json.has("completionTime") && !json.getString("completionTime").isEmpty()) {
+					if (json.has("completionTime") && !json.isNull("completionTime") && !json.getString("completionTime").isEmpty()) {
 						order.setCompletionTime(LocalDateTime.parse(json.getString("completionTime")));
 					}
 
@@ -264,7 +268,7 @@ public class OrderService {
 
 					// Parse placementTime and completionTime
 					order.setPlacementTime(LocalDateTime.parse(json.getString("placementTime")));
-					if (json.has("completionTime") && !json.getString("completionTime").isEmpty()) {
+					if (json.has("completionTime") && !json.isNull("completionTime") && !json.getString("completionTime").isEmpty()) {
 						order.setCompletionTime(LocalDateTime.parse(json.getString("completionTime")));
 					}
 
@@ -303,7 +307,7 @@ public class OrderService {
 				order.setId(json.getString("id"));
 				order.setCustomerId(json.getString("customerId"));
 				order.setVendorId(json.getString("vendorId"));
-				order.setRunnerId(json.getString("runnerId"));
+				order.setRunnerId(json.optString("runnerId", null));
 
 				// Convert items (stored as JSON) to HashMap<String, Integer>
 				JSONObject itemsJson = json.getJSONObject("items");
@@ -319,12 +323,12 @@ public class OrderService {
 				order.setPlacementTime(LocalDateTime.parse(json.getString("placementTime")));
 
 				// Optional fields
-				if (json.has("completionTime") && !json.isNull("completionTime")) {
+				if (json.has("completionTime") && !json.isNull("completionTime") && !json.getString("completionTime").isEmpty()) {
 					order.setCompletionTime(LocalDateTime.parse(json.getString("completionTime")));
 				}
 
 				order.setNotes(json.optString("notes", ""));
-				order.setDeliveryAddress(json.getString("deliveryAddress"));
+				order.setDeliveryAddress(json.optString("deliveryAddress", null));
 
 				orders.add(order); // Add to the list
 			}
@@ -409,7 +413,7 @@ public class OrderService {
 	}
 
 	// Method to delete an order from the text file
-	public ResponseCode deleteOrder(String id) {
+	public static ResponseCode deleteOrder(String id) {
 
 		String filePath = SYS_PATH + "order.txt";
 

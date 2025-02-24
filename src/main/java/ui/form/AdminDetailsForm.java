@@ -7,11 +7,13 @@ import dto.AdminDTO;
 import enumeration.ResponseCode;
 import service.address.AddressService;
 import service.admin.AdminService;
+import service.distance.DistanceService;
 
 import java.awt.*;
 
 public class AdminDetailsForm extends JFrame {
-    private JTextField idField, nameField, phoneField, emailField, passwordField;
+    private JTextField idField, nameField, phoneField, emailField;
+    private JPasswordField passwordField;
     private JCheckBox statusCheckBox;
     private JButton saveButton, closeButton, editAddressButton;
 
@@ -115,16 +117,26 @@ public class AdminDetailsForm extends JFrame {
         dialog.add(closeButton);
 
         saveButton.addActionListener(e -> {
+            // validation
+            if (streetField.getText().isEmpty() || cityField.getText().isEmpty() || stateField.getText().isEmpty()
+                    || postalCodeField.getText().isEmpty() || countryField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             // Update address object
-            AddressDTO updatedAddress = new AddressDTO();
-            updatedAddress.setId(address.getId());
-            updatedAddress.setStreet(streetField.getText());
-            updatedAddress.setCity(cityField.getText());
-            updatedAddress.setState(stateField.getText());
-            updatedAddress.setPostalCode(postalCodeField.getText());
-            updatedAddress.setCountry(countryField.getText());
+            address.setStreet(streetField.getText());
+            address.setCity(cityField.getText());
+            address.setState(stateField.getText());
+            address.setPostalCode(postalCodeField.getText());
+            address.setCountry(countryField.getText());
 
-            ResponseCode response = AddressService.updateAddress(updatedAddress);
+            // verification using api
+            if (!DistanceService.verifyAddress(address)) {
+                JOptionPane.showMessageDialog(this, "Invalid address", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            ResponseCode response = AddressService.updateAddress(address);
             if (response == ResponseCode.SUCCESS) {
                 JOptionPane.showMessageDialog(this, "Address updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -143,30 +155,51 @@ public class AdminDetailsForm extends JFrame {
     // Update admin object with new values
     private void updateAdmin(AdminDTO admin) {
         // Check if the fields are empty
-        if (idField.getText().isEmpty() || nameField.getText().isEmpty() || phoneField.getText().isEmpty() || emailField.getText().isEmpty() || passwordField.getText().isEmpty()) {
+        if (nameField.getText().isEmpty() || phoneField.getText().isEmpty() || emailField.getText().isEmpty()
+                || passwordField.getPassword().length == 0) {
             JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Check if any fields is modified
-        if (idField.getText().equals(admin.getId()) && nameField.getText().equals(admin.getName()) && phoneField.getText().equals(admin.getPhoneNumber()) && emailField.getText().equals(admin.getEmailAddress()) && passwordField.getText().equals(admin.getPassword()) && statusCheckBox.isSelected() == admin.getStatus()) {
+        if (nameField.getText().equals(admin.getName()) && phoneField.getText().equals(admin.getPhoneNumber())
+                && emailField.getText().equals(admin.getEmailAddress())
+                && statusCheckBox.isSelected() == admin.getStatus()
+                && passwordField.getPassword().equals(admin.getPassword().toCharArray())) {
             JOptionPane.showMessageDialog(this, "No changes made", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
-        AdminDTO updatedAdmin = new AdminDTO();
-        updatedAdmin.setId(admin.getId());
-        updatedAdmin.setName(nameField.getText());
-        updatedAdmin.setPhoneNumber(phoneField.getText());
-        updatedAdmin.setAddressId(admin.getAddressId());
-        updatedAdmin.setEmailAddress(emailField.getText());
-        updatedAdmin.setPassword(passwordField.getText());
-        updatedAdmin.setStatus(statusCheckBox.isSelected());
+        // check phone number
+        if (!phoneField.getText().matches("\\d{10}") && !phoneField.getText().matches("\\d{11}")) {
+            JOptionPane.showMessageDialog(this, "Invalid phone number", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // check email
+        if (!emailField.getText().matches("^(.+)@(.+)$")) {
+            JOptionPane.showMessageDialog(this, "Invalid email address", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // password length
+        if (passwordField.getPassword().length < 8) {
+            JOptionPane.showMessageDialog(this, "Password must be at least 8 characters", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        admin.setName(nameField.getText());
+        admin.setPhoneNumber(phoneField.getText());
+        admin.setEmailAddress(emailField.getText());
+        admin.setPassword(String.valueOf(passwordField.getPassword()));
+        admin.setStatus(statusCheckBox.isSelected());
 
         // Update admin object
-        ResponseCode response = AdminService.updateAdmin(updatedAdmin);
+        ResponseCode response = AdminService.updateAdmin(admin);
         if (response == ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(this, "Admin updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to update admin", "Error", JOptionPane.ERROR_MESSAGE);
         }

@@ -111,7 +111,8 @@ public class DistanceService {
         }
 
         double distance = getDistance(address1, address2);
-        return distance * 0.5; // RM0.50 per kilometer
+        double fee = distance * 0.5; // RM0.50 per kilometer
+        return Math.round(fee * 100.0) / 100.0; // Round to 2 decimal places
     }
 
     

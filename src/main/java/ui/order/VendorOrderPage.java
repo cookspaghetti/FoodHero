@@ -11,9 +11,11 @@ import service.order.OrderService;
 import service.processor.ItemProcessor;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
+import ui.utils.MultiLineRenderer;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -23,6 +25,8 @@ public class VendorOrderPage extends JFrame {
 	private JTable orderTable;
 	private DefaultTableModel tableModel;
 	private JScrollPane tableScrollPane;
+
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
 	public VendorOrderPage() {
 		setTitle("Vendor Orders");
@@ -64,6 +68,9 @@ public class VendorOrderPage extends JFrame {
 		orderTable.getColumnModel().getColumn(6).setCellRenderer(new ButtonRenderer(ButtonMode.UPDATE));
 		orderTable.getColumnModel().getColumn(6).setCellEditor(new ButtonEditor(orderTable, ButtonMode.UPDATE));
 
+		// Apply multi-line rendering to the table
+		orderTable.getColumnModel().getColumn(2).setCellRenderer(new MultiLineRenderer());
+
 		loadOrders();
 
 		setVisible(true);
@@ -80,9 +87,9 @@ public class VendorOrderPage extends JFrame {
 		for (OrderDTO order : orders) {
 			Object[] rowData = {
 				order.getId(),
-				order.getPlacementTime(),
-				order.getCompletionTime(),
+				order.getPlacementTime().format(formatter),
 				processItemList(order.getVendorId(), order.getItems()),
+				order.getNotes(),
 				order.getTotalAmount(),
 				order.getStatus(),
 				"View History"

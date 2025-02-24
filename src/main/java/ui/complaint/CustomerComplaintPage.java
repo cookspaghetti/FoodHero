@@ -18,13 +18,14 @@ import enumeration.ButtonMode;
 import enumeration.ComplaintStatus;
 import service.complaint.ComplaintService;
 import service.general.SessionControlService;
+import ui.form.CustomerCreateComplaintForm;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
 import ui.utils.MultiLineRenderer;
 
 public class CustomerComplaintPage extends JFrame {
 	private JTextField searchField;
-	private JButton searchButton;
+	private JButton searchButton, createButton;
 	private JComboBox<ComplaintStatus> statusFilter;
 	private JTable complaintTable;
 	private JScrollPane tableScrollPane;
@@ -56,11 +57,17 @@ public class CustomerComplaintPage extends JFrame {
 			filterByStatus((ComplaintStatus) statusFilter.getSelectedItem());
 		});
 
+		createButton = new JButton("Create Complaint");
+		createButton.addActionListener(e -> {
+			new CustomerCreateComplaintForm();
+		});
+
 		searchPanel.add(new JLabel("Search Complaint:"));
 		searchPanel.add(searchField);
 		searchPanel.add(searchButton);
 		searchPanel.add(new JLabel("Filter by Status:"));
 		searchPanel.add(statusFilter);
+		searchPanel.add(createButton);
 		add(searchPanel, BorderLayout.NORTH);
 
 		// Table Panel
@@ -104,6 +111,10 @@ public class CustomerComplaintPage extends JFrame {
 	private Object[][] getComplaintData() {
 		List<ComplaintDTO> complaints = ComplaintService.readCustomerComplaints(SessionControlService.getUser().getId());
 		Object[][] data = new Object[complaints.size()][6];
+		for (int i = 0; i < complaints.size(); i++) {
+			ComplaintDTO complaint = complaints.get(i);
+			data[i] = new Object[] {complaint.getId(), complaint.getCustomerId(), complaint.getOrderId(), complaint.getDescription(), complaint.getStatus(), "View"};
+		}
 		return data;
 	}
 

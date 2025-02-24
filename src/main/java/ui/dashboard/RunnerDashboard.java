@@ -2,6 +2,7 @@ package ui.dashboard;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -125,18 +127,37 @@ public class RunnerDashboard extends JFrame {
 		setJMenuBar(menuBar);
 
 		// ======= Header Panel (Welcome & Logout) =======
-		headerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		headerPanel = new JPanel(new BorderLayout());
+		JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+		// Style components
 		welcomeLabel = new JLabel("Welcome, " + runner.getName());
+		welcomeLabel.setFont(new Font("Arial", Font.BOLD, 12));
 		logoutButton = new JButton("Logout");
 		logoutButton.setFocusable(false);
 
+		// Set fonts and colors
+		Font labelFont = new Font("Arial", Font.PLAIN, 12);
+		welcomeLabel.setFont(labelFont);
+		logoutButton.setFont(labelFont);
+
+		// Add logout action
 		logoutButton.addActionListener(e -> {
+			SessionControlService.clearSession();
 			new LoginInterface().setVisible(true);
 			this.dispose();
 		});
 
-		headerPanel.add(welcomeLabel);
-		headerPanel.add(logoutButton);
+		// Add components to panels
+		leftPanel.add(welcomeLabel);
+		rightPanel.add(logoutButton);
+
+		// Add panels to header
+		headerPanel.add(leftPanel, BorderLayout.WEST);
+		headerPanel.add(rightPanel, BorderLayout.EAST);
+
+		// Add header to frame
 		getContentPane().add(headerPanel, BorderLayout.NORTH);
 
 		// ======= Pending Orders Table =======
@@ -160,12 +181,6 @@ public class RunnerDashboard extends JFrame {
 		// Render vendor address cell multi line
 		pendingOrdersTable.getColumnModel().getColumn(2).setCellRenderer(new MultiLineRenderer());
 
-		// Adding sample data
-		Object[][] data = getPendingTasks();
-		for (Object[] row : data) {
-			tableModel.addRow(row);
-		}
-
 		// Rendering buttons on Actions column
 		pendingOrdersTable.getColumn("Actions").setCellRenderer(new ButtonRenderer(ButtonMode.VIEW));
 		pendingOrdersTable.getColumn("Actions").setCellEditor(new ButtonEditor(pendingOrdersTable, ButtonMode.VIEW));
@@ -174,6 +189,12 @@ public class RunnerDashboard extends JFrame {
 		pendingOrdersPanel.add(pendingOrdersLabel, BorderLayout.NORTH);
 		pendingOrdersPanel.add(tableScrollPane, BorderLayout.CENTER);
 		getContentPane().add(pendingOrdersPanel, BorderLayout.CENTER);
+
+		// Adding data
+		Object[][] data = getPendingTasks();
+		for (Object[] row : data) {
+			tableModel.addRow(row);
+		}
 	}
 
 	private void showDashboard() {
@@ -194,6 +215,11 @@ public class RunnerDashboard extends JFrame {
 	}
 
 	private void openRunnerCurrentTaskPage() {
+		TaskDTO task = TaskService.readTask(SessionControlService.getCurrentTask());
+		if (task == null) {
+			JOptionPane.showMessageDialog(this, "No current task found", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		new RunnerCurrentTaskForm(TaskService.readTask(SessionControlService.getCurrentTask())).setVisible(true);
 	}
 
@@ -210,41 +236,60 @@ public class RunnerDashboard extends JFrame {
 		List<TaskDTO> tasks = TaskService.readAllTask();
 		List<Object[]> data = new ArrayList<>();
 
+		if (tasks == null || tasks.isEmpty()) {
+			System.out.println("No tasks found");
+			pendingOrdersLabel.setText("Pending Orders (0)");
+			return new Object[0][6];
+		}
+
 		for (TaskDTO task : tasks) {
-			if (task.getStatus() == TaskStatus.PENDING && task.getRunnerId() == null) {
-				// Read order, ensuring it's not null
-				OrderDTO order = OrderService.readOrder(task.getOrderId());
-				if (order == null) {
-					System.err.println("Order not found for task ID: " + task.getId());
-					continue;
+			// Check if task is pending and belongs to current runner
+			if (task != null && task.getStatus() == TaskStatus.PENDING
+					&& task.getRunnerId().equals(runner.getId())) {
+
+				try {
+					// Read order
+					OrderDTO order = OrderService.readOrder(task.getOrderId());
+					if (order == null) {
+						System.err.println("Order not found for task: " + task.getId());
+						continue;
+					}
+
+					// Read vendor
+					VendorDTO vendor = VendorService.readVendor(order.getVendorId());
+					if (vendor == null) {
+						System.err.println("Vendor not found for order: " + order.getId());
+						continue;
+					}
+
+					// Read vendor address
+					AddressDTO address = AddressService.getAddressById(vendor.getAddressId());
+					String vendorAddress = address != null ? AddressService.concatAddress(address)
+							: "Address not found";
+
+					// Create row data
+					Object[] row = new Object[] {
+							task.getId(), // Task ID
+							vendor.getVendorName(), // Vendor Name
+							vendorAddress, // Vendor Address
+							order.getPlacementTime(), // Placement Time
+							task.getStatus().toString(), // Status
+							"View" // Actions
+					};
+					data.add(row);
+
+				} catch (Exception e) {
+					System.err.println("Error processing task " + task.getId() + ": " + e.getMessage());
+					e.printStackTrace();
 				}
-
-				// Read vendor, ensuring it's not null
-				VendorDTO vendor = VendorService.readVendor(order.getVendorId());
-				if (vendor == null) {
-					System.err.println("Vendor not found for order ID: " + order.getId());
-					continue;
-				}
-
-				// Read address, ensuring it's not null
-				AddressDTO address = AddressService.getAddressById(vendor.getAddressId());
-				String vendorAddress = (address != null) ? AddressService.concatAddress(address) : "N/A";
-
-				// Add row to data
-				Object[] row = {
-						task.getId(),
-						vendor.getName(),
-						vendorAddress,
-						order.getPlacementTime(),
-						task.getStatus(),
-						"View"
-				};
-				data.add(row);
 			}
 		}
-		
+
+		// Update label with count
 		pendingOrdersLabel.setText("Pending Orders (" + data.size() + ")");
-		return data.toArray(new Object[0][6]);
+
+		// Convert list to array
+		return data.toArray(new Object[data.size()][6]);
 	}
 
 }

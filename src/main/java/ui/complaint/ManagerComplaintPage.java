@@ -94,6 +94,10 @@ public class ManagerComplaintPage extends JFrame {
 	private Object[][] getComplaintData() {
 		List<ComplaintDTO> complaints = ComplaintService.readAllComplaint();
 		Object[][] data = new Object[complaints.size()][6];
+		for (int i = 0; i < complaints.size(); i++) {
+			ComplaintDTO complaint = complaints.get(i);
+			data[i] = new Object[] {complaint.getId(), complaint.getCustomerId(), complaint.getOrderId(), complaint.getDescription(), complaint.getStatus(), "View"};
+		}
 		return data;
 	}
 

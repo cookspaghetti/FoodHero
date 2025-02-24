@@ -11,15 +11,18 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import dto.NotificationDTO;
 import dto.TaskDTO;
 import enumeration.ResponseCode;
 import enumeration.ServiceType;
 import enumeration.TaskStatus;
 import service.utils.IdGenerationUtils;
+import service.notification.NotificationService;
+import service.runner.RunnerService;
 
 public class TaskService {
 
-	private static final String SYS_PATH = "src\\main\\resources\\database\\";
+	private static final String SYS_PATH = "src\\main\\resources\\database\\task\\";
 
 	// Method to create a task and save to a text file in JSON format
 	public static ResponseCode createTask(TaskDTO task) {
@@ -40,6 +43,18 @@ public class TaskService {
 		// Write JSON to text file
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
+
+			// send notification
+			NotificationDTO notification = new NotificationDTO();
+			notification.setUserId(task.getRunnerId());
+			notification.setMessage("New task assigned with ID: " + json.getString("id"));
+			notification.setRead(false);
+			notification.setTimestamp(LocalDateTime.now());
+			notification.setTitle("New Task");
+			ResponseCode response = NotificationService.createNotification(notification);
+			if (response != ResponseCode.SUCCESS) {
+				System.err.println("Failed to send notification for new task.");
+			}
 			System.out.println("Task created successfully!");
 			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
@@ -184,7 +199,15 @@ public class TaskService {
 				if (json.getString("id").equals(updatedTask.getId())) {
 					// Updating task details
 					json.put("orderId", updatedTask.getOrderId());
-					json.put("runnerId", updatedTask.getRunnerId());
+
+					if (updatedTask.getRunnerId().equals("")) {
+						System.out.println("Assigning runner to task with ID " + updatedTask.getId());
+						json.put("runnerId", RunnerService.assignRunner(updatedTask.getCustomerAddress()));
+					} else {
+						System.out.println("Runner already assigned to task with ID " + updatedTask.getId());
+						json.put("runnerId", updatedTask.getRunnerId());
+					}
+					
 					json.put("status", updatedTask.getStatus());
 					json.put("taskDetails", updatedTask.getTaskDetails());
 					json.put("deliveryFee", updatedTask.getDeliveryFee());

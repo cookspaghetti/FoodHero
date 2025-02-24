@@ -16,6 +16,7 @@ import service.vendor.VendorService;
 
 import java.awt.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class RunnerTaskHistoryPage extends JFrame {
@@ -24,6 +25,8 @@ public class RunnerTaskHistoryPage extends JFrame {
     private JButton filterButton;
     private JComboBox<TaskStatus> statusFilter;
     private DefaultTableModel tableModel;
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     private RunnerDTO runner = (RunnerDTO) SessionControlService.getUser();
 
@@ -60,7 +63,7 @@ public class RunnerTaskHistoryPage extends JFrame {
         taskTable.getColumn("Order ID").setPreferredWidth(40);
         taskTable.getColumn("Vendor Name").setPreferredWidth(100);
         taskTable.getColumn("Task Details").setPreferredWidth(100);
-        taskTable.getColumn("Delivery Fee").setPreferredWidth(60);
+        taskTable.getColumn("Delivery Fee").setPreferredWidth(50);
       
         add(new JScrollPane(taskTable), BorderLayout.CENTER);
 
@@ -80,8 +83,8 @@ public class RunnerTaskHistoryPage extends JFrame {
                     task.getTaskDetails(),
                     task.getStatus(),
                     task.getDeliveryFee(),
-                    task.getAcceptanceTime(),
-                    task.getCompletionTime()
+                    task.getAcceptanceTime().format(formatter),
+                    task.getCompletionTime() == null ? "" : task.getCompletionTime().format(formatter)
             });
         }
     }
@@ -106,8 +109,8 @@ public class RunnerTaskHistoryPage extends JFrame {
                         task.getTaskDetails(),
                         task.getStatus(),
                         task.getDeliveryFee(),
-                        task.getAcceptanceTime(),
-                        task.getCompletionTime()
+                        task.getAcceptanceTime().format(formatter),
+                        task.getCompletionTime() == null ? "" : task.getCompletionTime().format(formatter)
                 });
             }
         }
@@ -128,8 +131,8 @@ public class RunnerTaskHistoryPage extends JFrame {
                         task.getTaskDetails(),
                         task.getStatus(),
                         task.getDeliveryFee(),
-                        task.getAcceptanceTime(),
-                        task.getCompletionTime()
+                        task.getAcceptanceTime().format(formatter),
+                        task.getCompletionTime() == null ? "" : task.getCompletionTime().format(formatter)
                 });
             }
         }

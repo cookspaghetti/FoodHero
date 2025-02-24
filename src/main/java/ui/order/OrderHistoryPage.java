@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,8 @@ public class OrderHistoryPage extends JFrame {
 	private JTable orderTable;
 	private DefaultTableModel tableModel;
 	private JScrollPane tableScrollPane;
+
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
 	public OrderHistoryPage() {
 		setTitle("Order History");
@@ -101,8 +104,8 @@ public class OrderHistoryPage extends JFrame {
 		for (OrderDTO order : orders) {
 			Object[] rowData = {
 				order.getId(),
-				order.getPlacementTime(),
-				order.getCompletionTime(),
+				order.getPlacementTime().format(formatter),
+				order.getCompletionTime() == null ? "" : order.getCompletionTime().format(formatter),
 				processItemList(order.getVendorId(), order.getItems()),
 				order.getTotalAmount(),
 				order.getStatus(),
@@ -122,8 +125,8 @@ public class OrderHistoryPage extends JFrame {
 			if (order.getStatus() == selectedStatus) {
 				Object[] rowData = {
 					order.getId(),
-					order.getPlacementTime(),
-					order.getCompletionTime(),
+					order.getPlacementTime().format(formatter),
+					order.getCompletionTime() == null ? "" : order.getCompletionTime().format(formatter),
 					processItemList(order.getVendorId(), order.getItems()),
 					order.getTotalAmount(),
 					order.getStatus(),
@@ -144,8 +147,8 @@ public class OrderHistoryPage extends JFrame {
 			if (isWithinTimeRange(order.getPlacementTime(), selectedTimeRange)) {
 				Object[] rowData = {
 					order.getId(),
-					order.getPlacementTime(),
-					order.getCompletionTime(),
+					order.getPlacementTime().format(formatter),
+					order.getCompletionTime() == null ? "" : order.getCompletionTime().format(formatter),
 					processItemList(order.getVendorId(), order.getItems()),
 					order.getTotalAmount(),
 					order.getStatus(),

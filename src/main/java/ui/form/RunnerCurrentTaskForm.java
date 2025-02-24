@@ -1,6 +1,7 @@
 package ui.form;
 
 import java.awt.GridLayout;
+import java.time.LocalDateTime;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -154,13 +155,36 @@ public class RunnerCurrentTaskForm extends JFrame {
         }
         
         // Method to update order status and runner's current task if task is completed
+        if (statusComboBox.getSelectedItem() == TaskStatus.IN_PROGRESS) {
+            // Update order status
+            OrderDTO order = OrderService.readOrder(task.getOrderId());
+            order.setStatus(OrderStatus.ON_THE_WAY);
+            response = OrderService.updateOrder(order);
+            if (response != ResponseCode.SUCCESS) {
+                JOptionPane.showMessageDialog(null, "Failed to update order status", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Task status updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
+        }
         if (statusComboBox.getSelectedItem() == TaskStatus.COMPLETED) {
             // Update order status
             OrderDTO order = OrderService.readOrder(task.getOrderId());
             order.setStatus(OrderStatus.DELIVERED);
+            order.setCompletionTime(LocalDateTime.now());
             response = OrderService.updateOrder(order);
             if (response != ResponseCode.SUCCESS) {
                 JOptionPane.showMessageDialog(null, "Failed to update order status", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Update task status
+            task.setStatus(TaskStatus.COMPLETED);
+            task.setCompletionTime(LocalDateTime.now());
+            response = TaskService.updateTask(task);
+            if (response != ResponseCode.SUCCESS) {
+                JOptionPane.showMessageDialog(null, "Failed to update task status", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             
@@ -175,6 +199,7 @@ public class RunnerCurrentTaskForm extends JFrame {
             }
         } else {
             JOptionPane.showMessageDialog(null, "Task status updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         }
     }
 }

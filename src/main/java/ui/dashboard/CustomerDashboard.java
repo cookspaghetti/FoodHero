@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import dto.CustomerDTO;
 import dto.OrderDTO;
+import dto.VendorDTO;
 import enumeration.ButtonMode;
 import enumeration.OrderStatus;
 import service.general.SessionControlService;
@@ -27,13 +28,13 @@ import ui.utils.ButtonRenderer;
 import ui.vendor.CustomerVendorPage;
 
 public class CustomerDashboard extends JFrame {
-	private CustomerDTO customer;
-    
+    private CustomerDTO customer;
+
     // UI Components
     private JMenuBar menuBar;
     private JMenu homeMenu, vendorMenu, orderMenu, transactionMenu, complaintMenu, notificationMenu, profileMenu;
-    private JMenuItem dashboardItem, viewVendorsItem, orderManagementItem, transactionManagementItem, 
-                      complaintManagementItem, notificationItem, editProfileItem;
+    private JMenuItem dashboardItem, viewVendorsItem, orderManagementItem, transactionManagementItem,
+            complaintManagementItem, notificationItem, editProfileItem;
     private JPanel headerPanel, activeOrdersPanel;
     private JLabel balanceLabel, welcomeLabel, activeOrdersLabel;
     private JButton logoutButton;
@@ -108,20 +109,39 @@ public class CustomerDashboard extends JFrame {
         setJMenuBar(menuBar);
 
         // ======= Header Panel (Welcome & Logout) =======
-        headerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        balanceLabel = new JLabel("Account Balance: " + customer.getCredit());
+        headerPanel = new JPanel(new BorderLayout());
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+        // Style components
+        balanceLabel = new JLabel(String.format("Balance: RM%.2f", customer.getCredit()));
         welcomeLabel = new JLabel("Welcome, " + customer.getName());
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 12));
         logoutButton = new JButton("Logout");
         logoutButton.setFocusable(false);
 
+        // Set fonts and colors
+        Font labelFont = new Font("Arial", Font.PLAIN, 12);
+        balanceLabel.setFont(labelFont);
+        logoutButton.setFont(labelFont);
+
+        // Add logout action
         logoutButton.addActionListener(e -> {
+            SessionControlService.clearSession(); // Clear session if you have this method
             new LoginInterface().setVisible(true);
             this.dispose();
         });
 
-        headerPanel.add(balanceLabel);
-        headerPanel.add(welcomeLabel);
-        headerPanel.add(logoutButton);
+        // Add components to panels
+        leftPanel.add(welcomeLabel);
+        rightPanel.add(balanceLabel);
+        rightPanel.add(logoutButton);
+
+        // Add panels to header
+        headerPanel.add(leftPanel, BorderLayout.WEST);
+        headerPanel.add(rightPanel, BorderLayout.EAST);
+
+        // Add header to frame
         getContentPane().add(headerPanel, BorderLayout.NORTH);
 
         // ======= Active Orders Table =======
@@ -157,90 +177,123 @@ public class CustomerDashboard extends JFrame {
         });
 
         // Rendering buttons on Actions column
-        activeOrdersTable.getColumn("Actions").setCellRenderer(new ButtonRenderer(ButtonMode.VIEW));
-        activeOrdersTable.getColumn("Actions").setCellEditor(new ButtonEditor(activeOrdersTable, ButtonMode.VIEW));
+        activeOrdersTable.getColumn("Actions").setCellRenderer(new ButtonRenderer(ButtonMode.VIEWORDER));
+        activeOrdersTable.getColumn("Actions").setCellEditor(new ButtonEditor(activeOrdersTable, ButtonMode.VIEWORDER));
 
         tableScrollPane = new JScrollPane(activeOrdersTable);
         activeOrdersPanel.add(activeOrdersLabel, BorderLayout.NORTH);
         activeOrdersPanel.add(tableScrollPane, BorderLayout.CENTER);
         getContentPane().add(activeOrdersPanel, BorderLayout.CENTER);
-	}
+    }
 
-	// Menu actions
-	private void showDashboard() {
-		this.dispose();
-		new CustomerDashboard((CustomerDTO) SessionControlService.getUser()).setVisible(true);
-	}
+    // Menu actions
+    private void showDashboard() {
+        this.dispose();
+        new CustomerDashboard((CustomerDTO) SessionControlService.getUser()).setVisible(true);
+    }
 
-	private void openVendorPage() {
-		new CustomerVendorPage().setVisible(true);
-	}
+    private void openVendorPage() {
+        new CustomerVendorPage().setVisible(true);
+    }
 
-	private void openOrderPage() {
-		new CustomerOrderPage().setVisible(true);
-	}
+    private void openOrderPage() {
+        new CustomerOrderPage().setVisible(true);
+    }
 
-	private void openTransactionPage() {
-		new CustomerTransactionPage().setVisible(true);
-	}
+    private void openTransactionPage() {
+        new CustomerTransactionPage().setVisible(true);
+    }
 
-	private void openComplaintPage() {
-		new CustomerComplaintPage().setVisible(true);
-	}
+    private void openComplaintPage() {
+        new CustomerComplaintPage().setVisible(true);
+    }
 
-	private void openNotificationPage() {
-		new NotificationPage().setVisible(true);
-	}
+    private void openNotificationPage() {
+        new NotificationPage().setVisible(true);
+    }
 
-	private void openProfilePage() {
-		new CustomerProfilePage((CustomerDTO) SessionControlService.getUser()).setVisible(true);
-	}
+    private void openProfilePage() {
+        new CustomerProfilePage((CustomerDTO) SessionControlService.getUser()).setVisible(true);
+    }
 
-	// Populating the table
-	private Object[][] getActiveOrders() {
-		List<OrderDTO> orders = OrderService.readCustomerOrders(customer.getId());
-		Object[][] data = new Object[orders.size()][7];
-		for (int i = 0; i < orders.size(); i++) {
-			OrderDTO order = orders.get(i);
-			data[i][0] = order.getId(); // Order ID
-			data[i][1] = VendorService.readVendor(order.getVendorId()).getVendorName(); // Vendor Name
-			data[i][2] = VendorService.readVendor(order.getVendorId()).getVendorType(); // Vendor Type
-			data[i][3] = processItemList(order.getVendorId(), order.getItems()); // Item
-			data[i][4] = getProgress(order.getStatus()); // Progress
-			data[i][5] = order.getStatus(); // Status
-			data[i][6] = "View"; // Actions
-		}
-		activeOrdersLabel.setText("Active Orders (" + orders.size() + ")");
-		return data;
-	}
+    // Populating the table
+    private Object[][] getActiveOrders() {
+        List<OrderDTO> orders = OrderService.readCustomerOrders(customer.getId());
+        // First, filter out delivered orders and null orders
+        List<OrderDTO> activeOrders = orders.stream()
+                .filter(order -> order != null && order.getStatus() != OrderStatus.DELIVERED)
+                .filter(order -> order != null && order.getStatus() != OrderStatus.DINE_IN)
+                .filter(order -> order != null && order.getStatus() != OrderStatus.CANCELLED)
+                .filter(order -> order != null && order.getStatus() != OrderStatus.FAILED)
+                .toList();
 
-	// Process item list to display in the table
-	private String processItemList(String vendorId, HashMap<String, Integer> items) {
-		try{
-			CompletableFuture<String> itemFuture = ItemProcessor.processItemListAsync(vendorId, items);
-			return itemFuture.join();
-		} catch (Exception e) {
-			System.err.println("Error processing item list: " + e.getMessage());
-			return "Error";
-		}
-	}
+        Object[][] data = new Object[activeOrders.size()][7];
+        int index = 0; // Use separate index since we're skipping some orders
 
-	// Get progress based on order status
-	private int getProgress(OrderStatus status) {
-		switch (status) {
-			case PENDING:
-				return 0;
-			case PROCESSING:
-				return 25;
-			case READY_FOR_PICKUP:
-				return 50;
-			case ON_THE_WAY:
-				return 75;
-			case DELIVERED:
-				return 100;
-			default:
-				return 0;
-		}
-	}
+        for (OrderDTO order : activeOrders) {
+            try {
+                VendorDTO vendor = VendorService.readVendor(order.getVendorId());
+                if (vendor == null) {
+                    continue; // Skip if vendor not found
+                }
+
+                data[index][0] = order.getId(); // Order ID
+                data[index][1] = vendor.getVendorName(); // Vendor Name
+                data[index][2] = vendor.getVendorType(); // Vendor Type
+                data[index][3] = processItemList(order.getVendorId(), order.getItems()); // Item
+                data[index][4] = getProgress(order.getStatus()); // Progress
+                data[index][5] = order.getStatus(); // Status
+                data[index][6] = "View"; // Actions
+                index++;
+            } catch (Exception e) {
+                System.err.println("Error processing order " + order.getId() + ": " + e.getMessage());
+            }
+        }
+
+        // Trim array if needed due to skipped orders
+        if (index < data.length) {
+            Object[][] trimmedData = new Object[index][7];
+            System.arraycopy(data, 0, trimmedData, 0, index);
+            data = trimmedData;
+        }
+
+        activeOrdersLabel.setText("Active Orders (" + index + ")");
+        return data;
+    }
+
+    // Process item list to display in the table
+    private String processItemList(String vendorId, HashMap<String, Integer> items) {
+        try {
+            CompletableFuture<String> itemFuture = ItemProcessor.processItemListAsync(vendorId, items);
+            return itemFuture.join();
+        } catch (Exception e) {
+            System.err.println("Error processing item list: " + e.getMessage());
+            return "Error";
+        }
+    }
+
+    // Get progress based on order status
+    private int getProgress(OrderStatus status) {
+        switch (status) {
+            case PENDING:
+                return 0;
+            case RUNNER_ASSIGNED:
+                return 10;
+            case PROCESSING:
+                return 25;
+            case READY_FOR_PICKUP:
+                return 50;
+            case ON_THE_WAY:
+                return 75;
+            case READY_FOR_TAKEAWAY:
+                return 75;
+            case DELIVERED:
+                return 100;
+            case DINE_IN:
+                return 100;
+            default:
+                return 0;
+        }
+    }
 
 }

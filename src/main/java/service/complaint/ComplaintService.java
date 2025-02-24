@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +13,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import dto.ComplaintDTO;
+import dto.NotificationDTO;
 import enumeration.ComplaintStatus;
 import enumeration.ResponseCode;
 import enumeration.ServiceType;
+import service.notification.NotificationService;
 import service.utils.IdGenerationUtils;
 
 public class ComplaintService {
@@ -37,6 +40,19 @@ public class ComplaintService {
 		// Write JSON to text file
 		try (FileWriter file = new FileWriter(filePath, true)) {
 			file.write(json.toString() + System.lineSeparator());
+
+			// Send notification
+			NotificationDTO notification = new NotificationDTO();
+			notification.setUserId("manager");
+			notification.setMessage("New complaint received with ID: " + json.getString("id"));
+			notification.setRead(false);
+			notification.setTimestamp(LocalDateTime.now());
+			notification.setTitle("New Complaint");
+			ResponseCode response = NotificationService.createNotification(notification);
+			if (response != ResponseCode.SUCCESS) {
+				System.err.println("Failed to send notification for new complaint.");
+			}
+
 			return ResponseCode.SUCCESS;
 		} catch (IOException e) {
 			System.err.println("Error writing complain to file: " + e.getMessage());
@@ -61,7 +77,7 @@ public class ComplaintService {
 					complain.setOrderId(json.getString("orderId"));
 					complain.setDescription(json.getString("description"));
 					complain.setStatus(ComplaintStatus.valueOf(json.getString("status")));
-					complain.setSolution(json.getString("solution"));
+					complain.setSolution(json.optString("solution", ""));
 
 					return complain; // Complain found, return it
 				}
@@ -94,7 +110,7 @@ public class ComplaintService {
 					complain.setOrderId(json.getString("orderId"));
 					complain.setDescription(json.getString("description"));
 					complain.setStatus(ComplaintStatus.valueOf(json.getString("status")));
-					complain.setSolution(json.getString("solution"));
+					complain.setSolution(json.optString("solution", ""));
 
 					complaints.add(complain); // Add to the list
 				}
@@ -125,7 +141,7 @@ public class ComplaintService {
 				complain.setOrderId(json.getString("orderId"));
 				complain.setDescription(json.getString("description"));
 				complain.setStatus(ComplaintStatus.valueOf(json.getString("status")));
-				complain.setSolution(json.getString("solution"));
+				complain.setSolution(json.optString("solution", ""));
 
 				complaints.add(complain); // Add to the list
 			}
@@ -179,6 +195,19 @@ public class ComplaintService {
 			}
 			if (found) {
 				System.out.println("Complain with ID " + updatedComplain.getId() + " updated successfully.");
+				
+				// Send notification
+				NotificationDTO notification = new NotificationDTO();
+				notification.setUserId(updatedComplain.getCustomerId());
+				notification.setMessage("Your complaint with ID: " + updatedComplain.getId() + " has been updated.");
+				notification.setRead(false);
+				notification.setTimestamp(LocalDateTime.now());
+				notification.setTitle("Complaint Updated");
+				ResponseCode response = NotificationService.createNotification(notification);
+				if (response != ResponseCode.SUCCESS) {
+					System.err.println("Failed to send notification for new complaint.");
+				}
+
 				return ResponseCode.SUCCESS;
 			} else {
 				System.out.println("Complain with ID " + updatedComplain.getId() + " not found.");

@@ -24,6 +24,10 @@ import java.util.List;
 public class VendorDashboard extends JFrame {
 	private VendorDTO vendor;
 
+	private JPanel headerPanel;
+	private JLabel welcomeLabel;
+	private JButton logoutButton;
+
 	private String[] activeOrders;
 	private String[] topSales;
 	private String[] earningsToday;
@@ -49,7 +53,7 @@ public class VendorDashboard extends JFrame {
 		JMenuItem dashboardItem = new JMenuItem("Dashboard");
 		dashboardItem.addActionListener(e -> showDashboard());
 		homeMenu.add(dashboardItem);
-		
+
 		// Order Menu
 		JMenu orderMenu = new JMenu("Order");
 		JMenuItem orderItem = new JMenuItem("All Orders");
@@ -58,21 +62,21 @@ public class VendorDashboard extends JFrame {
 		orderHistoryItem.addActionListener(e -> openOrderHistoryPage());
 		orderMenu.add(orderItem);
 		orderMenu.add(orderHistoryItem);
-		
+
 		// Item Menu
-        JMenu itemMenu = new JMenu("Item");
-        JMenuItem itemMenuItem = new JMenuItem("Item Management");
+		JMenu itemMenu = new JMenu("Item");
+		JMenuItem itemMenuItem = new JMenuItem("Item Management");
 		itemMenuItem.addActionListener(e -> openItemPage());
-        itemMenu.add(itemMenuItem);
-        
-        // Review Menu
-        JMenu reviewMenu = new JMenu("Review");
-        JMenuItem reviewItem = new JMenuItem("Reviews");
-        reviewItem.addActionListener(e -> openReviewPage());
-        reviewMenu.add(reviewItem);
-        
-        // Revenue Menu
-        JMenu revenueMenu = new JMenu("Revenue");
+		itemMenu.add(itemMenuItem);
+
+		// Review Menu
+		JMenu reviewMenu = new JMenu("Review");
+		JMenuItem reviewItem = new JMenuItem("Reviews");
+		reviewItem.addActionListener(e -> openReviewPage());
+		reviewMenu.add(reviewItem);
+
+		// Revenue Menu
+		JMenu revenueMenu = new JMenu("Revenue");
 		JMenuItem revenueItem = new JMenuItem("Revenue Management");
 		revenueItem.addActionListener(e -> openRevenuePage());
 		revenueMenu.add(revenueItem);
@@ -88,29 +92,48 @@ public class VendorDashboard extends JFrame {
 		JMenuItem profileItem = new JMenuItem("Profile Management");
 		profileItem.addActionListener(e -> openProfilePage());
 		profileMenu.add(profileItem);
-        
-        menuBar.add(homeMenu);
-        menuBar.add(orderMenu);
-        menuBar.add(itemMenu);
-        menuBar.add(reviewMenu);
-        menuBar.add(revenueMenu);
-        setJMenuBar(menuBar);
+
+		menuBar.add(homeMenu);
+		menuBar.add(orderMenu);
+		menuBar.add(itemMenu);
+		menuBar.add(reviewMenu);
+		menuBar.add(revenueMenu);
+		menuBar.add(notificationMenu);
+		menuBar.add(profileMenu);
+		setJMenuBar(menuBar);
 
 		// ======= Header Panel (Welcome & Logout) =======
-		JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		JLabel welcomeLabel = new JLabel("Welcome, " + vendor.getName());
-		JButton logoutButton = new JButton("Logout");
+		headerPanel = new JPanel(new BorderLayout());
+		JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+		// Style components
+		welcomeLabel = new JLabel("Welcome, " + vendor.getName());
+		welcomeLabel.setFont(new Font("Arial", Font.BOLD, 12));
+		logoutButton = new JButton("Logout");
 		logoutButton.setFocusable(false);
 
-		// Logout Button Action
+		// Set fonts and colors
+		Font labelFont = new Font("Arial", Font.PLAIN, 12);
+		welcomeLabel.setFont(labelFont);
+		logoutButton.setFont(labelFont);
+
+		// Add logout action
 		logoutButton.addActionListener(e -> {
+			SessionControlService.clearSession();
 			new LoginInterface().setVisible(true);
 			this.dispose();
 		});
 
-		headerPanel.add(welcomeLabel);
-		headerPanel.add(logoutButton);
+		// Add components to panels
+		leftPanel.add(welcomeLabel);
+		rightPanel.add(logoutButton);
 
+		// Add panels to header
+		headerPanel.add(leftPanel, BorderLayout.WEST);
+		headerPanel.add(rightPanel, BorderLayout.EAST);
+
+		// Add header to frame
 		getContentPane().add(headerPanel, BorderLayout.NORTH);
 
 		// ======= Data Panel =======
@@ -152,19 +175,19 @@ public class VendorDashboard extends JFrame {
 		this.dispose();
 		new VendorDashboard((VendorDTO) SessionControlService.getUser()).setVisible(true);
 	}
-	
+
 	private void openOrderPage() {
 		new VendorOrderPage().setVisible(true);
 	}
-	
+
 	private void openOrderHistoryPage() {
 		new OrderHistoryPage().setVisible(true);
 	}
-	
+
 	private void openItemPage() {
 		new VendorItemPage().setVisible(true);
 	}
-	
+
 	private void openReviewPage() {
 		new VendorReviewPage((VendorDTO) SessionControlService.getUser()).setVisible(true);
 	}
@@ -180,14 +203,16 @@ public class VendorDashboard extends JFrame {
 	private void openProfilePage() {
 		new VendorProfilePage((VendorDTO) SessionControlService.getUser()).setVisible(true);
 	}
-	
+
 	// ======= Data Methods =======
 	private String[] getActiveOrders() {
 		List<String> activeOrders = new ArrayList<>();
 		List<OrderDTO> orders = OrderService.readVendorOrders(vendor.getId());
 		for (OrderDTO order : orders) {
-			if (order.getStatus().equals(OrderStatus.PENDING) || order.getStatus().equals(OrderStatus.PROCESSING) || order.getStatus().equals(OrderStatus.ON_THE_WAY) || 
-				order.getStatus().equals(OrderStatus.READY_FOR_PICKUP)) {
+			if (order.getStatus().equals(OrderStatus.PENDING) || order.getStatus().equals(OrderStatus.PROCESSING)
+					|| order.getStatus().equals(OrderStatus.ON_THE_WAY) 
+					|| order.getStatus().equals(OrderStatus.READY_FOR_PICKUP)
+					|| order.getStatus().equals(OrderStatus.RUNNER_ASSIGNED)) {
 				activeOrders.add(order.getId());
 			}
 		}
@@ -217,10 +242,10 @@ public class VendorDashboard extends JFrame {
 
 		// Get the top 10 sales
 		salesByItems.entrySet().stream()
-			.sorted((item1, item2) -> item2.getValue().compareTo(item1.getValue()))
-			.limit(10)
-			.forEach(item -> topSales.add(item.getKey() + " - " + item.getValue()));
-		
+				.sorted((item1, item2) -> item2.getValue().compareTo(item1.getValue()))
+				.limit(10)
+				.forEach(item -> topSales.add(item.getKey() + " - " + item.getValue()));
+
 		return topSales.toArray(new String[0]);
 	}
 
@@ -236,6 +261,6 @@ public class VendorDashboard extends JFrame {
 			}
 		}
 		earnings = earnings * 0.9; // 10% commission fee
-		return new String[]{String.format("RM %.2f", earnings)};
+		return new String[] { String.format("RM %.2f", earnings) };
 	}
 }

@@ -154,7 +154,7 @@ public class ItemService {
 		String email = SessionControlService.getEmailAddress();
 		String vendorId;
 
-		if (role != Role.VENDOR) {
+		if (role != Role.VENDOR && role != Role.MANAGER) {
 			return ResponseCode.ACCESS_DENIED;
 		} else {
 			VendorDTO vendor = VendorService.readVendorByEmail(email);

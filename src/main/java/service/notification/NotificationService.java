@@ -29,7 +29,7 @@ public class NotificationService {
 		// Construct JSON Object
 		JSONObject json = new JSONObject();
 		json.put("id", IdGenerationUtils.getNextId(ServiceType.NOTIFICATION, null, null));
-		json.put("recipientId", notification.getUserId());
+		json.put("userId", notification.getUserId());
 		json.put("title", notification.getTitle());
 		json.put("message", notification.getMessage());
 		json.put("timestamp", notification.getTimestamp().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
@@ -113,6 +113,94 @@ public class NotificationService {
 		}
 		
 		return notifications;
+	}
+
+	// Method to read manager notification from the text file
+	public static List<NotificationDTO> readManagerNotification() {
+		String filePath = SYS_PATH + "notification.txt";
+		
+		List<NotificationDTO> notifications = new ArrayList<>();
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("userId").equals("manager")) {
+					NotificationDTO notification = new NotificationDTO();
+					notification.setId(json.getString("id"));
+					notification.setUserId(json.getString("userId"));
+					notification.setTitle(json.getString("title"));
+					notification.setMessage(json.getString("message"));
+					notification.setTimestamp(LocalDateTime.parse(json.getString("timestamp"), DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+					notification.setRead(json.getBoolean("isRead"));
+					
+					notifications.add(notification);
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading notification from file: " + e.getMessage());
+		} catch (Exception e) {
+			System.err.println("Error parsing JSON: " + e.getMessage());
+		}
+		
+		if (notifications.isEmpty()) {
+			System.out.println("Notification for Manager not found.");
+		}
+		
+		return notifications;
+	}
+
+	// Method to update a notification in the text file
+	public static ResponseCode updateNotification(NotificationDTO notification) {
+
+		String filePath = SYS_PATH + "notification.txt";
+
+		List<String> updatedNotifications = new ArrayList<>();
+		boolean isUpdated = false;
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("id").equals(notification.getId())) {
+					// Update the notification
+					json.put("userId", notification.getUserId());
+					json.put("title", notification.getTitle());
+					json.put("message", notification.getMessage());
+					json.put("timestamp", notification.getTimestamp().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+					json.put("isRead", notification.isRead());
+					isUpdated = true;
+				}
+
+				updatedNotifications.add(json.toString());
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading notifications from file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
+		}
+
+		// Write back the updated list
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+			for (String updatedNotification : updatedNotifications) {
+				writer.write(updatedNotification);
+				writer.newLine();
+			}
+		} catch (IOException e) {
+			System.err.println("Error writing updated notifications to file: " + e.getMessage());
+			return ResponseCode.IO_EXCEPTION;
+		}
+
+		if (isUpdated) {
+			System.out.println("Notification with ID " + notification.getId() + " updated successfully.");
+			return ResponseCode.SUCCESS;
+		} else {
+			System.out.println("Notification with ID " + notification.getId() + " not found.");
+			return ResponseCode.RECORD_NOT_FOUND;
+		}
 	}
 
 	// Method to delete a notification from the text file

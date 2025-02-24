@@ -60,54 +60,74 @@ public class ManagerRevenuePage extends JFrame {
         searchButton.addActionListener(e -> searchVendor());
         yearFilterComboBox.addActionListener(e -> filterYear(yearFilterComboBox.getSelectedItem().toString()));
 
-        // Populate fixed months
-        String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-        for (String month : months) {
-            tableModel.addRow(new Object[]{month, "N/A", "N/A"});
-        }
-
         setVisible(true);
     }
     
     // Method to update the table
+    private static final String[] MONTHS = {
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    };
+    
     private void updateTable(String year) {
+        if (vendor == null) {
+            JOptionPane.showMessageDialog(this, "Vendor not found", "Search Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    
         // Get list of orders
         List<OrderDTO> orders = OrderService.readVendorOrders(vendor.getId());
-        for (OrderDTO order : orders) {
-            // Filter orders that are not delivered
-            if (order.getStatus() != OrderStatus.DELIVERED) {
-                continue;
+        tableModel.setRowCount(0);
+    
+        // Initialize table with zeros
+        for (String month : MONTHS) {
+            tableModel.addRow(new Object[]{month, 0, 0.0});
+        }
+    
+        if (orders == null || orders.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No orders found for " + year, 
+                "Information", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+    
+        try {
+            for (OrderDTO order : orders) {
+                // Skip invalid orders
+                if (order == null || order.getCompletionTime() == null || 
+                    order.getStatus() != OrderStatus.DELIVERED || 
+                    !String.valueOf(order.getCompletionTime().getYear()).equals(year)) {
+                    continue;
+                }
+    
+                int month = order.getCompletionTime().getMonthValue();
+                int currentCount = Integer.parseInt(tableModel.getValueAt(month - 1, 1).toString());
+                double currentEarnings = Double.parseDouble(tableModel.getValueAt(month - 1, 2).toString());
+    
+                // Update count and earnings with proper formatting
+                tableModel.setValueAt(currentCount + 1, month - 1, 1);
+                tableModel.setValueAt(
+                    String.format("%.2f", currentEarnings + order.getTotalAmount()), 
+                    month - 1, 2
+                );
             }
-            // Filter orders that are not in the selected year
-            if (!String.valueOf(order.getCompletionTime().getYear()).equals(year)) {
-                continue;
-            }
-
-            int month = order.getCompletionTime().getMonthValue();
-            int orderCount = Integer.parseInt(tableModel.getValueAt(month - 1, 1).toString());
-            double earnings = Double.parseDouble(tableModel.getValueAt(month - 1, 2).toString());
-
-            tableModel.setValueAt(orderCount + 1, month - 1, 1);
-            tableModel.setValueAt(earnings + order.getTotalAmount(), month - 1, 2);
+        } catch (Exception e) {
+            System.err.println("Error processing orders: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error processing orders", 
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     
-    // Method to filter the year
+    // Method to filter by year
     private void filterYear(String year) {
-        // Reset table
-        tableModel.setRowCount(0);
-        String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-        for (String month : months) {
-            tableModel.addRow(new Object[]{month, "N/A", "N/A"});
+        if (vendor != null) {
+            updateTable(year);
         }
-
-        // Update table
-        updateTable(year);
     }
     
     // Method to read the vendor details
     private void searchVendor() {
         String searchTerm = searchField.getText().trim().toLowerCase();
+        vendor = null;
 
 		// Validate search term
 		if (searchTerm.isEmpty()) {
@@ -116,6 +136,7 @@ public class ManagerRevenuePage extends JFrame {
 		}
 
         // Reset table
+        tableModel.setRowCount(0);
         String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
         for (String month : months) {
             tableModel.addRow(new Object[]{month, "N/A", "N/A"});
@@ -123,14 +144,14 @@ public class ManagerRevenuePage extends JFrame {
 
 		// Search for vendor
 		if (VendorService.readVendor(searchTerm) != null) {
+            System.out.println("Vendor found by ID");
             vendor = VendorService.readVendor(searchTerm);
-        }
-
-        if (VendorService.readVendorByName(searchTerm) != null) {
+        } else if (VendorService.readVendorByName(searchTerm) != null) {
+            System.out.println("Vendor found by name");
             vendor = VendorService.readVendorByName(searchTerm);
         }
 
-        if (vendor.getId() == null) {
+        if (vendor == null) {
             JOptionPane.showMessageDialog(this, "Vendor not found", "Search Error", JOptionPane.ERROR_MESSAGE);
             return;
         }

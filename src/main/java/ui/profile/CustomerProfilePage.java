@@ -5,10 +5,14 @@ import javax.swing.*;
 import dto.AddressDTO;
 import dto.CustomerDTO;
 import enumeration.ResponseCode;
+import enumeration.ServiceType;
 import service.address.AddressService;
 import service.customer.CustomerService;
+import service.distance.DistanceService;
+import service.utils.IdGenerationUtils;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CustomerProfilePage extends JFrame {
@@ -20,7 +24,7 @@ public class CustomerProfilePage extends JFrame {
         setTitle("Customer Profile");
         setSize(400, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new GridLayout(8, 2, 5, 5));
+        setLayout(new GridLayout(7, 2, 5, 5));
 
         add(new JLabel("ID:"));
         idLabel = new JLabel(customer.getId());
@@ -58,7 +62,6 @@ public class CustomerProfilePage extends JFrame {
         saveButton.addActionListener(e -> updateCustomer(customer));
         add(saveButton);
 
-
         setLocationRelativeTo(null);
         setVisible(true);
     }
@@ -73,7 +76,7 @@ public class CustomerProfilePage extends JFrame {
         JTextField cityField = new JTextField();
         JTextField stateField = new JTextField();
         JTextField postalCodeField = new JTextField();
-        JTextField countryField = new JTextField();
+        JTextField countryField = new JTextField("Malaysia");
 
         dialog.add(new JLabel("Street:"));
         dialog.add(streetField);
@@ -88,7 +91,15 @@ public class CustomerProfilePage extends JFrame {
 
         JButton saveAddressButton = new JButton("Save Address");
         saveAddressButton.addActionListener(e -> {
+            // validation
+            if (streetField.getText().isEmpty() || cityField.getText().isEmpty() || stateField.getText().isEmpty()
+                    || postalCodeField.getText().isEmpty() || countryField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            // save address
             AddressDTO newAddress = new AddressDTO();
+            newAddress.setId(IdGenerationUtils.getNextId(ServiceType.ADDRESS, null, null));
             newAddress.setStreet(streetField.getText());
             newAddress.setCity(cityField.getText());
             newAddress.setState(stateField.getText());
@@ -96,17 +107,26 @@ public class CustomerProfilePage extends JFrame {
             newAddress.setCountry(countryField.getText());
             newAddress.setUserId(customer.getId());
 
+            // verification using api
+            if (!DistanceService.verifyAddress(newAddress)) {
+                JOptionPane.showMessageDialog(this, "Invalid address", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             ResponseCode response = AddressService.createAddress(newAddress);
             if (response != ResponseCode.SUCCESS) {
                 JOptionPane.showMessageDialog(this, "Failed to save address", "Error", JOptionPane.ERROR_MESSAGE);
             }
             List<String> deliveryAddresses = customer.getDeliveryAddresses();
-            deliveryAddresses.add(newAddress.toString());
+            if (deliveryAddresses == null) {
+                deliveryAddresses = new ArrayList<>();
+            }
+            deliveryAddresses.add(newAddress.getId());
             customer.setDeliveryAddresses(deliveryAddresses);
 
             response = CustomerService.updateCustomer(customer);
             if (response == ResponseCode.SUCCESS) {
-                JOptionPane.showMessageDialog(this, "Address saved successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Address saved successfully", "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to save address", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -145,7 +165,8 @@ public class CustomerProfilePage extends JFrame {
 
                 ResponseCode response = CustomerService.updateCustomer(customer);
                 if (response == ResponseCode.SUCCESS) {
-                    JOptionPane.showMessageDialog(this, "Address removed successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Address removed successfully", "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(this, "Failed to remove address", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -165,7 +186,6 @@ public class CustomerProfilePage extends JFrame {
 
     // Method to edit an address from the customer's list of addresses
     private void openEditAddressDialog(CustomerDTO customer) {
-
         List<String> deliveryAddresses = customer.getDeliveryAddresses();
 
         if (deliveryAddresses.isEmpty()) {
@@ -175,7 +195,7 @@ public class CustomerProfilePage extends JFrame {
 
         JDialog dialog = new JDialog(this, "Edit Address", true);
         dialog.setSize(300, 300);
-        dialog.setLayout(new GridLayout(6, 2, 5, 5));
+        dialog.setLayout(new GridLayout(7, 2, 5, 5));
 
         JTextField streetField = new JTextField();
         JTextField cityField = new JTextField();
@@ -195,6 +215,7 @@ public class CustomerProfilePage extends JFrame {
                 countryField.setText(address.getCountry());
             }
         });
+        dialog.add(new JLabel("Select Address:"));
         dialog.add(editComboBox);
 
         dialog.add(new JLabel("Street:"));
@@ -210,6 +231,12 @@ public class CustomerProfilePage extends JFrame {
 
         JButton saveAddressButton = new JButton("Save Address");
         saveAddressButton.addActionListener(e -> {
+            // validation
+            if (streetField.getText().isEmpty() || cityField.getText().isEmpty() || stateField.getText().isEmpty()
+                    || postalCodeField.getText().isEmpty() || countryField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             // Update address object
             AddressDTO updatedAddress = new AddressDTO();
             updatedAddress.setId((String) editComboBox.getSelectedItem());
@@ -218,10 +245,18 @@ public class CustomerProfilePage extends JFrame {
             updatedAddress.setState(stateField.getText());
             updatedAddress.setPostalCode(postalCodeField.getText());
             updatedAddress.setCountry(countryField.getText());
+            updatedAddress.setUserId(customer.getId());
+
+            // verification using api
+            if (!DistanceService.verifyAddress(updatedAddress)) {
+                JOptionPane.showMessageDialog(this, "Invalid address", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
             ResponseCode response = AddressService.updateAddress(updatedAddress);
             if (response == ResponseCode.SUCCESS) {
-                JOptionPane.showMessageDialog(this, "Address updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Address updated successfully", "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to update address", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -236,14 +271,50 @@ public class CustomerProfilePage extends JFrame {
 
     // Method to update the customer's profile
     private void updateCustomer(CustomerDTO customer) {
+        // Check if the fields are empty
+        if (nameField.getText().isEmpty() || phoneField.getText().isEmpty() || emailField.getText().isEmpty()
+                || passwordField.getPassword().length == 0) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Check if any fields is modified
+        if (nameField.getText().equals(customer.getName()) && phoneField.getText().equals(customer.getPhoneNumber())
+                && emailField.getText().equals(customer.getEmailAddress())
+                && passwordField.getPassword().toString().equals(customer.getPassword())) {
+            JOptionPane.showMessageDialog(this, "No changes made", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        // check phone number
+        if (!phoneField.getText().matches("\\d{10}") && !phoneField.getText().matches("\\d{11}")) {
+            JOptionPane.showMessageDialog(this, "Invalid phone number", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // check email
+        if (!emailField.getText().matches("^(.+)@(.+)$")) {
+            JOptionPane.showMessageDialog(this, "Invalid email address", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // password length
+        if (passwordField.getPassword().length < 8) {
+            JOptionPane.showMessageDialog(this, "Password must be at least 8 characters", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
         customer.setName(nameField.getText());
         customer.setPhoneNumber(phoneField.getText());
         customer.setEmailAddress(emailField.getText());
-        customer.setPassword(new String(passwordField.getPassword()));
+        customer.setPassword(String.valueOf(passwordField.getPassword()));
 
         ResponseCode response = CustomerService.updateCustomer(customer);
         if (response == ResponseCode.SUCCESS) {
-            JOptionPane.showMessageDialog(this, "Customer updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Customer updated successfully", "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to update customer", "Error", JOptionPane.ERROR_MESSAGE);
         }

@@ -17,9 +17,11 @@ import dto.AddressDTO;
 import enumeration.ResponseCode;
 import service.address.AddressService;
 import service.customer.CustomerService;
+import service.distance.DistanceService;
 
 public class CustomerDetailsForm extends JFrame {
-    private JTextField idField, nameField, phoneField, emailField, passwordField;
+    private JTextField idField, nameField, phoneField, emailField;
+    private JPasswordField passwordField;
     private JCheckBox statusCheckBox;
     private JButton saveButton, closeButton, editAddressButton;
 
@@ -122,16 +124,26 @@ public class CustomerDetailsForm extends JFrame {
         dialog.add(closeButton);
 
         saveButton.addActionListener(e -> {
+            // validation
+            if (streetField.getText().isEmpty() || cityField.getText().isEmpty() || stateField.getText().isEmpty()
+                    || postalCodeField.getText().isEmpty() || countryField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             // Update address object
-            AddressDTO updatedAddress = new AddressDTO();
-            updatedAddress.setId(address.getId());
-            updatedAddress.setStreet(streetField.getText());
-            updatedAddress.setCity(cityField.getText());
-            updatedAddress.setState(stateField.getText());
-            updatedAddress.setPostalCode(postalCodeField.getText());
-            updatedAddress.setCountry(countryField.getText());
+            address.setStreet(streetField.getText());
+            address.setCity(cityField.getText());
+            address.setState(stateField.getText());
+            address.setPostalCode(postalCodeField.getText());
+            address.setCountry(countryField.getText());
 
-            ResponseCode response = AddressService.updateAddress(updatedAddress);
+            // verification using api
+            if (!DistanceService.verifyAddress(address)) {
+                JOptionPane.showMessageDialog(this, "Invalid address", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            ResponseCode response = AddressService.updateAddress(address);
             if (response == ResponseCode.SUCCESS) {
                 JOptionPane.showMessageDialog(this, "Address updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -149,30 +161,48 @@ public class CustomerDetailsForm extends JFrame {
 
     private void updateCustomer(CustomerDTO customer) {
         // Check if the fields are empty
-        if (idField.getText().isEmpty() || nameField.getText().isEmpty() || phoneField.getText().isEmpty() || emailField.getText().isEmpty() || passwordField.getText().isEmpty()) {
+        if (nameField.getText().isEmpty() || phoneField.getText().isEmpty() || emailField.getText().isEmpty()
+                || passwordField.getPassword().length == 0) {
             JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Check if any fields is modified
-        if (idField.getText().equals(customer.getId()) && nameField.getText().equals(customer.getName())
-                && phoneField.getText().equals(customer.getPhoneNumber()) && emailField.getText().equals(customer.getEmailAddress())
-                && passwordField.getText().equals(customer.getPassword()) && statusCheckBox.isSelected() == customer.getStatus()) {
-            JOptionPane.showMessageDialog(this, "No changes detected", "Error", JOptionPane.ERROR_MESSAGE);
+        if (nameField.getText().equals(customer.getName()) && phoneField.getText().equals(customer.getPhoneNumber())
+                && emailField.getText().equals(customer.getEmailAddress())
+                && passwordField.getPassword().toString().equals(customer.getPassword())) {
+            JOptionPane.showMessageDialog(this, "No changes made", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
-        CustomerDTO updatedCustomer = new CustomerDTO();
-        updatedCustomer.setId(customer.getId());
-        updatedCustomer.setName(nameField.getText());
-        updatedCustomer.setPhoneNumber(phoneField.getText());
-        updatedCustomer.setEmailAddress(emailField.getText());
-        updatedCustomer.setPassword(passwordField.getText());
-        updatedCustomer.setStatus(statusCheckBox.isSelected());
+        // check phone number
+        if (!phoneField.getText().matches("\\d{10}") && !phoneField.getText().matches("\\d{11}")) {
+            JOptionPane.showMessageDialog(this, "Invalid phone number", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        ResponseCode response = CustomerService.updateCustomer(updatedCustomer);
+        // check email
+        if (!emailField.getText().matches("^(.+)@(.+)$")) {
+            JOptionPane.showMessageDialog(this, "Invalid email address", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // password length
+        if (passwordField.getPassword().length < 8) {
+            JOptionPane.showMessageDialog(this, "Password must be at least 8 characters", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        customer.setName(nameField.getText());
+        customer.setPhoneNumber(phoneField.getText());
+        customer.setEmailAddress(emailField.getText());
+        customer.setPassword(String.valueOf(passwordField.getPassword()));
+
+        ResponseCode response = CustomerService.updateCustomer(customer);
         if (response == ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(this, "Customer updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to update customer", "Error", JOptionPane.ERROR_MESSAGE);
         }

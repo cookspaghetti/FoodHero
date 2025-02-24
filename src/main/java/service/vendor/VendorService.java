@@ -87,7 +87,7 @@ public class VendorService {
 				JSONObject json = new JSONObject(line);
 
 				// Check if the ID matches
-				if (json.getString("id").toLowerCase().equals(id.toLowerCase())) {
+				if (json.getString("id").equalsIgnoreCase(id)) {
 					// Construct Vendor object
 					VendorDTO vendor = new VendorDTO();
 					vendor.setId(json.getString("id"));
@@ -138,7 +138,7 @@ public class VendorService {
 				JSONObject json = new JSONObject(line);
 
 				// Check if the ID matches
-				if (json.getString("email").equals(email)) {
+				if (json.getString("emailAddress").equals(email)) {
 					// Construct Vendor object
 					VendorDTO vendor = new VendorDTO();
 					vendor.setId(json.getString("id"));

@@ -17,6 +17,7 @@ import dto.RunnerDTO;
 import dto.VendorDTO;
 import enumeration.ResponseCode;
 import enumeration.Role;
+import enumeration.VendorType;
 import service.utils.JsonUtils;
 
 public class LoginService {
@@ -111,17 +112,20 @@ public class LoginService {
 			runner.setPlateNumber(json.optString("plateNumber", ""));
 			runner.setEarnings(json.optDouble("earnings", 0.0));
 			runner.setRatings(json.optDouble("ratings", 0.0));
+			runner.setAvailable(json.optBoolean("available", true));
+			runner.setLastDeliveredAddress(json.optString("lastDeliveredAddress", ""));
+			runner.setCurrentTask(json.optString("currentTask", ""));
 
 			// Convert JSON arrays to List<String>
 			runner.setTasks(JsonUtils.jsonArrayToList(json.getJSONArray("tasks")));
 			runner.setReviews(JsonUtils.jsonArrayToList(json.getJSONArray("reviews")));
 
-			runner.setLastDeliveredAddress(json.getString("lastDeliveredAddress"));
-
 			// Parse lastDeliveryDate as LocalDateTime
 			String dateStr = json.optString("lastDeliveryDate", null);
 			if (dateStr != null && !dateStr.isEmpty()) {
 				runner.setLastDeliveryDate(LocalDateTime.parse(dateStr));
+			} else {
+				runner.setLastDeliveryDate(null);
 			}
 
 			SessionControlService.setSession(runner);
@@ -138,6 +142,8 @@ public class LoginService {
 			vendor.setVendorName(json.getString("vendorName"));
 			vendor.setRatings(json.getDouble("ratings"));
 			vendor.setPassword(json.getString("password"));
+			vendor.setOpen(json.getBoolean("open"));
+			vendor.setVendorType(VendorType.valueOf(json.getString("vendorType")));
 
 			// Convert JSON Object (items) to HashMap<String, Integer>
 			HashMap<String, Integer> itemsMap = new HashMap<>();

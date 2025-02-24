@@ -38,13 +38,17 @@ import ui.revenue.ManagerRevenuePage;
 public class ManagerDashboard extends JFrame {
 	private ManagerDTO manager;
 
+	private JPanel headerPanel;
+	private JLabel welcomeLabel;
+	private JButton logoutButton;
+
 	private String[] activeVendors;
 	private String[] activeRunners;
 	private String[] newComplaints;
 	private int numActiveVendors = 0;
 	private int numActiveRunners = 0;
 	private int numNewComplaints = 0;
-	
+
 	public ManagerDashboard(ManagerDTO manager) {
 		this.manager = manager;
 		initComponents();
@@ -108,24 +112,43 @@ public class ManagerDashboard extends JFrame {
 		menuBar.add(revenueMenu);
 		menuBar.add(performanceMenu);
 		menuBar.add(complaintMenu);
+		menuBar.add(notificationMenu);
+		menuBar.add(profileMenu);
 
 		setJMenuBar(menuBar);
 
 		// ======= Header Panel (Welcome & Logout) =======
-		JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		JLabel welcomeLabel = new JLabel("Welcome, " + manager.getName());
-		JButton logoutButton = new JButton("Logout");
+		headerPanel = new JPanel(new BorderLayout());
+		JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+		// Style components
+		welcomeLabel = new JLabel("Welcome, " + manager.getName());
+		welcomeLabel.setFont(new Font("Arial", Font.BOLD, 12));
+		logoutButton = new JButton("Logout");
 		logoutButton.setFocusable(false);
 
-		// Logout Button Action
+		// Set fonts and colors
+		Font labelFont = new Font("Arial", Font.PLAIN, 12);
+		welcomeLabel.setFont(labelFont);
+		logoutButton.setFont(labelFont);
+
+		// Add logout action
 		logoutButton.addActionListener(e -> {
+			SessionControlService.clearSession();
 			new LoginInterface().setVisible(true);
 			this.dispose();
 		});
 
-		headerPanel.add(welcomeLabel);
-		headerPanel.add(logoutButton);
+		// Add components to panels
+		leftPanel.add(welcomeLabel);
+		rightPanel.add(logoutButton);
 
+		// Add panels to header
+		headerPanel.add(leftPanel, BorderLayout.WEST);
+		headerPanel.add(rightPanel, BorderLayout.EAST);
+
+		// Add header to frame
 		getContentPane().add(headerPanel, BorderLayout.NORTH);
 
 		// ======= Data Panel =======
@@ -171,15 +194,15 @@ public class ManagerDashboard extends JFrame {
 	private void openItemPage() {
 		new ManagerItemPage().setVisible(true);
 	}
-	
+
 	private void openRevenuePage() {
 		new ManagerRevenuePage().setVisible(true);
 	}
-	
+
 	private void openPerformancePage() {
 		new ManagerPerformancePage().setVisible(true);
 	}
-	
+
 	private void openComplaintPage() {
 		new ManagerComplaintPage().setVisible(true);
 	}
@@ -198,7 +221,7 @@ public class ManagerDashboard extends JFrame {
 		List<String> activeVendors = new ArrayList<>();
 		for (VendorDTO vendor : vendors) {
 			if (vendor.getOpen()) {
-				activeVendors.add(vendor.getName());
+				activeVendors.add(vendor.getVendorName());
 			}
 		}
 		numActiveVendors = activeVendors.size();
@@ -223,8 +246,8 @@ public class ManagerDashboard extends JFrame {
 		List<String> newComplaints = new ArrayList<>();
 		List<ComplaintDTO> complaints = ComplaintService.readAllComplaint();
 		for (ComplaintDTO complaint : complaints) {
-			if (!complaint.getStatus().equals(ComplaintStatus.PENDING)) {
-				newComplaints.add(complaint.getOrderId());
+			if (complaint.getStatus().equals(ComplaintStatus.PENDING)) {
+				newComplaints.add(complaint.getId());
 			}
 		}
 		numNewComplaints = newComplaints.size();

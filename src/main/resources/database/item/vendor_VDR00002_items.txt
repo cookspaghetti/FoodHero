@@ -1,0 +1,3 @@
+{"price":18.8,"defaultAmount":100,"name":"Nasi Ayam Penyet","vendorId":"VDR00002","description":"delicious!","id":"ITM00001","availability":true}
+{"price":17.5,"defaultAmount":100,"name":"Nasi Ayam Kicap","vendorId":"VDR00002","description":"Super delicious chicken with soy sauce","id":"ITM00002","availability":true}
+{"price":8.5,"defaultAmount":100,"name":"Milo Ais Kau Kau","vendorId":"VDR00002","description":"Iced milo drink","id":"ITM00003","availability":true}

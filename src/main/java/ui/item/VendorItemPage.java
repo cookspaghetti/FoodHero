@@ -102,6 +102,11 @@ public class VendorItemPage extends JFrame {
 
 	// ======= Action Methods =======
 	private void searchItems(ActionEvent e) {
+		if (searchField.getText().trim().isEmpty()) {
+			loadItems();
+			return;
+		}
+		
 		String searchTerm = searchField.getText().trim().toLowerCase();
 		
 		// Clear table

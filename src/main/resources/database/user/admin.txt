@@ -1,1 +1,3 @@
-{"emailAddress":"owen@gmail.com","password":"1","phoneNumber":"0123456789","name":"Owen","id":"ADM00001","addressId":"ADR00001","status":true}
+{"emailAddress":"owen@gmail.com","password":"1","phoneNumber":"0123456789","name":"Owen Wong","id":"ADM00001","addressId":"ADR00006","status":true}
+{"emailAddress":"alex@gmail.com","password":"11111111","phoneNumber":"01144445555","name":"Alex","id":"ADM00002","addressId":"ADR00011","status":false}
+{"emailAddress":"brandon@gmail.com","password":"11111111","phoneNumber":"01155558888","name":"Brandon","id":"ADM00003","addressId":"ADR00013","status":true}

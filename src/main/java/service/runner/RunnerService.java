@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -40,24 +41,25 @@ public class RunnerService {
 		json.put("phoneNumber", runner.getPhoneNumber());
 		json.put("addressId", runner.getAddressId()); // Fixed from "address"
 		json.put("emailAddress", runner.getEmailAddress());
-		json.put("password", runner.getPassword());   // Added password
-		json.put("status", runner.getStatus());       // Added status
+		json.put("password", runner.getPassword()); // Added password
+		json.put("status", runner.getStatus()); // Added status
 		json.put("plateNumber", runner.getPlateNumber());
 
 		// Handle lists properly
 		json.put("tasks", runner.getTasks() != null ? new JSONArray(runner.getTasks()) : new JSONArray());
 		json.put("reviews", runner.getReviews() != null ? new JSONArray(runner.getReviews()) : new JSONArray());
-		
+
 		json.put("available", runner.isAvailable());
 		json.put("currentTask", runner.getCurrentTask());
 		json.put("earnings", runner.getEarnings());
-		json.put("ratings", runner.getRatings());     // Added ratings field
-		json.put("lastDeliveredAddress", runner.getLastDeliveredAddress() != null ? runner.getLastDeliveredAddress() : "");
+		json.put("ratings", runner.getRatings()); // Added ratings field
+		json.put("lastDeliveredAddress",
+				runner.getLastDeliveredAddress() != null ? runner.getLastDeliveredAddress() : "");
 
 		// Handle null lastDeliveryDate
-		json.put("lastDeliveryDate", runner.getLastDeliveryDate() != null 
-				? runner.getLastDeliveryDate().toString() 
-						: "");
+		json.put("lastDeliveryDate", runner.getLastDeliveryDate() != null
+				? runner.getLastDeliveryDate().toString()
+				: "");
 
 		// Write JSON to text file
 		try (FileWriter file = new FileWriter(filePath, true)) {
@@ -67,12 +69,12 @@ public class RunnerService {
 			System.err.println("Error writing runner to file: " + e.getMessage());
 			return ResponseCode.IO_EXCEPTION;
 		}
-		
+
 		ResponseCode response = ReviewService.createRunnerReviewDataStorage(runner.getId());
 		if (response != ResponseCode.SUCCESS) {
 			return response;
 		}
-		
+
 		return ResponseCode.SUCCESS;
 	}
 
@@ -94,15 +96,15 @@ public class RunnerService {
 					runner.setId(json.getString("id"));
 					runner.setName(json.getString("name"));
 					runner.setPhoneNumber(json.getString("phoneNumber"));
-					runner.setAddressId(json.optString("addressId", ""));  // Fixed field name
+					runner.setAddressId(json.optString("addressId", "")); // Fixed field name
 					runner.setEmailAddress(json.optString("emailAddress", "")); // Fixed field name
-					runner.setPassword(json.optString("password", ""));    // Added password
-					runner.setStatus(json.optBoolean("status", true));     // Added status (default true)
+					runner.setPassword(json.optString("password", "")); // Added password
+					runner.setStatus(json.optBoolean("status", true)); // Added status (default true)
 					runner.setPlateNumber(json.optString("plateNumber", ""));
 					runner.setEarnings(json.optDouble("earnings", 0.0));
 					runner.setRatings(json.optDouble("ratings", 0.0));
 					runner.setAvailable(json.optBoolean("available"));
-					runner.setCurrentTask(json.getString("currentTask"));
+					runner.setCurrentTask(json.optString("currentTask", ""));
 
 					// Convert JSON arrays to List<String>
 					runner.setTasks(JsonUtils.jsonArrayToList(json.getJSONArray("tasks")));
@@ -158,15 +160,15 @@ public class RunnerService {
 					runner.setId(json.getString("id"));
 					runner.setName(json.getString("name"));
 					runner.setPhoneNumber(json.getString("phoneNumber"));
-					runner.setAddressId(json.optString("addressId", ""));  // Fixed field name
+					runner.setAddressId(json.optString("addressId", "")); // Fixed field name
 					runner.setEmailAddress(json.optString("emailAddress", "")); // Fixed field name
-					runner.setPassword(json.optString("password", ""));    // Added password
-					runner.setStatus(json.optBoolean("status", true));     // Added status (default true)
+					runner.setPassword(json.optString("password", "")); // Added password
+					runner.setStatus(json.optBoolean("status", true)); // Added status (default true)
 					runner.setPlateNumber(json.optString("plateNumber", ""));
 					runner.setEarnings(json.optDouble("earnings", 0.0));
 					runner.setRatings(json.optDouble("ratings", 0.0));
 					runner.setAvailable(json.optBoolean("available"));
-					runner.setCurrentTask(json.getString("currentTask"));
+					runner.setCurrentTask(json.optString("currentTask", ""));
 
 					// Convert JSON arrays to List<String>
 					runner.setTasks(JsonUtils.jsonArrayToList(json.getJSONArray("tasks")));
@@ -219,16 +221,16 @@ public class RunnerService {
 				runner.setId(json.getString("id"));
 				runner.setName(json.getString("name"));
 				runner.setPhoneNumber(json.getString("phoneNumber"));
-				runner.setAddressId(json.optString("addressId", ""));  // Fixed field name
+				runner.setAddressId(json.optString("addressId", "")); // Fixed field name
 				runner.setEmailAddress(json.optString("emailAddress", "")); // Fixed field name
-				runner.setPassword(json.optString("password", ""));    // Added password
-				runner.setStatus(json.optBoolean("status", true));     // Added status (default true)
+				runner.setPassword(json.optString("password", "")); // Added password
+				runner.setStatus(json.optBoolean("status", true)); // Added status (default true)
 				runner.setPlateNumber(json.optString("plateNumber", ""));
 				runner.setEarnings(json.optDouble("earnings", 0.0));
 				runner.setRatings(json.optDouble("ratings", 0.0));
 				runner.setAvailable(json.optBoolean("available"));
-				runner.setCurrentTask(json.getString("currentTask"));
-				
+				runner.setCurrentTask(json.optString("currentTask", ""));
+
 				// Reading tasks and reviews (Lists)
 				runner.setTasks(JsonUtils.jsonArrayToList(json.getJSONArray("tasks")));
 				runner.setReviews(JsonUtils.jsonArrayToList(json.getJSONArray("reviews")));
@@ -280,26 +282,30 @@ public class RunnerService {
 					// Update JSON object with new runner data
 					json.put("name", updatedRunner.getName());
 					json.put("phoneNumber", updatedRunner.getPhoneNumber());
-					json.put("addressId", updatedRunner.getAddressId());                // Fixed field name
-					json.put("emailAddress", updatedRunner.getEmailAddress());          // Fixed field name
-					json.put("password", updatedRunner.getPassword());                  // Added password
-					json.put("status", updatedRunner.getStatus());                      // Added status
+					json.put("addressId", updatedRunner.getAddressId()); // Fixed field name
+					json.put("emailAddress", updatedRunner.getEmailAddress()); // Fixed field name
+					json.put("password", updatedRunner.getPassword()); // Added password
+					json.put("status", updatedRunner.getStatus()); // Added status
 					json.put("plateNumber", updatedRunner.getPlateNumber());
 					json.put("earnings", updatedRunner.getEarnings());
-					json.put("ratings", updatedRunner.getRatings());                    // Added ratings
+					json.put("ratings", updatedRunner.getRatings()); // Added ratings
 					json.put("available", updatedRunner.isAvailable());
 					json.put("currentTask", updatedRunner.getCurrentTask());
-					
-					// Convert Lists to JSON Arrays safely
-					json.put("tasks", updatedRunner.getTasks() != null ? new JSONArray(updatedRunner.getTasks()) : new JSONArray());
-					json.put("reviews", updatedRunner.getReviews() != null ? new JSONArray(updatedRunner.getReviews()) : new JSONArray());
 
-					json.put("lastDeliveredAddress", updatedRunner.getLastDeliveredAddress() != null ? updatedRunner.getLastDeliveredAddress() : "");
+					// Convert Lists to JSON Arrays safely
+					json.put("tasks", updatedRunner.getTasks() != null ? new JSONArray(updatedRunner.getTasks())
+							: new JSONArray());
+					json.put("reviews", updatedRunner.getReviews() != null ? new JSONArray(updatedRunner.getReviews())
+							: new JSONArray());
+
+					json.put("lastDeliveredAddress",
+							updatedRunner.getLastDeliveredAddress() != null ? updatedRunner.getLastDeliveredAddress()
+									: "");
 
 					// Handle lastDeliveryDate safely
-					json.put("lastDeliveryDate", 
-							updatedRunner.getLastDeliveryDate() != null 
-							? updatedRunner.getLastDeliveryDate().toString() 
+					json.put("lastDeliveryDate",
+							updatedRunner.getLastDeliveryDate() != null
+									? updatedRunner.getLastDeliveryDate().toString()
 									: "");
 
 					found = true;
@@ -349,7 +355,7 @@ public class RunnerService {
 				// Skip the line if the ID matches (deleting this record)
 				if (json.getString("id").equals(id)) {
 					found = true; // Mark as found
-					continue;     // Skip adding this record to the updated list
+					continue; // Skip adding this record to the updated list
 				}
 				updatedLines.add(json.toString());
 			}
@@ -379,47 +385,48 @@ public class RunnerService {
 
 	public static String assignRunner(String customerAddressId) {
 		AddressDTO customerAddress = AddressService.getAddressById(customerAddressId);
-
-		List<RunnerDTO> runners = readAllRunner();
-		List<RunnerDTO> availableRunners = new ArrayList<>();
-		RunnerDTO selectedRunner = null;
-
-		for (RunnerDTO runner : runners) {
-			if (runner.isAvailable()) {
-				availableRunners.add(runner);
-			}
+		if (customerAddress == null) {
+			System.out.println("Invalid customer address ID.");
+			return null;
 		}
+
+		List<RunnerDTO> availableRunners = readAllRunner().stream()
+				.filter(RunnerDTO::isAvailable)
+				.collect(Collectors.toList());
 
 		if (availableRunners.isEmpty()) {
 			System.out.println("No available runners found.");
 			return null;
 		}
 
-		for (RunnerDTO runner : availableRunners) {
-			AddressDTO lastDeliveredAddress;
-			if (runner.getLastDeliveredAddress() != null) {
-				lastDeliveredAddress = AddressService.getAddressById(runner.getLastDeliveredAddress());
-			} else {
-				lastDeliveredAddress = AddressService.getAddressById(runner.getAddressId());
-			}
+		// Find a runner in the same city and state
+		RunnerDTO selectedRunner = availableRunners.stream()
+				.filter(runner -> {
+					AddressDTO lastAddress = (runner.getLastDeliveredAddress() != null)
+							? AddressService.getAddressById(runner.getLastDeliveredAddress())
+							: AddressService.getAddressById(runner.getAddressId());
 
-			if (lastDeliveredAddress.getCity().equals(customerAddress.getCity())
-					&& lastDeliveredAddress.getState().equals(customerAddress.getState())) {
-				selectedRunner = runner;
-				break;
-			}
-		}
-		if (selectedRunner != null) {
-			NotificationDTO notification = new NotificationDTO();
-			notification.setUserId(selectedRunner.getId());
-			notification.setTitle("New Delivery Task");
-			notification.setMessage("You have a new delivery task.");
-			notification.setRead(false);
-			notification.setTimestamp(LocalDateTime.now());
-			NotificationService.createNotification(notification);
-			return selectedRunner.getId();
-		} else {
+					return lastAddress != null &&
+							lastAddress.getCity().equals(customerAddress.getCity()) &&
+							lastAddress.getState().equals(customerAddress.getState());
+				})
+				.findFirst()
+				.orElse(null);
+
+		if (selectedRunner == null) {
+			System.out.println("No suitable runner found in the same city and state.");
 			return null;
 		}
+
+		// Notify the selected runner
+		NotificationDTO notification = new NotificationDTO();
+		notification.setUserId(selectedRunner.getId());
+		notification.setTitle("New Delivery Task");
+		notification.setMessage("You have a new delivery task.");
+		notification.setRead(false);
+		notification.setTimestamp(LocalDateTime.now());
+
+		NotificationService.createNotification(notification);
+		return selectedRunner.getId();
 	}
 }

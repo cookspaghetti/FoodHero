@@ -8,12 +8,13 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 import dto.VendorDTO;
 import enumeration.ButtonMode;
@@ -29,6 +30,7 @@ public class VendorPage extends JFrame {
 	private JTable vendorTable;
 	private DefaultTableModel tableModel;
 	private JButton createVendorButton;
+	private TableRowSorter<DefaultTableModel> sorter;
 
 	public VendorPage() {
 		setTitle("Vendor Management");
@@ -48,7 +50,7 @@ public class VendorPage extends JFrame {
 		searchButton = new JButton("Search");
 		searchButton.addActionListener(this::searchVendors);
 
-		filterComboBox = new JComboBox<>(new String[]{"All", "Active", "Inactive"});
+		filterComboBox = new JComboBox<>(new String[] { "All", "Active", "Inactive" });
 		filterComboBox.addActionListener(this::filterVendors);
 
 		topPanel.add(new JLabel("Search:"));
@@ -56,7 +58,7 @@ public class VendorPage extends JFrame {
 		topPanel.add(searchButton);
 		topPanel.add(new JLabel("Filter:"));
 		topPanel.add(filterComboBox);
-		
+
 		createVendorButton = new JButton("New Vendor");
 		createVendorButton.addActionListener(this::createVendor);
 		topPanel.add(createVendorButton);
@@ -64,16 +66,20 @@ public class VendorPage extends JFrame {
 		add(topPanel, BorderLayout.NORTH);
 
 		// ======= Vendor Table =======
-		String[] columnNames = {"ID", "Name", "Email", "Status", "Action"};
+		String[] columnNames = { "ID", "Name", "Email", "Status", "Action" };
 		tableModel = new DefaultTableModel(columnNames, 0) {
 			@Override
-		    public boolean isCellEditable(int row, int column) {
-		        return column == 4; // Make only the "Action" column editable
-		    }
+			public boolean isCellEditable(int row, int column) {
+				return column == 4; // Make only the "Action" column editable
+			}
 		};
 		vendorTable = new JTable(tableModel);
-		vendorTable.setRowHeight(40); 
-		
+		vendorTable.setRowHeight(40);
+
+		// Initialize table sorter after creating the table
+		sorter = new TableRowSorter<>(tableModel);
+		vendorTable.setRowSorter(sorter);
+
 		// Apply renderer and editor to the table
 		vendorTable.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer(ButtonMode.EDITDELETE));
 		vendorTable.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(vendorTable, ButtonMode.EDITDELETE));
@@ -86,10 +92,10 @@ public class VendorPage extends JFrame {
 	// ======= Action Methods =======
 	private void searchVendors(ActionEvent e) {
 		String searchTerm = searchField.getText().trim().toLowerCase();
-		
+
 		// Validate search term
 		if (searchTerm.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Please enter a search term", "Search Error", JOptionPane.ERROR_MESSAGE);
+			loadVendors();
 			return;
 		}
 
@@ -114,34 +120,25 @@ public class VendorPage extends JFrame {
 		String filter = (String) filterComboBox.getSelectedItem();
 		filterTable(filter);
 	}
-	
+
 	private void createVendor(ActionEvent e) {
 		new VendorCreateUserForm().setVisible(true);
-		loadVendors();
 	}
 
 	// ======= Filtering Logic =======
 	private void filterTable(String filter) {
-		for (int i = 0; i < vendorTable.getRowCount(); i++) {
-			boolean visible = false;
-			switch (filter) {
-				case "All":
-					visible = true;
-					break;
-				case "Active":
-					visible = vendorTable.getValueAt(i, 3).equals("Active");
-					break;
-				case "Inactive":
-					visible = vendorTable.getValueAt(i, 3).equals("Inactive");
-					break;
+		sorter.setRowFilter(filter.equals("All") ? null : new RowFilter<DefaultTableModel, Integer>() {
+			@Override
+			public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+				String status = (String) entry.getValue(3); // Status column index
+				return status.equalsIgnoreCase(filter);
 			}
-			vendorTable.setRowHeight(i, visible ? 40 : 0);
-		}
+		});
 	}
 
 	// ======= Utility Method =======
 	private void addRow(String id, String name, String email, boolean status) {
-		tableModel.addRow(new Object[]{id, name, email, status ? "Active" : "Inactive", "Edit"});
+		tableModel.addRow(new Object[] { id, name, email, status ? "Active" : "Inactive", "Edit" });
 	}
 
 	private void loadVendors() {

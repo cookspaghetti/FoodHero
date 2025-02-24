@@ -41,13 +41,15 @@ public class CustomerCreateComplaintForm extends JFrame {
         getContentPane().add(new JScrollPane(descriptionArea));
 
         JButton submitButton = new JButton("Submit");
-        getContentPane().add(new JLabel());
         getContentPane().add(submitButton);
         JButton closeButton = new JButton("Close");
-        getContentPane().add(new JLabel());
         getContentPane().add(closeButton);
 
         submitButton.addActionListener(e -> {
+            if (orderComboBox.getSelectedItem().equals("No recent orders")) {
+                JOptionPane.showMessageDialog(this, "No recent orders found");
+                return;
+            }
             submitComplaint(orderComboBox.getSelectedItem().toString(), descriptionArea.getText());
         });
 
@@ -64,11 +66,19 @@ public class CustomerCreateComplaintForm extends JFrame {
         for (OrderDTO order : orders) {
             orderIds.add(order.getId());
         }
+        if (orderIds.isEmpty()) {
+            orderIds.add("No recent orders");
+        }
         return orderIds.toArray(new String[0]);
     }
 
     // Submit the complaint
     private void submitComplaint(String orderId, String description) {
+        // Validate empty fields
+        if (orderId.isEmpty() || description.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields");
+            return;
+        }
         ComplaintDTO complaint = new ComplaintDTO();
         complaint.setId(IdGenerationUtils.getNextId(ServiceType.COMPLAIN, null, null));
         complaint.setCustomerId(SessionControlService.getId());

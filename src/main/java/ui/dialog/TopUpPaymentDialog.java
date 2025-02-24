@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import dto.AddTransactionDTO;
 import dto.CustomerDTO;
+import dto.NotificationDTO;
 import enumeration.PaymentMethod;
 import enumeration.ResponseCode;
 import enumeration.ServiceType;
@@ -18,6 +19,7 @@ import service.customer.CustomerService;
 import service.general.SessionControlService;
 import service.transaction.TransactionService;
 import service.utils.IdGenerationUtils;
+import service.notification.NotificationService;
 
 public class TopUpPaymentDialog extends JDialog {
 
@@ -88,8 +90,21 @@ public class TopUpPaymentDialog extends JDialog {
         if (updateCustomer != ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(this, "Failed to update customer balance", "Error", JOptionPane.ERROR_MESSAGE);
             return;
-        } else {
+        }
+
+        // Send notification
+        NotificationDTO notification = new NotificationDTO();
+        notification.setUserId(customerId);
+        notification.setMessage("Top up successful. Amount: RM" + addTransactionDTO.getAmount());
+        notification.setTimestamp(LocalDateTime.now());
+        notification.setRead(false);
+        notification.setTitle("Top Up Successful");
+        
+        ResponseCode sendNotification = NotificationService.createNotification(notification);
+        if (sendNotification == ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(this, "Top up successful", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to send notification", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         dispose();

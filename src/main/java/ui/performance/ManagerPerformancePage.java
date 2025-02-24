@@ -136,7 +136,7 @@ public class ManagerPerformancePage extends JFrame {
 			totalRating += review.getRating();
 		}
 		if (reviews.size() == 0) {
-			return "N/A";
+			return "0.0";
 		}
 		double averageRating = totalRating / reviews.size();
 		return String.format("%.1f", averageRating);
@@ -164,8 +164,10 @@ public class ManagerPerformancePage extends JFrame {
 	private void sortByRating(ActionEvent evt) {
 		String sort = sortOptions.getSelectedItem().toString();
 		if (sort.equals("Ascending")) {
+			System.out.println("Sort Ascending");
 			sortAscending();
 		} else {
+			System.out.println("Sort Descending");
 			sortDescending();
 		}
 	}

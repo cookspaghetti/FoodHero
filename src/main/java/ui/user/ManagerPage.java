@@ -8,12 +8,13 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 import dto.ManagerDTO;
 import enumeration.ButtonMode;
@@ -29,6 +30,7 @@ public class ManagerPage extends JFrame {
 	private JTable managerTable;
 	private DefaultTableModel tableModel;
 	private JButton createManagerButton;
+	private TableRowSorter<DefaultTableModel> sorter;
 
 	public ManagerPage() {
 		setTitle("Manager Management");
@@ -74,6 +76,10 @@ public class ManagerPage extends JFrame {
 		managerTable = new JTable(tableModel);
 		managerTable.setRowHeight(40); 
 
+		// Initialize table sorter after creating the table
+    	sorter = new TableRowSorter<>(tableModel);
+    	managerTable.setRowSorter(sorter);
+
 		// Apply renderer and editor to the table
 		managerTable.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer(ButtonMode.EDITDELETE));
 		managerTable.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(managerTable, ButtonMode.EDITDELETE));
@@ -89,7 +95,7 @@ public class ManagerPage extends JFrame {
 		
 		// Validate search term
 		if (searchTerm.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Please enter a search term", "Search Error", JOptionPane.ERROR_MESSAGE);
+			loadManagers();
 			return;
 		}
 
@@ -118,24 +124,18 @@ public class ManagerPage extends JFrame {
 	private void createManager(ActionEvent e) {
 		ManagerCreateUserForm form = new ManagerCreateUserForm();
 		form.setVisible(true);
-		loadManagers();
 	}
 
 	// ======= Filtering Logic =======
 	private void filterTable(String filter) {
-		for (int i = 0; i < managerTable.getRowCount(); i++) {
-			String status = (String) managerTable.getValueAt(i, 3);
-			boolean show = false;
-			if (filter.equals("All")) {
-				show = true;
-			} else if (filter.equals("Active") && status.equals("Active")) {
-				show = true;
-			} else if (filter.equals("Inactive") && status.equals("Inactive")) {
-				show = true;
-			}
-			managerTable.setRowHeight(i, show ? 40 : 0);
-		}
-	}
+    sorter.setRowFilter(filter.equals("All") ? null : new RowFilter<DefaultTableModel, Integer>() {
+        @Override
+        public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+            String status = (String) entry.getValue(3); // Status column index
+            return status.equalsIgnoreCase(filter);
+        }
+    });
+}
 
 	// ======= Utility Method =======
 	private void addRow(String id, String name, String email, boolean status) {

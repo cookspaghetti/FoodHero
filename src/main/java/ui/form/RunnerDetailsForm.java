@@ -16,10 +16,13 @@ import dto.RunnerDTO;
 import dto.AddressDTO;
 import enumeration.ResponseCode;
 import service.address.AddressService;
+import service.distance.DistanceService;
 import service.runner.RunnerService;
 
 public class RunnerDetailsForm extends JFrame {
-    private JTextField idField, nameField, phoneField, emailField, passwordField;
+    private JTextField idField, nameField, phoneField, emailField, numberPlateField;
+    private JPasswordField passwordField;
+    private JCheckBox availableCheckBox;
     private JCheckBox statusCheckBox;
     private JButton saveButton, closeButton, editAddressButton;
 
@@ -27,7 +30,7 @@ public class RunnerDetailsForm extends JFrame {
         setTitle("Runner Information");
         setSize(400, 360);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new GridLayout(8, 2, 5, 5));
+        setLayout(new GridLayout(10, 2, 5, 5));
 
         JLabel label = new JLabel("ID:");
         label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -66,11 +69,23 @@ public class RunnerDetailsForm extends JFrame {
         passwordField = new JPasswordField(runner.getPassword());
         add(passwordField);
 
+        JLabel label_7 = new JLabel("Number Plate:");
+        label_7.setHorizontalAlignment(SwingConstants.CENTER);
+        add(label_7);
+        numberPlateField = new JTextField(runner.getPlateNumber());
+        add(numberPlateField);
+
         JLabel label_6 = new JLabel("Status:");
         label_6.setHorizontalAlignment(SwingConstants.CENTER);
         add(label_6);
         statusCheckBox = new JCheckBox("Active", runner.getStatus());
         add(statusCheckBox);
+
+        JLabel label_8 = new JLabel("Available:");
+        label_8.setHorizontalAlignment(SwingConstants.CENTER);
+        add(label_8);
+        availableCheckBox = new JCheckBox("Available to Tasks", runner.isAvailable());
+        add(availableCheckBox);
 
         saveButton = new JButton("Save");
         closeButton = new JButton("Close");
@@ -121,16 +136,26 @@ public class RunnerDetailsForm extends JFrame {
         dialog.add(closeButton);
 
         saveButton.addActionListener(e -> {
+            // validation
+            if (streetField.getText().isEmpty() || cityField.getText().isEmpty() || stateField.getText().isEmpty()
+                    || postalCodeField.getText().isEmpty() || countryField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             // Update address object
-            AddressDTO updatedAddress = new AddressDTO();
-            updatedAddress.setId(address.getId());
-            updatedAddress.setStreet(streetField.getText());
-            updatedAddress.setCity(cityField.getText());
-            updatedAddress.setState(stateField.getText());
-            updatedAddress.setPostalCode(postalCodeField.getText());
-            updatedAddress.setCountry(countryField.getText());
+            address.setStreet(streetField.getText());
+            address.setCity(cityField.getText());
+            address.setState(stateField.getText());
+            address.setPostalCode(postalCodeField.getText());
+            address.setCountry(countryField.getText());
 
-            ResponseCode response = AddressService.updateAddress(updatedAddress);
+            // verification using api
+            if (!DistanceService.verifyAddress(address)) {
+                JOptionPane.showMessageDialog(this, "Invalid address", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            ResponseCode response = AddressService.updateAddress(address);
             if (response == ResponseCode.SUCCESS) {
                 JOptionPane.showMessageDialog(this, "Address updated successfully", "Success",
                         JOptionPane.INFORMATION_MESSAGE);
@@ -149,35 +174,54 @@ public class RunnerDetailsForm extends JFrame {
 
     private void updateRunner(RunnerDTO runner) {
         // Check if the fields are empty
-        if (idField.getText().isEmpty() || nameField.getText().isEmpty() || phoneField.getText().isEmpty()
-                || emailField.getText().isEmpty() || passwordField.getText().isEmpty()) {
+        if (nameField.getText().isEmpty() || phoneField.getText().isEmpty() || emailField.getText().isEmpty()
+                || passwordField.getPassword().length == 0 || numberPlateField.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
             return;
-
         }
 
         // Check if any fields is modified
-        if (idField.getText().equals(runner.getId()) && nameField.getText().equals(runner.getName())
-                && phoneField.getText().equals(runner.getPhoneNumber())
+        if (nameField.getText().equals(runner.getName()) && phoneField.getText().equals(runner.getPhoneNumber())
                 && emailField.getText().equals(runner.getEmailAddress())
-                && passwordField.getText().equals(runner.getPassword())
-                && statusCheckBox.isSelected() == runner.getStatus()) {
-            JOptionPane.showMessageDialog(this, "No changes were made", "Error", JOptionPane.ERROR_MESSAGE);
+                && statusCheckBox.isSelected() == runner.getStatus()
+                && availableCheckBox.isSelected() == runner.isAvailable()
+                && numberPlateField.getText().equals(runner.getPlateNumber())
+                && passwordField.getPassword().equals(runner.getPassword().toCharArray())) {
+            JOptionPane.showMessageDialog(this, "No changes made", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
-        RunnerDTO updatedRunner = new RunnerDTO();
-        updatedRunner.setId(runner.getId());
-        updatedRunner.setName(nameField.getText());
-        updatedRunner.setPhoneNumber(phoneField.getText());
-        updatedRunner.setEmailAddress(emailField.getText());
-        updatedRunner.setPassword(passwordField.getText());
-        updatedRunner.setStatus(statusCheckBox.isSelected());
-        updatedRunner.setAddressId(runner.getAddressId());
+        // check phone number
+        if (!phoneField.getText().matches("\\d{10}") && !phoneField.getText().matches("\\d{11}")) {
+            JOptionPane.showMessageDialog(this, "Invalid phone number", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        ResponseCode response = RunnerService.updateRunner(updatedRunner);
+        // check email
+        if (!emailField.getText().matches("^(.+)@(.+)$")) {
+            JOptionPane.showMessageDialog(this, "Invalid email address", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // password length
+        if (passwordField.getPassword().length < 8) {
+            JOptionPane.showMessageDialog(this, "Password must be at least 8 characters", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        runner.setName(nameField.getText());
+        runner.setPhoneNumber(phoneField.getText());
+        runner.setEmailAddress(emailField.getText());
+        runner.setPassword(String.valueOf(passwordField.getPassword()));
+        runner.setStatus(statusCheckBox.isSelected());
+        runner.setPlateNumber(numberPlateField.getText());
+        runner.setAvailable(availableCheckBox.isSelected());
+
+        ResponseCode response = RunnerService.updateRunner(runner);
         if (response == ResponseCode.SUCCESS) {
             JOptionPane.showMessageDialog(this, "Runner updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to update runner", "Error", JOptionPane.ERROR_MESSAGE);
         }

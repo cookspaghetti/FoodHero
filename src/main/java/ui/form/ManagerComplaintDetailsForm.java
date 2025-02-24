@@ -65,7 +65,12 @@ public class ManagerComplaintDetailsForm extends JFrame {
             }
             
             // Check if solution is empty
-            if (solutionArea.getText().isEmpty()) {
+            if (complaint.getStatus() == ComplaintStatus.RESOLVED && solutionArea.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Solution cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (complaint.getStatus() == ComplaintStatus.REJECTED && solutionArea.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Solution cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }

@@ -8,12 +8,13 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 import dto.CustomerDTO;
 import enumeration.ButtonMode;
@@ -29,6 +30,7 @@ public class CustomerPage extends JFrame {
 	private JTable customerTable;
 	private DefaultTableModel tableModel;
 	private JButton createCustomerButton;
+	private TableRowSorter<DefaultTableModel> sorter;
 
 	public CustomerPage() {
 		setTitle("Customer Management");
@@ -48,7 +50,7 @@ public class CustomerPage extends JFrame {
 		searchButton = new JButton("Search");
 		searchButton.addActionListener(this::searchCustomers);
 
-		filterComboBox = new JComboBox<>(new String[]{"All", "Active", "Inactive"});
+		filterComboBox = new JComboBox<>(new String[] { "All", "Active", "Inactive" });
 		filterComboBox.addActionListener(this::filterCustomers);
 
 		topPanel.add(new JLabel("Search:"));
@@ -56,7 +58,7 @@ public class CustomerPage extends JFrame {
 		topPanel.add(searchButton);
 		topPanel.add(new JLabel("Filter:"));
 		topPanel.add(filterComboBox);
-		
+
 		createCustomerButton = new JButton("New Customer");
 		createCustomerButton.addActionListener(this::createCustomer);
 		topPanel.add(createCustomerButton);
@@ -64,19 +66,24 @@ public class CustomerPage extends JFrame {
 		add(topPanel, BorderLayout.NORTH);
 
 		// ======= Customer Table =======
-		String[] columnNames = {"ID", "Name", "Email", "Status", "Action"};
+		String[] columnNames = { "ID", "Name", "Email", "Status", "Action" };
 		tableModel = new DefaultTableModel(columnNames, 0) {
 			@Override
-		    public boolean isCellEditable(int row, int column) {
-		        return column == 4; // Make only the "Action" column editable
-		    }
+			public boolean isCellEditable(int row, int column) {
+				return column == 4; // Make only the "Action" column editable
+			}
 		};
 		customerTable = new JTable(tableModel);
-		customerTable.setRowHeight(40); 
-		
+		customerTable.setRowHeight(40);
+
+		// Initialize table sorter after creating the table
+		sorter = new TableRowSorter<>(tableModel);
+		customerTable.setRowSorter(sorter);
+
 		// Apply renderer and editor to the table
 		customerTable.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer(ButtonMode.EDITDELETE));
-		customerTable.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(customerTable, ButtonMode.EDITDELETE));
+		customerTable.getColumnModel().getColumn(4)
+				.setCellEditor(new ButtonEditor(customerTable, ButtonMode.EDITDELETE));
 
 		loadCustomers();
 
@@ -86,10 +93,10 @@ public class CustomerPage extends JFrame {
 	// ======= Action Methods =======
 	private void searchCustomers(ActionEvent e) {
 		String searchTerm = searchField.getText().trim().toLowerCase();
-		
+
 		// Validate search term
 		if (searchTerm.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Please enter a search term", "Search Error", JOptionPane.ERROR_MESSAGE);
+			loadCustomers();
 			return;
 		}
 
@@ -114,30 +121,24 @@ public class CustomerPage extends JFrame {
 		String filter = (String) filterComboBox.getSelectedItem();
 		filterTable(filter);
 	}
-	
+
 	private void createCustomer(ActionEvent e) {
 		new CustomerCreateUserForm().setVisible(true);
-		loadCustomers();
 	}
 
 	// ======= Filtering Logic =======
 	private void filterTable(String filter) {
-		for (int i = 0; i < customerTable.getRowCount(); i++) {
-			String status = (String) customerTable.getValueAt(i, 3);
-			boolean show = false;
-			if (filter.equals("All")) {
-				show = true;
-			} else if (filter.equals("Active") && status.equals("Active")) {
-				show = true;
-			} else if (filter.equals("Inactive") && status.equals("Inactive")) {
-				show = true;
+		sorter.setRowFilter(filter.equals("All") ? null : new RowFilter<DefaultTableModel, Integer>() {
+			@Override
+			public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+				String status = (String) entry.getValue(3); // Status column index
+				return status.equalsIgnoreCase(filter);
 			}
-			customerTable.setRowHeight(i, show ? 40 : 0);
-		}
+		});
 	}
 
 	private void addRow(String id, String name, String email, boolean status) {
-		tableModel.addRow(new Object[]{id, name, email, status ? "Active" : "Inactive", "Edit"});
+		tableModel.addRow(new Object[] { id, name, email, status ? "Active" : "Inactive", "Edit" });
 	}
 
 	private void loadCustomers() {

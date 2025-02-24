@@ -54,6 +54,8 @@ public class SessionControlService {
     private static List<String> deliveryAddresses;		  // Customer
     
     private static HashMap<String, Integer> cartItems;    // item id, amount
+	
+	private static String currentSelectedAddress;         // Address Service
 
 	// === Set Session for Admin ===
 	public static void setSession(AdminDTO admin) {
@@ -109,7 +111,7 @@ public class SessionControlService {
 	public static void setSession(CustomerDTO customer) {
 		clearSession();
 		user = customer;
-		role = Role.VENDOR;
+		role = Role.CUSTOMER;
 		setCommonUserInfo(customer);
 
 		credit = customer.getCredit();
@@ -205,5 +207,14 @@ public class SessionControlService {
 		if (cartItems != null) {
 			cartItems.put(itemId, amount);
 		}
+	}
+
+	// Address Service
+	public static void setCurrentSelectedAddress(String address) {
+		currentSelectedAddress = address;
+	}
+
+	public static String getCurrentSelectedAddress() {
+		return currentSelectedAddress;
 	}
 }

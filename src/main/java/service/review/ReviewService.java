@@ -23,7 +23,7 @@ public class ReviewService {
 	private static final String SYS_PATH = "src\\main\\resources\\database\\review\\";
 
 	// Method to create a VendorReview and save it to a text file in JSON format
-	public ResponseCode createVendorReview(VendorReviewDTO review) {
+	public static ResponseCode createVendorReview(VendorReviewDTO review) {
 		
         String filePath = SYS_PATH + "vendor_" + review.getVendorId() + "_review.txt";
         
@@ -54,7 +54,7 @@ public class ReviewService {
 			while ((line = reader.readLine()) != null) {
 				JSONObject json = new JSONObject(line);
 
-				if (json.getString("id").equals(id)) {
+				if (json.getString("orderId").equals(id)) {
 					VendorReviewDTO review = new VendorReviewDTO();
 					review.setId(json.getString("id"));
 					review.setOrderId(json.getString("orderId"));
@@ -208,7 +208,7 @@ public class ReviewService {
     }
 
 	// Method to create a RunnerReview and save to a text file
-	public ResponseCode createRunnerReview(RunnerReviewDTO review) {
+	public static ResponseCode createRunnerReview(RunnerReviewDTO review) {
 		
 	    String filePath = SYS_PATH + "runner_" + review.getRunnerId() + "_review.txt";
 

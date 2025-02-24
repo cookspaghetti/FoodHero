@@ -3,6 +3,7 @@ package ui.form;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -10,6 +11,7 @@ import dto.AddTransactionDTO;
 import dto.CustomerDTO;
 import dto.OrderDTO;
 import enumeration.OrderStatus;
+import enumeration.PaymentMethod;
 import enumeration.ResponseCode;
 import enumeration.ServiceType;
 import service.customer.CustomerService;
@@ -48,7 +50,8 @@ public class CustomerOrderDetailsForm extends JFrame {
         getContentPane().add(new JLabel("RM " + String.valueOf(order.getTotalAmount())));
 
         getContentPane().add(new JLabel("Placement Time:"));
-        getContentPane().add(new JLabel(order.getPlacementTime().toString()));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        getContentPane().add(new JLabel(order.getPlacementTime().format(formatter)));
 
         getContentPane().add(new JLabel("Status:"));
         getContentPane().add(new JLabel(order.getStatus().toString()));
@@ -96,6 +99,8 @@ public class CustomerOrderDetailsForm extends JFrame {
             addTransaction.setAmount(order.getTotalAmount());
             addTransaction.setDate(LocalDateTime.now());
             addTransaction.setDescription("Refund for order cancellation " + order.getId());
+            addTransaction.setAdminId(null);
+            addTransaction.setPaymentMethod(PaymentMethod.REFUND);
             response = TransactionService.createAddTransaction(addTransaction);
             if (response != ResponseCode.SUCCESS) {
                 JOptionPane.showMessageDialog(this, "Failed to refund customer.");

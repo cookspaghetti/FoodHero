@@ -1,0 +1,1 @@
+{"totalAmount":27.3,"completionTime":"2025-02-25T00:08:11.863088800","deliveryFee":0.91,"notes":"Delivery","placementTime":"2025-02-24T16:05:02.791755600","deliveryAddress":"ADR00007","customerId":"CUS00001","vendorId":"VDR00002","runnerId":"RUN00001","id":"ORD00001","items":{"ITM00003":1,"ITM00001":1},"status":"DELIVERED"}

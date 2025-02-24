@@ -1,5 +1,14 @@
 {"country":"Malaysia","city":"Bukit Jalil","street":"Street 1, Building 1","postalCode":"57000","id":"ADR00001","state":"Kuala Lumpur","userId":"ADM00002"}
-{"country":"Malaysia","city":"Bukit Jalil","street":"Street 1, Building 1","postalCode":"57000","id":"ADR00002","state":"Kuala Lumpur","userId":"MGR00001"}
-{"country":"Malaysia","city":"Bukit Jalil","street":"Taman Sri Endah","postalCode":"57000","id":"ADR00003","state":"Kuala Lumpur","userId":"CUS00001"}
-{"country":"Malaysia","city":"Sri Petaling","street":"Taman Naga Emas","postalCode":"57000","id":"ADR00004","state":"Kuala Lumpur","userId":"VDR00001"}
-{"country":"Malaysia","city":"Bukit Jalil","street":"TPM Resource Center","postalCode":"57000","id":"ADR00005","state":"Kuala Lumpur","userId":"RUN00001"}
+{"country":"Malaysia","city":"Sri Petaling","street":"Taman Naga Emas","postalCode":"57000","id":"ADR00002","state":"Kuala Lumpur","userId":"MGR00001"}
+{"country":"Malaysia","city":"Sri Petaling","street":"Jalan 1/149e, Taman Sri Endah","postalCode":"57000","id":"ADR00003","state":"Kuala Lumpur","userId":"CUS00001"}
+{"country":"Malaysia","city":"Sri Petaling","street":"20, Jalan Radin Bagus 9","postalCode":"57000","id":"ADR00004","state":"Kuala Lumpur","userId":"VDR00001"}
+{"country":"Malaysia","city":"Sri Petaling","street":"72, Jalan Sri Petaling 1","postalCode":"57000","id":"ADR00005","state":"Kuala Lumpur","userId":"RUN00001"}
+{"country":"Malaysia","city":"Bukit Jalil","street":"Taman Sri Endah","postalCode":"57000","id":"ADR00006","state":"Kuala Lumpur","userId":"ADM00001"}
+{"country":"Malaysia","city":"Sri Petaling","street":"Taman Sri Endah","postalCode":"57000","id":"ADR00007","state":"Kuala Lumpur","userId":"CUS00001"}
+{"country":"12321","city":"123123","street":"113","postalCode":"123123","id":"ADR00008","state":"12312","userId":"CUS00001"}
+{"country":"Malaysia","city":"Sri Petaling","street":"Jalan 4/149a","postalCode":"57000","id":"ADR00009","state":"Kuala Lumpur","userId":"CUS00001"}
+{"country":"Malaysia","city":"Sri Petaling","street":"Jalan Wan Sendari","postalCode":"57000","id":"ADR00010","state":"Kuala Lumpur","userId":"RUN00002"}
+{"country":"Malaysia","city":"Chemor","street":"94, Jalan Sri Klebang 33","postalCode":"31200","id":"ADR00011","state":"Perak","userId":"ADM00002"}
+{"country":"Malaysia","city":"Sri Petaling ","street":"Jalan 1/149j","postalCode":"57000","id":"ADR00012","state":"Kuala Lumpur","userId":"RUN00003"}
+{"country":"Malaysia","city":"Bukit Jalil","street":"Technology Park Malaysia","postalCode":"57000","id":"ADR00013","state":"Kuala Lumpur","userId":"ADM00003"}
+{"country":"Malaysia","city":"Sungai Besi","street":"47, Jalan Tasik Utama 8","postalCode":"57000","id":"ADR00014","state":"Kuala Lumpur","userId":"VDR00002"}

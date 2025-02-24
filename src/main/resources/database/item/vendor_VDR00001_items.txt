@@ -1,0 +1,1 @@
+{"price":85.5,"defaultAmount":10,"name":"Hot Pot for 4","vendorId":"VDR00001","description":"Tasty hot pot for 4 person.","id":"ITM00001","availability":true}

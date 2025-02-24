@@ -16,10 +16,12 @@ import dto.VendorDTO;
 import dto.AddressDTO;
 import enumeration.ResponseCode;
 import service.address.AddressService;
+import service.distance.DistanceService;
 import service.vendor.VendorService;
 
 public class VendorDetailsForm extends JFrame {
-    private JTextField idField, nameField, phoneField, emailField, passwordField, vendorNameField, vendorTypeField;
+    private JTextField idField, nameField, phoneField, emailField, vendorNameField, vendorTypeField;
+    private JPasswordField passwordField;
     private JCheckBox statusCheckBox;
     private JButton saveButton, closeButton, editAddressButton;
 
@@ -71,13 +73,13 @@ public class VendorDetailsForm extends JFrame {
         getContentPane().add(label_6);
         statusCheckBox = new JCheckBox("Active", vendor.getStatus());
         getContentPane().add(statusCheckBox);
-        
+
         JLabel label_7 = new JLabel("Vendor Name");
         label_7.setHorizontalAlignment(SwingConstants.CENTER);
         getContentPane().add(label_7);
         vendorNameField = new JTextField(vendor.getVendorName());
         getContentPane().add(vendorNameField);
-        
+
         JLabel label_8 = new JLabel("Vendor Type");
         label_8.setHorizontalAlignment(SwingConstants.CENTER);
         getContentPane().add(label_8);
@@ -92,7 +94,7 @@ public class VendorDetailsForm extends JFrame {
         closeButton.addActionListener(e -> dispose());
         saveButton.addActionListener(e -> updateVendor(vendor));
         editAddressButton.addActionListener(e -> openAddressDialog(vendor));
-        
+
         setLocationRelativeTo(null);
         setVisible(true);
     }
@@ -133,18 +135,29 @@ public class VendorDetailsForm extends JFrame {
         dialog.add(closeButton);
 
         saveButton.addActionListener(e -> {
+            // validation
+            if (streetField.getText().isEmpty() || cityField.getText().isEmpty() || stateField.getText().isEmpty()
+                    || postalCodeField.getText().isEmpty() || countryField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             // Update address object
-            AddressDTO updatedAddress = new AddressDTO();
-            updatedAddress.setId(address.getId());
-            updatedAddress.setStreet(streetField.getText());
-            updatedAddress.setCity(cityField.getText());
-            updatedAddress.setState(stateField.getText());
-            updatedAddress.setPostalCode(postalCodeField.getText());
-            updatedAddress.setCountry(countryField.getText());
+            address.setStreet(streetField.getText());
+            address.setCity(cityField.getText());
+            address.setState(stateField.getText());
+            address.setPostalCode(postalCodeField.getText());
+            address.setCountry(countryField.getText());
 
-            ResponseCode response = AddressService.updateAddress(updatedAddress);
+            // verification using api
+            if (!DistanceService.verifyAddress(address)) {
+                JOptionPane.showMessageDialog(this, "Invalid address", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            ResponseCode response = AddressService.updateAddress(address);
             if (response == ResponseCode.SUCCESS) {
-                JOptionPane.showMessageDialog(this, "Address updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Address updated successfully", "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to update address", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -160,31 +173,53 @@ public class VendorDetailsForm extends JFrame {
 
     private void updateVendor(VendorDTO vendor) {
         // Check if the fields are empty
-        if (idField.getText().isEmpty() || nameField.getText().isEmpty() || phoneField.getText().isEmpty() || emailField.getText().isEmpty() || passwordField.getText().isEmpty()) {
+        if (nameField.getText().isEmpty() || phoneField.getText().isEmpty() || emailField.getText().isEmpty()
+                || passwordField.getPassword().length == 0) {
             JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Check if any fields is modified
-        if (idField.getText().equals(vendor.getId()) && nameField.getText().equals(vendor.getName()) && phoneField.getText().equals(vendor.getPhoneNumber()) && emailField.getText().equals(vendor.getEmailAddress()) && passwordField.getText().equals(vendor.getPassword()) && statusCheckBox.isSelected() == vendor.getStatus()) {
+        if (nameField.getText().equals(vendor.getName()) && phoneField.getText().equals(vendor.getPhoneNumber())
+                && emailField.getText().equals(vendor.getEmailAddress())
+                && statusCheckBox.isSelected() == vendor.getStatus()
+                && vendorNameField.getText().equals(vendor.getVendorName())
+                && passwordField.getPassword().equals(vendor.getPassword().toCharArray())) {
             JOptionPane.showMessageDialog(this, "No changes made", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
-        VendorDTO updatedVendor = new VendorDTO();
-        updatedVendor.setId(vendor.getId());
-        updatedVendor.setName(nameField.getText());
-        updatedVendor.setPhoneNumber(phoneField.getText());
-        updatedVendor.setEmailAddress(emailField.getText());
-        updatedVendor.setPassword(passwordField.getText());
-        updatedVendor.setStatus(statusCheckBox.isSelected());
-        updatedVendor.setVendorName(vendorNameField.getText());
-        updatedVendor.setVendorType(vendor.getVendorType());
-        updatedVendor.setAddressId(vendor.getAddressId());
+        // check phone number
+        if (!phoneField.getText().matches("\\d{10}") && !phoneField.getText().matches("\\d{11}")) {
+            JOptionPane.showMessageDialog(this, "Invalid phone number", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        ResponseCode response = VendorService.updateVendor(updatedVendor);
+        // check email
+        if (!emailField.getText().matches("^(.+)@(.+)$")) {
+            JOptionPane.showMessageDialog(this, "Invalid email address", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // password length
+        if (passwordField.getPassword().length < 8) {
+            JOptionPane.showMessageDialog(this, "Password must be at least 8 characters", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        vendor.setName(nameField.getText());
+        vendor.setPhoneNumber(phoneField.getText());
+        vendor.setEmailAddress(emailField.getText());
+        vendor.setPassword(String.valueOf(passwordField.getPassword()));
+        vendor.setStatus(statusCheckBox.isSelected());
+        vendor.setVendorName(vendorNameField.getText());
+
+        ResponseCode response = VendorService.updateVendor(vendor);
         if (response == ResponseCode.SUCCESS) {
-            JOptionPane.showMessageDialog(this, "Vendor updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vendor updated successfully", "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to update vendor", "Error", JOptionPane.ERROR_MESSAGE);
         }

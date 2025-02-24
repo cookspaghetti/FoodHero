@@ -7,6 +7,7 @@ import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -36,7 +37,6 @@ public class VendorRevenuePage extends JFrame {
         // Search Panel
         JPanel searchPanel = new JPanel();
         yearFilterComboBox = new JComboBox<>();
-        yearFilterComboBox.addActionListener(e -> filterYear(yearFilterComboBox.getSelectedItem().toString()));
         
         // Populate year combo box (starting from 2015)
         for (int year = 2015; year <= Year.now().getValue(); year++) {
@@ -46,19 +46,18 @@ public class VendorRevenuePage extends JFrame {
         searchPanel.add(new JLabel("Year:"));
         searchPanel.add(yearFilterComboBox);
         add(searchPanel, BorderLayout.NORTH);
-
+        
         // Table Panel
         String[] columnNames = {"Month", "Orders", "Earnings"};
         tableModel = new DefaultTableModel(columnNames, 0);
         revenueTable = new JTable(tableModel);
         tableScrollPane = new JScrollPane(revenueTable);
         add(tableScrollPane, BorderLayout.CENTER);
+        
+        yearFilterComboBox.setSelectedItem(String.valueOf(Year.now().getValue()));
+        updateTable(yearFilterComboBox.getSelectedItem().toString());
 
-        // Populate fixed months
-        String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-        for (String month : months) {
-            tableModel.addRow(new Object[]{month, "N/A", "N/A"});
-        }
+        yearFilterComboBox.addActionListener(e -> filterYear(yearFilterComboBox.getSelectedItem().toString()));
 
         setVisible(true);
     }
@@ -67,22 +66,51 @@ public class VendorRevenuePage extends JFrame {
     private void updateTable(String year) {
         // Get list of orders
         List<OrderDTO> orders = OrderService.readVendorOrders(vendor.getId());
+        tableModel.setRowCount(0);
+    
+        if (orders == null || orders.isEmpty()) {
+            // Reset table with default values
+            String[] months = {"January", "February", "March", "April", "May", "June", 
+                              "July", "August", "September", "October", "November", "December"};
+            for (String month : months) {
+                tableModel.addRow(new Object[]{month, 0, 0.0});
+            }
+            
+            if (orders == null) {
+                JOptionPane.showMessageDialog(this, "Error fetching orders", "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
+            return;
+        }
+    
+        // Initialize table with zeros
+        String[] months = {"January", "February", "March", "April", "May", "June", 
+                          "July", "August", "September", "October", "November", "December"};
+        for (String month : months) {
+            tableModel.addRow(new Object[]{month, 0, 0.0});
+        }
+    
+        // Process orders
         for (OrderDTO order : orders) {
-            // Filter orders that are not delivered
-            if (order.getStatus() != OrderStatus.DELIVERED) {
-                continue;
+            try {
+                // Skip invalid orders
+                if (order == null || order.getCompletionTime() == null || 
+                    order.getStatus() != OrderStatus.DELIVERED || 
+                    !String.valueOf(order.getCompletionTime().getYear()).equals(year)) {
+                    continue;
+                }
+    
+                int month = order.getCompletionTime().getMonthValue();
+                int currentCount = Integer.parseInt(tableModel.getValueAt(month - 1, 1).toString());
+                double currentEarnings = Double.parseDouble(tableModel.getValueAt(month - 1, 2).toString());
+    
+                tableModel.setValueAt(currentCount + 1, month - 1, 1);
+                tableModel.setValueAt(String.format("%.2f", currentEarnings + order.getTotalAmount()), 
+                    month - 1, 2);
+    
+            } catch (NumberFormatException e) {
+                System.err.println("Error processing order: " + e.getMessage());
             }
-            // Filter orders that are not in the selected year
-            if (!String.valueOf(order.getCompletionTime().getYear()).equals(year)) {
-                continue;
-            }
-
-            int month = order.getCompletionTime().getMonthValue();
-            int orderCount = Integer.parseInt(tableModel.getValueAt(month - 1, 1).toString());
-            double earnings = Double.parseDouble(tableModel.getValueAt(month - 1, 2).toString());
-
-            tableModel.setValueAt(orderCount + 1, month - 1, 1);
-            tableModel.setValueAt(earnings + order.getTotalAmount(), month - 1, 2);
         }
     }
     

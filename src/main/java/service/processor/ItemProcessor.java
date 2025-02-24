@@ -15,7 +15,7 @@ public class ItemProcessor {
         return CompletableFuture.supplyAsync(() -> {
             ItemDTO item = ItemService.readItem(vendorId, itemId);
             if (item != null) {
-                return item.getName() + " x" + quantity + "\n";
+                return item.getName() + " x" + quantity;
             } else {
                 return "Unknown Item (" + itemId + ") x" + quantity;
             }
@@ -30,7 +30,7 @@ public class ItemProcessor {
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
             .thenApply(v -> futures.stream()
                 .map(CompletableFuture::join)
-                .collect(Collectors.joining(", ")));
+                .collect(Collectors.joining("\n")));
     }
 }
 

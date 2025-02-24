@@ -48,6 +48,10 @@ public class ButtonRenderer extends JPanel implements TableCellRenderer {
     	} else if (mode == ButtonMode.ADDTOCART) {
     		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
             add(addToCartButton);
+    	} else if (mode == ButtonMode.CARTEDITDELETE) {
+    		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 6));
+            add(editButton);
+            add(deleteButton);
     	}
     }
 

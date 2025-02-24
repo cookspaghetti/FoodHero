@@ -1,0 +1,7 @@
+{"date":"2025-02-24T09:21:39.566146300","amount":85.5,"orderId":"ORD00001","customerId":"CUS00001","description":"Order from Yosen Japanese Shabu Shabu","id":"DED00001"}
+{"date":"2025-02-24T09:21:51.643667500","amount":85.5,"orderId":"ORD00002","customerId":"CUS00001","description":"Order from Yosen Japanese Shabu Shabu","id":"DED00002"}
+{"date":"2025-02-24T09:30:15.090171900","amount":86.03,"orderId":"ORD00005","customerId":"CUS00001","description":"Order from Yosen Japanese Shabu Shabu","id":"DED00003"}
+{"date":"2025-02-24T09:49:20.065346800","amount":85.5,"orderId":"ORD00006","customerId":"CUS00001","description":"Order from Yosen Japanese Shabu Shabu","id":"DED00004"}
+{"date":"2025-02-24T10:33:07.218743500","amount":86.03,"orderId":"ORD00007","customerId":"CUS00001","description":"Order from Yosen Japanese Shabu Shabu","id":"DED00005"}
+{"date":"2025-02-24T15:47:20.002948900","amount":86.03,"orderId":"ORD00008","customerId":"CUS00001","description":"Order from Yosen Japanese Shabu Shabu","id":"DED00006"}
+{"date":"2025-02-24T16:05:02.803989700","amount":28.21,"orderId":"ORD00001","customerId":"CUS00001","description":"Order from Pop Meals @ Lakefield","id":"DED00007"}

@@ -8,6 +8,7 @@ import enumeration.ResponseCode;
 import enumeration.ServiceType;
 import enumeration.VendorType;
 import service.address.AddressService;
+import service.distance.DistanceService;
 import service.utils.IdGenerationUtils;
 import service.vendor.VendorService;
 
@@ -15,7 +16,8 @@ import java.awt.*;
 
 public class VendorCreateUserForm extends JFrame {
 
-    private JTextField idField, nameField, phoneField, emailField, passwordField;
+    private JTextField idField, nameField, phoneField, emailField;
+    private JPasswordField passwordField;
     private JCheckBox statusCheckBox;
     private JButton saveButton, closeButton, editAddressButton;
 
@@ -76,7 +78,7 @@ public class VendorCreateUserForm extends JFrame {
         getContentPane().add(saveButton);
         getContentPane().add(closeButton);
 
-        saveButton.addActionListener(e -> createCustomer());
+        saveButton.addActionListener(e -> createVendor());
         closeButton.addActionListener(e -> dispose());
         editAddressButton.addActionListener(e -> openAddressDialog());
 
@@ -93,7 +95,7 @@ public class VendorCreateUserForm extends JFrame {
         JTextField cityField = new JTextField();
         JTextField stateField = new JTextField();
         JTextField postalCodeField = new JTextField();
-        JTextField countryField = new JTextField();
+        JTextField countryField = new JTextField("Malaysia");
 
         dialog.add(new JLabel("Street:"));
         dialog.add(streetField);
@@ -112,6 +114,12 @@ public class VendorCreateUserForm extends JFrame {
         dialog.add(closeButton);
 
         saveButton.addActionListener(e -> {
+            // validation
+            if (streetField.getText().isEmpty() || cityField.getText().isEmpty() || stateField.getText().isEmpty()
+                    || postalCodeField.getText().isEmpty() || countryField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             // New address object
             AddressDTO newAddress = new AddressDTO();
             newAddress.setId(IdGenerationUtils.getNextId(ServiceType.ADDRESS, null, null));
@@ -122,12 +130,18 @@ public class VendorCreateUserForm extends JFrame {
             newAddress.setPostalCode(postalCodeField.getText());
             newAddress.setCountry(countryField.getText());
 
+            // verification using api
+            if (!DistanceService.verifyAddress(newAddress)) {
+                JOptionPane.showMessageDialog(this, "Invalid address", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             ResponseCode response = AddressService.createAddress(newAddress);
             if (response == ResponseCode.SUCCESS) {
                 newAddressId = newAddress.getId();
-                JOptionPane.showMessageDialog(this, "Address updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Address created successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(this, "Failed to update address", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Failed to create address", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
             dialog.dispose();
@@ -139,9 +153,34 @@ public class VendorCreateUserForm extends JFrame {
         dialog.setVisible(true);
     }
 
-    private void createCustomer() {
+    private void createVendor() {
         if (newAddressId == null) {
             JOptionPane.showMessageDialog(this, "Please create an address", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        // Check if the fields are empty
+        if (nameField.getText().isEmpty() || phoneField.getText().isEmpty() || emailField.getText().isEmpty()
+                || passwordField.getPassword().length == 0) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // check phone number
+        if (!phoneField.getText().matches("\\d{10}") && !phoneField.getText().matches("\\d{11}")) {
+            JOptionPane.showMessageDialog(this, "Invalid phone number", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // check email
+        if (!emailField.getText().matches("^(.+)@(.+)$")) {
+            JOptionPane.showMessageDialog(this, "Invalid email address", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // password length
+        if (passwordField.getPassword().length < 8) {
+            JOptionPane.showMessageDialog(this, "Password must be at least 8 characters", "Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
         VendorDTO vendor = new VendorDTO();
@@ -149,7 +188,7 @@ public class VendorCreateUserForm extends JFrame {
         vendor.setName(nameField.getText());
         vendor.setPhoneNumber(phoneField.getText());
         vendor.setEmailAddress(emailField.getText());
-        vendor.setPassword(passwordField.getText());
+        vendor.setPassword(String.valueOf(passwordField.getPassword()));
         vendor.setStatus(statusCheckBox.isSelected());
         vendor.setAddressId(newAddressId);
 

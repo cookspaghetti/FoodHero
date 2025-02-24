@@ -8,12 +8,13 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 import dto.RunnerDTO;
 import enumeration.ButtonMode;
@@ -29,6 +30,7 @@ public class RunnerPage extends JFrame {
 	private JTable runnerTable;
 	private DefaultTableModel tableModel;
 	private JButton createRunnerButton;
+	private TableRowSorter<DefaultTableModel> sorter;
 
 	public RunnerPage() {
 		setTitle("Runner Management");
@@ -48,7 +50,7 @@ public class RunnerPage extends JFrame {
 		searchButton = new JButton("Search");
 		searchButton.addActionListener(this::searchRunners);
 
-		filterComboBox = new JComboBox<>(new String[]{"All", "Active", "Inactive"});
+		filterComboBox = new JComboBox<>(new String[] { "All", "Active", "Inactive" });
 		filterComboBox.addActionListener(this::filterRunners);
 
 		topPanel.add(new JLabel("Search:"));
@@ -56,7 +58,7 @@ public class RunnerPage extends JFrame {
 		topPanel.add(searchButton);
 		topPanel.add(new JLabel("Filter:"));
 		topPanel.add(filterComboBox);
-		
+
 		createRunnerButton = new JButton("New Runner");
 		createRunnerButton.addActionListener(this::createRunner);
 		topPanel.add(createRunnerButton);
@@ -64,16 +66,20 @@ public class RunnerPage extends JFrame {
 		add(topPanel, BorderLayout.NORTH);
 
 		// ======= Runner Table =======
-		String[] columnNames = {"ID", "Name", "Email", "Status", "Action"};
+		String[] columnNames = { "ID", "Name", "Email", "Status", "Action" };
 		tableModel = new DefaultTableModel(columnNames, 0) {
 			@Override
-		    public boolean isCellEditable(int row, int column) {
-		        return column == 4; // Make only the "Action" column editable
-		    }
+			public boolean isCellEditable(int row, int column) {
+				return column == 4; // Make only the "Action" column editable
+			}
 		};
 		runnerTable = new JTable(tableModel);
-		runnerTable.setRowHeight(40); 
-		
+		runnerTable.setRowHeight(40);
+
+		// Initialize table sorter after creating the table
+		sorter = new TableRowSorter<>(tableModel);
+		runnerTable.setRowSorter(sorter);
+
 		// Apply renderer and editor to the table
 		runnerTable.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer(ButtonMode.EDITDELETE));
 		runnerTable.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(runnerTable, ButtonMode.EDITDELETE));
@@ -86,10 +92,10 @@ public class RunnerPage extends JFrame {
 	// ======= Action Methods =======
 	private void searchRunners(ActionEvent e) {
 		String searchTerm = searchField.getText().trim().toLowerCase();
-		
+
 		// Validate search term
 		if (searchTerm.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Please enter a search term", "Search Error", JOptionPane.ERROR_MESSAGE);
+			loadRunners();
 			return;
 		}
 
@@ -114,29 +120,25 @@ public class RunnerPage extends JFrame {
 		String filter = (String) filterComboBox.getSelectedItem();
 		filterTable(filter);
 	}
-	
+
 	private void createRunner(ActionEvent e) {
 		new RunnerCreateUserForm().setVisible(true);
-		loadRunners();
 	}
 
 	// ======= Filtering Logic =======
 	private void filterTable(String filter) {
-		for (int i = 0; i < runnerTable.getRowCount(); i++) {
-			String status = (String) runnerTable.getValueAt(i, 3);
-			if (filter.equals("All") || status.equalsIgnoreCase(filter)) {
-				runnerTable.setRowHeight(i, 40);
-				runnerTable.setValueAt(true, i, 4);
-			} else {
-				runnerTable.setRowHeight(i, 0);
-				runnerTable.setValueAt(false, i, 4);
+		sorter.setRowFilter(filter.equals("All") ? null : new RowFilter<DefaultTableModel, Integer>() {
+			@Override
+			public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+				String status = (String) entry.getValue(3); // Status column index
+				return status.equalsIgnoreCase(filter);
 			}
-		}
+		});
 	}
 
 	// ======= Utility Method =======
 	private void addRow(String id, String name, String email, boolean status) {
-		tableModel.addRow(new Object[]{id, name, email, status ? "Active" : "Inactive", "Edit"});
+		tableModel.addRow(new Object[] { id, name, email, status ? "Active" : "Inactive", "Edit" });
 	}
 
 	private void loadRunners() {

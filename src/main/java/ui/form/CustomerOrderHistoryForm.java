@@ -1,6 +1,7 @@
 package ui.form;
 
 import java.awt.GridLayout;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -11,9 +12,11 @@ import javax.swing.JTextArea;
 
 import dto.OrderDTO;
 import dto.ReviewDTO;
+import service.general.SessionControlService;
 import service.processor.ItemProcessor;
 import service.review.ReviewService;
 import service.vendor.VendorService;
+import ui.vendor.VendorMenuPage;
 
 public class CustomerOrderHistoryForm extends JFrame {
 
@@ -41,10 +44,11 @@ public class CustomerOrderHistoryForm extends JFrame {
         getContentPane().add(new JLabel(String.valueOf(order.getTotalAmount())));
 
         getContentPane().add(new JLabel("Placement Time:"));
-        getContentPane().add(new JLabel(order.getPlacementTime().toString()));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        getContentPane().add(new JLabel(order.getPlacementTime().format(formatter)));
 
         getContentPane().add(new JLabel("Completion Time:"));
-        getContentPane().add(new JLabel(order.getCompletionTime().toString()));
+        getContentPane().add(new JLabel(order.getCompletionTime() == null ? "Not completed" : order.getCompletionTime().format(formatter)));
         
         getContentPane().add(new JLabel("Notes:"));
         getContentPane().add(new JLabel(order.getNotes()));
@@ -59,7 +63,11 @@ public class CustomerOrderHistoryForm extends JFrame {
         getContentPane().add(new JLabel(ratings));
         
         JButton cancelButton = new JButton("Rate");
+        cancelButton.addActionListener(e -> {
+            new CustomerReviewForm(order.getVendorId(), order.getRunnerId(), order.getId());
+        });
         JButton closeButton = new JButton("Reorder");
+        closeButton.addActionListener(e -> reorder(order.getDeliveryAddress(), order.getVendorId(), order.getItems()));
         getContentPane().add(cancelButton);
         getContentPane().add(closeButton);
 
@@ -86,5 +94,15 @@ public class CustomerOrderHistoryForm extends JFrame {
             System.err.println("Error processing item list: " + e.getMessage());
             return "Error";
         }
+    }
+
+    // method to reorder
+    private void reorder(String selectedAddress, String vendorId, HashMap<String, Integer> items) {
+        this.dispose();
+        SessionControlService.setCurrentSelectedAddress(selectedAddress);
+        for (String itemId : items.keySet()) {
+            SessionControlService.addToCart(itemId, items.get(itemId));
+        }
+        new VendorMenuPage(vendorId).setVisible(true);
     }
 }

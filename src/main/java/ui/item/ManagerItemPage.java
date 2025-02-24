@@ -48,38 +48,41 @@ public class ManagerItemPage extends JFrame {
 		add(searchPanel, BorderLayout.NORTH);
 
 		// Table Panel
-		String[] columnNames = {"Item ID", "Item Name", "Price", "Vendor ID", "Availability", "Actions"};
+		String[] columnNames = {"Item ID", "Item Name", "Price", "Description", "Vendor ID", "Availability", "Actions"};
 		tableModel = new DefaultTableModel(columnNames, 0) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
-				return column == 5; // Make only the "Action" column editable
+				return column == 6; // Make only the "Action" column editable
 			}
 		};
 		itemTable = new JTable(tableModel);
 		itemTable.setRowHeight(40);
 
 		// Apply renderer and editor to the table
-		itemTable.getColumnModel().getColumn(5).setCellRenderer(new ButtonRenderer(ButtonMode.DISABLEDELETE));
-		itemTable.getColumnModel().getColumn(5).setCellEditor(new ButtonEditor(itemTable, ButtonMode.DISABLEDELETE));
+		itemTable.getColumnModel().getColumn(6).setCellRenderer(new ButtonRenderer(ButtonMode.DISABLEDELETE));
+		itemTable.getColumnModel().getColumn(6).setCellEditor(new ButtonEditor(itemTable, ButtonMode.DISABLEDELETE));
 
 		// Set column widths
 		TableColumn idColumn = itemTable.getColumn("Item ID");
-		idColumn.setPreferredWidth(80);
+		idColumn.setPreferredWidth(50);
 
 		TableColumn nameColumn = itemTable.getColumn("Item Name");
-		nameColumn.setPreferredWidth(250);
+		nameColumn.setPreferredWidth(150);
 
 		TableColumn priceColumn = itemTable.getColumn("Price");
-		priceColumn.setPreferredWidth(100);
+		priceColumn.setPreferredWidth(40);
 
 		TableColumn descColumn = itemTable.getColumn("Vendor ID");
-		descColumn.setPreferredWidth(80);
+		descColumn.setPreferredWidth(50);
+
+		TableColumn vendorColumn = itemTable.getColumn("Description");
+		vendorColumn.setPreferredWidth(150);
 
 		TableColumn availColumn = itemTable.getColumn("Availability");
-		availColumn.setPreferredWidth(80);
+		availColumn.setPreferredWidth(60);
 
 		TableColumn actionColumn = itemTable.getColumn("Actions");
-		actionColumn.setPreferredWidth(180);
+		actionColumn.setPreferredWidth(160);
 
 		add(new JScrollPane(itemTable), BorderLayout.CENTER);
 
@@ -113,7 +116,7 @@ public class ManagerItemPage extends JFrame {
 		// Update table
 		List<ItemDTO> items = ItemService.readAllItem(vendor.getId());
 		for (ItemDTO item : items) {
-			addItemRow(item.getId(), item.getName(), String.valueOf(item.getPrice()), item.getDescription(), item.isAvailability() ? "Active" : "Inactive");
+			addItemRow(item.getId(), item.getName(), String.valueOf(item.getPrice()), item.getDescription(), item.getVendorId(), item.isAvailability() ? "Active" : "Inactive");
 		}
 
 		if (items.isEmpty()) {
@@ -138,12 +141,13 @@ public class ManagerItemPage extends JFrame {
     }
 
 	// ======= Utility Method =======
-	private void addItemRow(String itemId, String itemName, String price, String desc, String avail) {
+	private void addItemRow(String itemId, String itemName, String price, String desc, String vendorId, String avail) {
 		Vector<String> row = new Vector<>();
 		row.add(itemId);
 		row.add(itemName);
 		row.add(price);
 		row.add(desc);
+		row.add(vendorId);
 		row.add(avail);
 		row.add("Actions");
 		tableModel.addRow(row);

@@ -6,6 +6,7 @@ import javax.swing.table.DefaultTableModel;
 import dto.ItemDTO;
 import enumeration.ButtonMode;
 import service.item.ItemService;
+import ui.review.CustomerVendorReviewPage;
 import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
 
@@ -26,17 +27,31 @@ public class VendorMenuPage extends JFrame {
 		JPanel headerPanel = new JPanel(new BorderLayout());
 		JLabel titleLabel = new JLabel("Menu", SwingConstants.LEFT);
 		titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		JButton reviewButton = new JButton("Reviews");
+		reviewButton.addActionListener(e -> {
+			new CustomerVendorReviewPage(vendorId);
+		});
 		JButton cartButton = new JButton("Cart");
 		cartButton.addActionListener(e -> {
 			new VendorCartPage(vendorId);
 		});
 
+		reviewButton.setPreferredSize(new Dimension(100, 30));
+		cartButton.setPreferredSize(new Dimension(100, 30));
+
+		// Create a panel for buttons
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5));
+		buttonPanel.add(reviewButton);
+		buttonPanel.add(cartButton);
+
+		// Add components to header panel
 		headerPanel.add(titleLabel, BorderLayout.WEST);
-		headerPanel.add(cartButton, BorderLayout.EAST);
+		headerPanel.add(buttonPanel, BorderLayout.EAST);
 		add(headerPanel, BorderLayout.NORTH);
 
 		// Table Model
-		String[] columnNames = {"Item ID", "Item Name", "Price", "Description", "Actions"};
+		String[] columnNames = { "Item ID", "Item Name", "Price", "Description", "Actions" };
 		tableModel = new DefaultTableModel(columnNames, 0) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
@@ -49,7 +64,7 @@ public class VendorMenuPage extends JFrame {
 		// Apply renderer and editor to the table
 		menuTable.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer(ButtonMode.ADDTOCART));
 		menuTable.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(menuTable, ButtonMode.ADDTOCART));
-		
+
 		loadVendorMenu(vendorId);
 
 		JScrollPane scrollPane = new JScrollPane(menuTable);
@@ -65,10 +80,9 @@ public class VendorMenuPage extends JFrame {
 			if (item.isAvailability() == false) {
 				continue;
 			}
-			Object[] data = {item.getId(), item.getName(), item.getPrice(), item.getDescription(), "Add to Cart"};
+			Object[] data = { item.getId(), item.getName(), item.getPrice(), item.getDescription(), "Add to Cart" };
 			tableModel.addRow(data);
 		}
 	}
 
 }
-
