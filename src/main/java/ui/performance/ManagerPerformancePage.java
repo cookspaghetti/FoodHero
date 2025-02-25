@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 import dto.RunnerDTO;
 import dto.RunnerReviewDTO;
@@ -18,6 +19,8 @@ import ui.utils.ButtonRenderer;
 import java.util.List;
 
 public class ManagerPerformancePage extends JFrame {
+	private TableRowSorter<DefaultTableModel> sorter;
+
 	private JTextField searchField;
 	private JButton searchButton;
 	private JComboBox<String> ratingFilter;
@@ -70,6 +73,10 @@ public class ManagerPerformancePage extends JFrame {
 		runnerTable.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer(ButtonMode.VIEW));
 		runnerTable.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(runnerTable, ButtonMode.VIEW));
 
+		// Initialize table sorter
+		sorter = new TableRowSorter<>(tableModel);
+		runnerTable.setRowSorter(sorter);
+
 		// Set column widths
 		TableColumn idColumn = runnerTable.getColumn("Runner ID");
 		idColumn.setPreferredWidth(100);
@@ -107,7 +114,7 @@ public class ManagerPerformancePage extends JFrame {
 
 		// Validate search term
 		if (searchTerm.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Please enter a search term", "Search Error", JOptionPane.ERROR_MESSAGE);
+			loadRunners();
 			return;
 		}
 
@@ -144,21 +151,28 @@ public class ManagerPerformancePage extends JFrame {
 
 	// Filter runners by rating
 	private void filterByRating(ActionEvent evt) {
-		String filter = ratingFilter.getSelectedItem().toString();
-		if (filter.equals("All Ratings")) {
-			loadRunners();
-			return;
-		}
+    String filter = ratingFilter.getSelectedItem().toString();
+    
+    if (filter.equals("All Ratings")) {
+        sorter.setRowFilter(null);
+        return;
+    }
 
-		tableModel.setRowCount(0);
-		List<RunnerDTO> runners = RunnerService.readAllRunner();
-		for (RunnerDTO runner : runners) {
-			String rating = getRunnerRating(runner.getId());
-			if (rating.equals(filter.substring(0, 1))) {
-				addRow(runner.getId(), runner.getName(), runner.getPhoneNumber(), rating);
-			}
-		}
-	}
+    sorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
+        @Override
+        public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+            try {
+                double rating = Double.parseDouble(entry.getValue(3).toString());
+                int starRating = (int) Math.floor(rating);
+                int filterRating = Integer.parseInt(filter.substring(0, 1));
+                return starRating == filterRating;
+            } catch (NumberFormatException e) {
+                System.err.println("Error parsing rating: " + e.getMessage());
+                return false;
+            }
+        }
+    });
+}
 
 	// Sort runners by rating
 	private void sortByRating(ActionEvent evt) {

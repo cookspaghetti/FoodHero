@@ -183,6 +183,19 @@ public class VendorCreateUserForm extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        // method to check duplicate email
+        if (VendorService.isDuplicateEmail(emailField.getText())) {
+            JOptionPane.showMessageDialog(this, "Email already exists", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // method to check duplicate phone number
+        if (VendorService.isDuplicatePhoneNumber(phoneField.getText())) {
+            JOptionPane.showMessageDialog(this, "Phone number already exists", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         VendorDTO vendor = new VendorDTO();
         vendor.setId(IdGenerationUtils.getNextId(ServiceType.VENDOR, null, null));
         vendor.setName(nameField.getText());

@@ -183,6 +183,19 @@ public class CustomerCreateUserForm extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        // method to check duplicate email
+        if (CustomerService.checkDuplicateEmail(emailField.getText())) {
+            JOptionPane.showMessageDialog(this, "Email already exists", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // method to check duplicate phone number
+        if (CustomerService.checkDuplicatePhoneNumber(phoneField.getText())) {
+            JOptionPane.showMessageDialog(this, "Phone number already exists", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         CustomerDTO customer = new CustomerDTO();
         customer.setId(IdGenerationUtils.getNextId(ServiceType.CUSTOMER, null, null));
         customer.setName(nameField.getText());

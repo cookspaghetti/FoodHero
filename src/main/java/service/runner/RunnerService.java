@@ -117,7 +117,7 @@ public class RunnerService {
 						String dateStr = json.getString("lastDeliveryDate").trim();
 						if (!dateStr.isEmpty()) {
 							try {
-								DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+								DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 								runner.setLastDeliveryDate(LocalDateTime.parse(dateStr, formatter));
 							} catch (Exception e) {
 								System.err.println("Error parsing date: " + e.getMessage());
@@ -181,7 +181,7 @@ public class RunnerService {
 						String dateStr = json.getString("lastDeliveryDate").trim();
 						if (!dateStr.isEmpty()) {
 							try {
-								DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+								DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 								runner.setLastDeliveryDate(LocalDateTime.parse(dateStr, formatter));
 							} catch (Exception e) {
 								System.err.println("Error parsing date: " + e.getMessage());
@@ -240,7 +240,7 @@ public class RunnerService {
 					String dateStr = json.getString("lastDeliveryDate").trim();
 					if (!dateStr.isEmpty()) {
 						try {
-							DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+							DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 							runner.setLastDeliveryDate(LocalDateTime.parse(dateStr, formatter));
 						} catch (Exception e) {
 							System.err.println("Error parsing date: " + e.getMessage());
@@ -387,7 +387,7 @@ public class RunnerService {
 		AddressDTO customerAddress = AddressService.getAddressById(customerAddressId);
 		if (customerAddress == null) {
 			System.out.println("Invalid customer address ID.");
-			return null;
+			return "";
 		}
 
 		List<RunnerDTO> availableRunners = readAllRunner().stream()
@@ -396,7 +396,7 @@ public class RunnerService {
 
 		if (availableRunners.isEmpty()) {
 			System.out.println("No available runners found.");
-			return null;
+			return "";
 		}
 
 		// Find a runner in the same city and state
@@ -415,7 +415,7 @@ public class RunnerService {
 
 		if (selectedRunner == null) {
 			System.out.println("No suitable runner found in the same city and state.");
-			return null;
+			return "";
 		}
 
 		// Notify the selected runner
@@ -428,5 +428,49 @@ public class RunnerService {
 
 		NotificationService.createNotification(notification);
 		return selectedRunner.getId();
+	}
+
+	// method to check duplicate phone number
+	public static boolean checkDuplicatePhoneNumber(String phoneNumber) {
+		List<RunnerDTO> runners = readAllRunner();
+		for (RunnerDTO runner : runners) {
+			if (runner.getPhoneNumber().equals(phoneNumber)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// method to check duplicate email address
+	public static boolean checkDuplicateEmail(String emailAddress) {
+		List<RunnerDTO> runners = readAllRunner();
+		for (RunnerDTO runner : runners) {
+			if (runner.getEmailAddress().equals(emailAddress)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// method to check duplicate plate number
+	public static boolean checkDuplicatePlateNumber(String plateNumber) {
+		List<RunnerDTO> runners = readAllRunner();
+		for (RunnerDTO runner : runners) {
+			if (runner.getPlateNumber().equals(plateNumber)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// check if any runner is available
+	public static boolean checkRunnerAvailability() {
+		List<RunnerDTO> runners = readAllRunner();
+		for (RunnerDTO runner : runners) {
+			if (runner.isAvailable()) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

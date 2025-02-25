@@ -36,7 +36,7 @@ public class VendorOrderHistoryForm extends JFrame {
         getContentPane().add(new JLabel("Total Amount:"));
         getContentPane().add(new JLabel(String.valueOf(order.getTotalAmount())));
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         getContentPane().add(new JLabel("Placement Time:"));
         getContentPane().add(new JLabel(order.getPlacementTime().format(formatter)));
 

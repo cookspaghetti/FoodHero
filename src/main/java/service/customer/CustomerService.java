@@ -292,4 +292,46 @@ public class CustomerService {
 		}
 	}
 
+	// method to check duplicate phone number
+	public static boolean checkDuplicatePhoneNumber(String phoneNumber) {
+		String filePath = SYS_PATH + "customer.txt";
+
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("phoneNumber").equals(phoneNumber)) {
+					return true;
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading customer file: " + e.getMessage());
+		}
+
+		return false;
+	}
+
+	// method to check duplicate email
+	public static boolean checkDuplicateEmail(String email) {
+		String filePath = SYS_PATH + "customer.txt";
+
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("emailAddress").equals(email)) {
+					return true;
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading customer file: " + e.getMessage());
+		}
+
+		return false;
+	}
+
 }

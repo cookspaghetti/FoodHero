@@ -5,3 +5,7 @@
 {"date":"2025-02-24T10:33:07.218743500","amount":86.03,"orderId":"ORD00007","customerId":"CUS00001","description":"Order from Yosen Japanese Shabu Shabu","id":"DED00005"}
 {"date":"2025-02-24T15:47:20.002948900","amount":86.03,"orderId":"ORD00008","customerId":"CUS00001","description":"Order from Yosen Japanese Shabu Shabu","id":"DED00006"}
 {"date":"2025-02-24T16:05:02.803989700","amount":28.21,"orderId":"ORD00001","customerId":"CUS00001","description":"Order from Pop Meals @ Lakefield","id":"DED00007"}
+{"date":"2025-02-25T09:24:40.725431500","amount":28.19,"orderId":"ORD00002","customerId":"CUS00001","description":"Order from Pop Meals @ Lakefield","id":"DED00008"}
+{"date":"2025-02-25T09:29:32.224165400","amount":171,"orderId":"ORD00003","customerId":"CUS00001","description":"Order from Yosen Japanese Shabu Shabu","id":"DED00009"}
+{"date":"2025-02-25T15:28:30.004939500","amount":39.6,"orderId":"ORD00005","customerId":"CUS00001","description":"Order from NASI KERABU MOKNAB PANTAI DALAM","id":"DED00010"}
+{"date":"2025-02-25T15:32:13.153850100","amount":18.87,"orderId":"ORD00006","customerId":"CUS00001","description":"Order from NASI KERABU MOKNAB PANTAI DALAM","id":"DED00011"}

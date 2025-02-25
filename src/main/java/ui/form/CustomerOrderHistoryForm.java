@@ -44,7 +44,7 @@ public class CustomerOrderHistoryForm extends JFrame {
         getContentPane().add(new JLabel(String.valueOf(order.getTotalAmount())));
 
         getContentPane().add(new JLabel("Placement Time:"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         getContentPane().add(new JLabel(order.getPlacementTime().format(formatter)));
 
         getContentPane().add(new JLabel("Completion Time:"));

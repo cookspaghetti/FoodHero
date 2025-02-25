@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 
 public class VendorCartPage extends JFrame {
+
     private JTable cartTable;
     private JButton checkoutButton;
     private DefaultTableModel tableModel;
@@ -94,6 +95,9 @@ public class VendorCartPage extends JFrame {
         for (String itemId : cartData.keySet()) {
             // Fetch item details from database
             ItemDTO item = ItemService.readItem(vendorId, itemId);
+            if (item.isAvailability() == false) {
+                continue;
+            }
             // Add item details to data array
             addRow(new Object[] { itemId, item.getName(), item.getPrice(), cartData.get(itemId),
                     item.getPrice() * cartData.get(itemId) });
@@ -143,7 +147,7 @@ public class VendorCartPage extends JFrame {
         // Get vendor and customer addresses
         VendorDTO vendor = VendorService.readVendor(vendorId);
         AddressDTO vendorAddress = vendor != null ? AddressService.getAddressById(vendor.getAddressId()) : null;
-        AddressDTO customerAddress = AddressService.getAddressById(customer.getAddressId());
+        AddressDTO customerAddress = AddressService.getAddressById(SessionControlService.getCurrentSelectedAddress());
     
         if (vendorAddress == null || customerAddress == null) {
             JOptionPane.showMessageDialog(this, "Address information is missing.", "Error", JOptionPane.ERROR_MESSAGE);

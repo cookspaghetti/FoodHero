@@ -217,4 +217,45 @@ public class AdminService {
 		}
 	}
 
+	// Check duplicate phone number
+	public static boolean checkDuplicatePhone(String phoneNumber) {
+		String filePath = SYS_PATH + "admin.txt";
+
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("phoneNumber").equals(phoneNumber)) {
+					return true;
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading admin file: " + e.getMessage());
+		}
+
+		return false;
+	}
+
+	// Check duplicate email address
+	public static boolean checkDuplicateEmail(String emailAddress) {
+		String filePath = SYS_PATH + "admin.txt";
+
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("emailAddress").equals(emailAddress)) {
+					return true;
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading admin file: " + e.getMessage());
+		}
+
+		return false;
+	}
 }

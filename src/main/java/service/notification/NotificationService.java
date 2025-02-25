@@ -24,6 +24,8 @@ public class NotificationService {
 	// Method to create a notification and save it to a text file in JSON format
 	public static ResponseCode createNotification(NotificationDTO notification) {
 
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 		String filePath = SYS_PATH + "notification.txt";
 
 		// Construct JSON Object
@@ -32,7 +34,7 @@ public class NotificationService {
 		json.put("userId", notification.getUserId());
 		json.put("title", notification.getTitle());
 		json.put("message", notification.getMessage());
-		json.put("timestamp", notification.getTimestamp().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+		json.put("timestamp", notification.getTimestamp().format(formatter));
 		json.put("isRead", notification.isRead());
 
 		// Write JSON to text file
@@ -50,6 +52,8 @@ public class NotificationService {
 	public NotificationDTO readNotification(String id) {
 		String filePath = SYS_PATH + "notification.txt";
 
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 			String line;
 
@@ -62,7 +66,7 @@ public class NotificationService {
 					notification.setUserId(json.getString("userId"));
 					notification.setTitle(json.getString("title"));
 					notification.setMessage(json.getString("message"));
-					notification.setTimestamp(LocalDateTime.parse(json.getString("timestamp"), DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+					notification.setTimestamp(LocalDateTime.parse(json.getString("timestamp"), formatter));
 					notification.setRead(json.getBoolean("isRead"));
 
 					return notification;
@@ -84,6 +88,8 @@ public class NotificationService {
 		
 		List<NotificationDTO> notifications = new ArrayList<>();
 
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 			String line;
 
@@ -96,7 +102,7 @@ public class NotificationService {
 					notification.setUserId(json.getString("userId"));
 					notification.setTitle(json.getString("title"));
 					notification.setMessage(json.getString("message"));
-					notification.setTimestamp(LocalDateTime.parse(json.getString("timestamp"), DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+					notification.setTimestamp(LocalDateTime.parse(json.getString("timestamp"), formatter));
 					notification.setRead(json.getBoolean("isRead"));
 					
 					notifications.add(notification);
@@ -121,6 +127,8 @@ public class NotificationService {
 		
 		List<NotificationDTO> notifications = new ArrayList<>();
 
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 			String line;
 
@@ -133,7 +141,7 @@ public class NotificationService {
 					notification.setUserId(json.getString("userId"));
 					notification.setTitle(json.getString("title"));
 					notification.setMessage(json.getString("message"));
-					notification.setTimestamp(LocalDateTime.parse(json.getString("timestamp"), DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+					notification.setTimestamp(LocalDateTime.parse(json.getString("timestamp"), formatter));
 					notification.setRead(json.getBoolean("isRead"));
 					
 					notifications.add(notification);
@@ -154,6 +162,7 @@ public class NotificationService {
 
 	// Method to update a notification in the text file
 	public static ResponseCode updateNotification(NotificationDTO notification) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 		String filePath = SYS_PATH + "notification.txt";
 
@@ -171,7 +180,7 @@ public class NotificationService {
 					json.put("userId", notification.getUserId());
 					json.put("title", notification.getTitle());
 					json.put("message", notification.getMessage());
-					json.put("timestamp", notification.getTimestamp().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+					json.put("timestamp", notification.getTimestamp().format(formatter));
 					json.put("isRead", notification.isRead());
 					isUpdated = true;
 				}

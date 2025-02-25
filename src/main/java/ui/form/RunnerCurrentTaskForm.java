@@ -164,6 +164,7 @@ public class RunnerCurrentTaskForm extends JFrame {
                 JOptionPane.showMessageDialog(null, "Failed to update order status", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
         } else {
             JOptionPane.showMessageDialog(null, "Task status updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
             dispose();
@@ -190,6 +191,8 @@ public class RunnerCurrentTaskForm extends JFrame {
             
             // Update runner's current task
             runner.setCurrentTask(null);
+            runner.setLastDeliveredAddress(task.getCustomerAddress());
+            runner.setLastDeliveryDate(LocalDateTime.now());
             response = RunnerService.updateRunner(runner);
             if (response == ResponseCode.SUCCESS) {
                 JOptionPane.showMessageDialog(null, "Task status updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);

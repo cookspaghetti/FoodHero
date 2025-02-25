@@ -61,8 +61,10 @@ public class OrderService {
 			// Send notification to the vendor
 			NotificationDTO notification = new NotificationDTO();
 			notification.setUserId(order.getVendorId());
-			notification.setMessage("New order received: " + order.getId());
+			notification.setMessage("New order received: " + json.getString("id"));
 			notification.setTimestamp(LocalDateTime.now());
+			notification.setTitle("New Order");
+			notification.setRead(false);
 			ResponseCode response = NotificationService.createNotification(notification);
 			if (response != ResponseCode.SUCCESS) {
 				System.err.println("Failed to send notification to vendor");
@@ -387,6 +389,18 @@ public class OrderService {
 					isUpdated = true;
 				}
 				updatedLines.add(json.toString());
+			}
+
+			// Send notification to the customer
+			NotificationDTO notification = new NotificationDTO();
+			notification.setUserId(updatedOrder.getCustomerId());
+			notification.setMessage("Order " + updatedOrder.getId() + " is " + updatedOrder.getStatus().toString());
+			notification.setTimestamp(LocalDateTime.now());
+			notification.setTitle("Order Updated");
+			notification.setRead(false);
+			ResponseCode response = NotificationService.createNotification(notification);
+			if (response != ResponseCode.SUCCESS) {
+				System.err.println("Failed to send notification to customer");
 			}
 	
 			// Write the updated data back to the file if there were changes

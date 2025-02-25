@@ -1,3 +1,5 @@
 {"date":"2025-02-22T23:19:44.396200600","amount":100,"customerId":"CUS00001","adminId":"ADM00002","description":"Top Up","paymentMethod":"CREDIT_CARD","id":"ADD00001"}
 {"date":"2025-02-24T09:10:53.096096300","amount":1000,"customerId":"CUS00001","adminId":"ADM00001","description":"Top Up","paymentMethod":"CREDIT_CARD","id":"ADD00002"}
 {"date":"2025-02-24T15:50:51.098713300","amount":85.5,"customerId":"CUS00001","adminId":"ADM00001","description":"Refund for order cancellation ORD00008","paymentMethod":"REFUND","id":"ADD00003"}
+{"date":"2025-02-25T15:20:02.532153200","amount":37.6,"customerId":"CUS00001","adminId":"","description":"Refund for order cancellation ORD00003","paymentMethod":"REFUND","id":"ADD00004"}
+{"date":"2025-02-25T15:27:22.883337600","amount":37.6,"customerId":"CUS00001","adminId":"","description":"Refund for order cancellation ORD00004","paymentMethod":"REFUND","id":"ADD00005"}

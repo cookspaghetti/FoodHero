@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 import dto.ItemDTO;
 import dto.VendorDTO;
@@ -18,6 +19,9 @@ import ui.utils.ButtonEditor;
 import ui.utils.ButtonRenderer;
 
 public class ManagerItemPage extends JFrame {
+
+	private TableRowSorter<DefaultTableModel> sorter;
+
 	private JTextField searchField;
 	private JButton searchButton;
 	private JComboBox<String> filterComboBox;
@@ -61,6 +65,10 @@ public class ManagerItemPage extends JFrame {
 		// Apply renderer and editor to the table
 		itemTable.getColumnModel().getColumn(6).setCellRenderer(new ButtonRenderer(ButtonMode.DISABLEDELETE));
 		itemTable.getColumnModel().getColumn(6).setCellEditor(new ButtonEditor(itemTable, ButtonMode.DISABLEDELETE));
+
+		// Initialize table sorter
+		sorter = new TableRowSorter<>(tableModel);
+		itemTable.setRowSorter(sorter);
 
 		// Set column widths
 		TableColumn idColumn = itemTable.getColumn("Item ID");
@@ -125,20 +133,21 @@ public class ManagerItemPage extends JFrame {
 	}
 
 	private void filterItems(ActionEvent e) {
-        String filter = (String) filterComboBox.getSelectedItem();
-        if (filter != null) {
-            filterTable(filter);
-        }
+    String filter = (String) filterComboBox.getSelectedItem();
+    if (filter != null) {
+        filterTable(filter);
     }
+}
 
-	// ======= Filtering Logic =======
-	private void filterTable(String filter) {
-        for (int i = 0; i < itemTable.getRowCount(); i++) {
-            String status = itemTable.getValueAt(i, 4).toString(); // Column index for Availability
-            boolean matchesFilter = filter.equals("All") || status.equals(filter);
-            itemTable.setRowHeight(i, matchesFilter ? 40 : 0);
+private void filterTable(String filter) {
+    sorter.setRowFilter(filter.equals("All") ? null : new RowFilter<DefaultTableModel, Integer>() {
+        @Override
+        public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+            String status = entry.getValue(5).toString(); // Column index for Availability
+            return status.equals(filter);
         }
-    }
+    });
+}
 
 	// ======= Utility Method =======
 	private void addItemRow(String itemId, String itemName, String price, String desc, String vendorId, String avail) {

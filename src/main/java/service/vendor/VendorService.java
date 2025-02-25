@@ -391,4 +391,66 @@ public class VendorService {
 	    }
 	}
 
+	// method to check duplicate email
+	public static boolean isDuplicateEmail(String email) {
+		String filePath = SYS_PATH + "vendor.txt";
+
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("emailAddress").equals(email)) {
+					return true;
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading vendor file: " + e.getMessage());
+		}
+
+		return false;
+	}
+
+	// method to check duplicate vendor name
+	public static boolean isDuplicateVendorName(String vendorName) {
+		String filePath = SYS_PATH + "vendor.txt";
+
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("vendorName").toLowerCase().equals(vendorName.toLowerCase())) {
+					return true;
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading vendor file: " + e.getMessage());
+		}
+
+		return false;
+	}
+
+	// method to check duplicate phone number
+	public static boolean isDuplicatePhoneNumber(String phoneNumber) {
+		String filePath = SYS_PATH + "vendor.txt";
+
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
+
+			while ((line = br.readLine()) != null) {
+				JSONObject json = new JSONObject(line);
+
+				if (json.getString("phoneNumber").equals(phoneNumber)) {
+					return true;
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading vendor file: " + e.getMessage());
+		}
+
+		return false;
+	}
 }

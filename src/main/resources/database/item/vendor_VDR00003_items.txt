@@ -1,0 +1,1 @@
+{"price":18.8,"defaultAmount":100,"name":"Nasi Kerabu","vendorId":"VDR00003","description":"Delicious","id":"ITM00001","availability":true}

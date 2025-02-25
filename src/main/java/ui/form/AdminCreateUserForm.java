@@ -184,6 +184,18 @@ public class AdminCreateUserForm extends JFrame {
             return;
         }
 
+        // Check duplicate phone number
+        if (AdminService.checkDuplicatePhone(phoneField.getText())) {
+            JOptionPane.showMessageDialog(this, "Phone number already exists", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Check duplicate email
+        if (AdminService.checkDuplicateEmail(emailField.getText())) {
+            JOptionPane.showMessageDialog(this, "Email already exists", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         AdminDTO admin = new AdminDTO();
         admin.setId(IdGenerationUtils.getNextId(ServiceType.ADMIN, null, null));
         admin.setName(nameField.getText());

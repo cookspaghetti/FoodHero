@@ -191,9 +191,6 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 			case VENDOR -> new VendorDetailsForm(VendorService.readVendor(itemId)).setVisible(true);
 			case RUNNER -> new RunnerDetailsForm(RunnerService.readRunner(itemId)).setVisible(true);
 			case ITEM -> new VendorItemDetailsForm(ItemService.readItem(vendorId, itemId)).setVisible(true);
-			// case TASK -> TaskService.editTask(itemId);
-			// case COMPLAIN -> ComplainService.editComplain(itemId);
-			// case NOTIFICATION -> NotificationService.editNotification(itemId);
 			default -> JOptionPane.showMessageDialog(null, "Invalid type for editing.");
 		}
 	}
@@ -217,9 +214,6 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 			case VENDOR -> VendorService.deleteVendor(itemId);
 			case RUNNER -> RunnerService.deleteRunner(itemId);
 			case ITEM -> ItemService.deleteItem(vendorId, itemId);
-			// case TASK -> TaskService.deleteTask(itemId);
-			// case COMPLAIN -> ComplainService.deleteComplain(itemId);
-			// case NOTIFICATION -> NotificationService.deleteNotification(itemId);
 			default -> JOptionPane.showMessageDialog(null, "Invalid type for deletion.");
 		}
 	}
@@ -343,7 +337,7 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 			return;
 		}
 
-		// Quantity Selector (JSpinner)
+		// Quantity Selector
 		SpinnerNumberModel model = new SpinnerNumberModel(itemQuantity.intValue(), 1, 100, 1);
 		JSpinner quantitySpinner = new JSpinner(model);
 		panel.add(quantitySpinner);
@@ -355,7 +349,7 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 		if (option == JOptionPane.OK_OPTION) {
 			int newQuantity = (int) quantitySpinner.getValue();
 
-			// Update cart logic (implement accordingly)
+			// Update cart logic
 			SessionControlService.updateCart(itemId, newQuantity);
 			JOptionPane.showMessageDialog(null, "Cart updated: " + itemName + " x" + newQuantity);
 		}

@@ -137,6 +137,7 @@ public class RunnerTaskDetailsForm extends JFrame {
 
         // Update runner's current task
         runner.setCurrentTask(taskId);
+        runner.setAvailable(false);
         response = RunnerService.updateRunner(runner);
         SessionControlService.setSession(runner);
         if (response != ResponseCode.SUCCESS) {

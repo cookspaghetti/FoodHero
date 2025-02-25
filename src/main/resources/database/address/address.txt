@@ -9,6 +9,9 @@
 {"country":"Malaysia","city":"Sri Petaling","street":"Jalan 4/149a","postalCode":"57000","id":"ADR00009","state":"Kuala Lumpur","userId":"CUS00001"}
 {"country":"Malaysia","city":"Sri Petaling","street":"Jalan Wan Sendari","postalCode":"57000","id":"ADR00010","state":"Kuala Lumpur","userId":"RUN00002"}
 {"country":"Malaysia","city":"Chemor","street":"94, Jalan Sri Klebang 33","postalCode":"31200","id":"ADR00011","state":"Perak","userId":"ADM00002"}
-{"country":"Malaysia","city":"Sri Petaling ","street":"Jalan 1/149j","postalCode":"57000","id":"ADR00012","state":"Kuala Lumpur","userId":"RUN00003"}
+{"country":"Malaysia","city":"Pantai Dalam","street":"Lorong Asrama","postalCode":"59200","id":"ADR00012","state":"Kuala Lumpur","userId":"RUN00003"}
 {"country":"Malaysia","city":"Bukit Jalil","street":"Technology Park Malaysia","postalCode":"57000","id":"ADR00013","state":"Kuala Lumpur","userId":"ADM00003"}
 {"country":"Malaysia","city":"Sungai Besi","street":"47, Jalan Tasik Utama 8","postalCode":"57000","id":"ADR00014","state":"Kuala Lumpur","userId":"VDR00002"}
+{"country":"Malaysia","city":"Chemor","street":"Jalan Pisang","postalCode":"31200","id":"ADR00015","state":"Perak ","userId":"ADM00004"}
+{"country":"Malaysia","city":"Pantai Dalam","street":"Jalan Pantai Dalam","postalCode":"59200","id":"ADR00016","state":"Kuala Lumpur","userId":"VDR00003"}
+{"country":"Malaysia","city":"Pantai Dalam","street":"Lorong Asrama","postalCode":"59200","id":"ADR00017","state":"Kuala Lumpur","userId":"CUS00001"}

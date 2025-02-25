@@ -121,7 +121,7 @@ public class CustomerTransactionPage extends JFrame {
         transactions.addAll(deductTransactions);
 
         transactions.sort((t1, t2) -> t2.getDate().compareTo(t1.getDate()));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         for (TransactionDTO transaction : transactions) {
             tableModel.addRow(new Object[] {
                     transaction.getId(),

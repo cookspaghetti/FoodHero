@@ -26,7 +26,7 @@ public class RunnerTaskHistoryPage extends JFrame {
     private JComboBox<TaskStatus> statusFilter;
     private DefaultTableModel tableModel;
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private RunnerDTO runner = (RunnerDTO) SessionControlService.getUser();
 

@@ -1,37 +1,16 @@
-{"isRead":true,"id":"NOT00001","title":"Item Disabled","message":"Your item 'Hot Pot for 4' has been disabled.","userId":"VDR00001","timestamp":"2025-02-23T14:39:17.629378"}
-{"isRead":false,"id":"NOT00002","message":"New order received: null","userId":"VDR00001","timestamp":"2025-02-24T08:56:11.6819779"}
-{"isRead":true,"id":"NOT00003","title":"Top Up Successful","message":"Top up successful. Amount: RM1000.0","userId":"CUS00001","timestamp":"2025-02-24T09:10:53.1000854"}
-{"isRead":false,"id":"NOT00004","message":"New order received: null","userId":"VDR00001","timestamp":"2025-02-24T09:12:19.2287647"}
-{"isRead":false,"id":"NOT00005","message":"New order received: null","userId":"VDR00001","timestamp":"2025-02-24T09:18:38.6717667"}
-{"isRead":false,"id":"NOT00006","message":"New order received: null","userId":"VDR00001","timestamp":"2025-02-24T09:21:39.5631527"}
-{"isRead":false,"id":"NOT00007","message":"New order received: null","userId":"VDR00001","timestamp":"2025-02-24T09:21:51.6426703"}
-{"isRead":false,"id":"NOT00008","message":"New order received: null","userId":"VDR00001","timestamp":"2025-02-24T09:22:20.9447007"}
-{"isRead":false,"id":"NOT00009","message":"New order received: null","userId":"VDR00001","timestamp":"2025-02-24T09:24:48.8686249"}
-{"isRead":false,"id":"NOT00010","message":"New order received: null","userId":"VDR00001","timestamp":"2025-02-24T09:30:15.0856288"}
-{"isRead":true,"id":"NOT00011","title":"New Delivery Task","message":"You have a new delivery task.","userId":"RUN00001","timestamp":"2025-02-24T09:30:15.0875925"}
-{"isRead":true,"id":"NOT00012","title":"Order Status Update","message":"Your order ORD00001 status has been updated to PROCESSING","userId":"CUS00001","timestamp":"2025-02-24T09:47:07.9615171"}
-{"isRead":true,"id":"NOT00013","title":"Order Status Update","message":"Your order ORD00002 status has been updated to READY_FOR_TAKEAWAY","userId":"CUS00001","timestamp":"2025-02-24T09:47:19.4566058"}
-{"isRead":true,"id":"NOT00014","title":"Order Status Update","message":"Your order ORD00003 status has been updated to PROCESSING","userId":"CUS00001","timestamp":"2025-02-24T09:47:26.1350918"}
-{"isRead":true,"id":"NOT00015","title":"Order Status Update","message":"Your order ORD00004 status has been updated to PROCESSING","userId":"CUS00001","timestamp":"2025-02-24T09:47:30.9508986"}
-{"isRead":true,"id":"NOT00016","title":"Order Status Update","message":"Your order ORD00005 status has been updated to PROCESSING","userId":"CUS00001","timestamp":"2025-02-24T09:47:41.4960629"}
-{"isRead":false,"id":"NOT00017","message":"New order received: null","userId":"VDR00001","timestamp":"2025-02-24T09:49:20.0633526"}
-{"isRead":true,"id":"NOT00018","title":"Order Status Update","message":"Your order ORD00001 status has been updated to DINE_IN","userId":"CUS00001","timestamp":"2025-02-24T09:49:58.4523706"}
-{"isRead":true,"id":"NOT00019","title":"Order Status Update","message":"Your order ORD00002 status has been updated to DELIVERED","userId":"CUS00001","timestamp":"2025-02-24T09:54:03.6120075"}
-{"isRead":true,"id":"NOT00020","title":"Order Status Update","message":"Your order ORD00006 status has been updated to DINE_IN","userId":"CUS00001","timestamp":"2025-02-24T09:54:15.9526009"}
-{"isRead":true,"id":"NOT00021","title":"Complaint Updated","message":"Your complaint with ID: COM00001 has been updated.","userId":"CUS00001","timestamp":"2025-02-24T10:30:26.4242058"}
-{"isRead":false,"id":"NOT00022","message":"New order received: null","userId":"VDR00001","timestamp":"2025-02-24T10:33:07.2097665"}
-{"isRead":true,"id":"NOT00023","title":"New Delivery Task","message":"You have a new delivery task.","userId":"RUN00001","timestamp":"2025-02-24T10:33:07.2147533"}
-{"isRead":true,"id":"NOT00024","title":"Order Status Update","message":"Your order ORD00007 status has been updated to ON_THE_WAY","userId":"CUS00001","timestamp":"2025-02-24T11:29:17.3159772"}
-{"isRead":false,"id":"NOT00025","message":"New order received: null","userId":"VDR00001","timestamp":"2025-02-24T15:47:19.9879897"}
-{"isRead":true,"id":"NOT00026","title":"New Delivery Task","message":"You have a new delivery task.","userId":"RUN00001","timestamp":"2025-02-24T15:47:19.9950012"}
-{"isRead":true,"id":"NOT00027","title":"New Task","message":"New task assigned with ID: TAK00002","userId":"RUN00001","timestamp":"2025-02-24T15:47:19.9989607"}
-{"isRead":false,"id":"NOT00028","message":"New order received: null","userId":"VDR00002","timestamp":"2025-02-24T16:05:02.7927881"}
-{"isRead":true,"id":"NOT00029","title":"New Delivery Task","message":"You have a new delivery task.","userId":"RUN00001","timestamp":"2025-02-24T16:05:02.7970376"}
-{"isRead":true,"id":"NOT00030","title":"New Task","message":"New task assigned with ID: TAK00001","userId":"RUN00001","timestamp":"2025-02-24T16:05:02.7999994"}
-{"isRead":true,"id":"NOT00031","title":"New Delivery Task","message":"You have a new delivery task.","userId":"RUN00001","timestamp":"2025-02-24T16:06:35.7738381"}
-{"isRead":true,"id":"NOT00032","title":"New Delivery Task","message":"You have a new delivery task.","userId":"RUN00001","timestamp":"2025-02-24T16:10:51.1743622"}
-{"isRead":true,"id":"NOT00033","title":"New Delivery Task","message":"You have a new delivery task.","userId":"RUN00001","timestamp":"2025-02-24T16:11:37.8405253"}
-{"isRead":true,"id":"NOT00034","title":"New Delivery Task","message":"You have a new delivery task.","userId":"RUN00001","timestamp":"2025-02-24T16:12:42.3437568"}
-{"isRead":true,"id":"NOT00035","title":"New Delivery Task","message":"You have a new delivery task.","userId":"RUN00001","timestamp":"2025-02-24T16:15:24.2454201"}
-{"isRead":true,"id":"NOT00036","title":"New Delivery Task","message":"You have a new delivery task.","userId":"RUN00001","timestamp":"2025-02-24T16:15:30.0849485"}
-{"isRead":false,"id":"NOT00037","title":"Order Status Update","message":"Your order ORD00001 status has been updated to READY_FOR_PICKUP","userId":"CUS00001","timestamp":"2025-02-25T00:07:25.0068087"}
+{"isRead":true,"id":"NOT00044","title":"Order Updated","message":"Order ORD00002 isdelivered","userId":"CUS00001","timestamp":"2025-02-22 10:14:07"}
+{"isRead":true,"id":"NOT00045","title":"New Order","message":"New order received: ORD00003","userId":"VDR00003","timestamp":"2025-02-25 15:17:41"}
+{"isRead":true,"id":"NOT00046","title":"Order Updated","message":"Order ORD00003 is CANCELLED","userId":"CUS00001","timestamp":"2025-02-25 15:20:01"}
+{"isRead":true,"id":"NOT00047","title":"New Order","message":"New order received: ORD00004","userId":"VDR00003","timestamp":"2025-02-25 15:22:46"}
+{"isRead":false,"id":"NOT00048","title":"Order Updated","message":"Order ORD00004 is CANCELLED","userId":"CUS00001","timestamp":"2025-02-25 15:27:21"}
+{"isRead":true,"id":"NOT00049","title":"New Order","message":"New order received: ORD00005","userId":"VDR00003","timestamp":"2025-02-25 15:28:29"}
+{"isRead":false,"id":"NOT00050","title":"New Delivery Task","message":"You have a new delivery task.","userId":"RUN00003","timestamp":"2025-02-25 15:28:29"}
+{"isRead":false,"id":"NOT00051","title":"New Task","message":"New task assigned with ID: TAK00003","userId":"RUN00003","timestamp":"2025-02-25 15:28:30"}
+{"isRead":false,"id":"NOT00052","title":"Order Updated","message":"Order ORD00005 is RUNNER_ASSIGNED","userId":"CUS00001","timestamp":"2025-02-25 15:29:24"}
+{"isRead":true,"id":"NOT00053","title":"New Order","message":"New order received: ORD00006","userId":"VDR00003","timestamp":"2025-02-25 15:32:13"}
+{"isRead":false,"id":"NOT00054","title":"New Delivery Task","message":"You have a new delivery task.","userId":"RUN00003","timestamp":"2025-02-25 15:32:13"}
+{"isRead":false,"id":"NOT00055","title":"New Task","message":"New task assigned with ID: TAK00004","userId":"RUN00003","timestamp":"2025-02-25 15:32:13"}
+{"isRead":false,"id":"NOT00056","title":"Order Updated","message":"Order ORD00005 is READY_FOR_PICKUP","userId":"CUS00001","timestamp":"2025-02-25 15:36:05"}
+{"isRead":false,"id":"NOT00057","title":"Order Status Update","message":"Your order ORD00005 status has been updated to READY_FOR_PICKUP","userId":"CUS00001","timestamp":"2025-02-25 15:36:05"}
+{"isRead":false,"id":"NOT00058","title":"Order Updated","message":"Order ORD00005 is ON_THE_WAY","userId":"CUS00001","timestamp":"2025-02-25 15:36:33"}
+{"isRead":false,"id":"NOT00059","title":"Order Updated","message":"Order ORD00005 is DELIVERED","userId":"CUS00001","timestamp":"2025-02-25 15:36:59"}

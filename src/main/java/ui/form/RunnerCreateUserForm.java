@@ -183,6 +183,19 @@ public class RunnerCreateUserForm extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        // method to check duplicate email
+        if (RunnerService.checkDuplicateEmail(emailField.getText())) {
+            JOptionPane.showMessageDialog(this, "Email already exists", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // method to check duplicate phone number
+        if (RunnerService.checkDuplicatePhoneNumber(phoneField.getText())) {
+            JOptionPane.showMessageDialog(this, "Phone number already exists", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         RunnerDTO runner = new RunnerDTO();
         runner.setId(IdGenerationUtils.getNextId(ServiceType.RUNNER, null, null));
         runner.setName(nameField.getText());

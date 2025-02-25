@@ -61,7 +61,7 @@ public class VendorOrderDetailsForm extends JFrame {
         getContentPane().add(totalAmountField);
 
         getContentPane().add(new JLabel("Placement Time:"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         placementTimeField = new JTextField(order.getPlacementTime().format(formatter));
         placementTimeField.setEditable(false);
         getContentPane().add(placementTimeField);

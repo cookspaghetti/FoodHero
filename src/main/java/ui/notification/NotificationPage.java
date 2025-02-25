@@ -59,7 +59,7 @@ public class NotificationPage extends JFrame {
         notifications.sort((n1, n2) -> n2.getTimestamp().compareTo(n1.getTimestamp()));
         // Clear the table
         tableModel.setRowCount(0);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         // Add notifications based on the filter
         for (NotificationDTO notification : notifications) {
             if (filter.equals("All") || (filter.equals("Read") && notification.isRead()) || (filter.equals("Unread") && !notification.isRead())) {

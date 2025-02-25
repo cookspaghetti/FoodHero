@@ -50,7 +50,7 @@ public class CustomerOrderDetailsForm extends JFrame {
         getContentPane().add(new JLabel("RM " + String.valueOf(order.getTotalAmount())));
 
         getContentPane().add(new JLabel("Placement Time:"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         getContentPane().add(new JLabel(order.getPlacementTime().format(formatter)));
 
         getContentPane().add(new JLabel("Status:"));
@@ -99,7 +99,7 @@ public class CustomerOrderDetailsForm extends JFrame {
             addTransaction.setAmount(order.getTotalAmount());
             addTransaction.setDate(LocalDateTime.now());
             addTransaction.setDescription("Refund for order cancellation " + order.getId());
-            addTransaction.setAdminId(null);
+            addTransaction.setAdminId("");
             addTransaction.setPaymentMethod(PaymentMethod.REFUND);
             response = TransactionService.createAddTransaction(addTransaction);
             if (response != ResponseCode.SUCCESS) {

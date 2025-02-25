@@ -186,7 +186,12 @@ public class SessionControlService {
 		if (cartItems == null) {
 			cartItems = new HashMap<>();
 		}
-		cartItems.put(itemId, amount);
+		if (cartItems.containsKey(itemId)) {
+			amount += cartItems.get(itemId);
+			cartItems.put(itemId, amount);
+		} else {
+			cartItems.put(itemId, amount);
+		}
 	}
 
 	public static void removeFromCart(String itemId) {

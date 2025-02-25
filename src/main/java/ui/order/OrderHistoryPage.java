@@ -35,7 +35,7 @@ public class OrderHistoryPage extends JFrame {
 	private DefaultTableModel tableModel;
 	private JScrollPane tableScrollPane;
 
-	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 	public OrderHistoryPage() {
 		setTitle("Order History");
